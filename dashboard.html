@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Momstone · Coach Dashboard</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #171717;
+      --rose: #d8b8ac;
+      --rose-dark: #b88f7e;
+      --rose-light: #f5ede9;
+      --bg: #f8f5f3;
+      --bg-deep: #111;
+      --muted: #888;
+      --line: rgba(0,0,0,0.08);
+      --card: #ffffff;
+      --green: #7eab8f;
+      --amber: #c9a96e;
+    }
+
+    body {
+      font-family: 'Satoshi', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 220px;
+      height: 100vh;
+      background: var(--bg-deep);
+      padding: 32px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--rose);
+      letter-spacing: 4px;
+      text-transform: lowercase;
+      margin-bottom: 32px;
+    }
+
+    .sidebar-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      font-weight: 700;
+      margin: 16px 0 8px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      cursor: pointer;
+      transition: 0.15s;
+      text-decoration: none;
+    }
+
+    .sidebar-item:hover, .sidebar-item.active {
+      background: rgba(216,184,172,0.1);
+      color: var(--rose);
+    }
+
+    .sidebar-item .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.6;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: 220px;
+      padding: 40px 48px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .topbar-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .topbar-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .refresh-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 50px;
+      border: 1px solid var(--line);
+      background: white;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      font-family: 'Satoshi', sans-serif;
+      transition: 0.15s;
+    }
+
+    .refresh-btn:hover { background: var(--rose-light); border-color: var(--rose); }
+
+    /* ── KPI CARDS ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid var(--line);
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .kpi-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value span {
+      font-size: 16px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .kpi-note {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .kpi-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 50px;
+      margin-top: 4px;
+    }
+
+    .kpi-badge.up { background: rgba(126,171,143,0.12); color: var(--green); }
+    .kpi-badge.neutral { background: rgba(201,169,110,0.12); color: var(--amber); }
+
+    /* ── GRID LAYOUT ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+
+    /* ── CHART CARDS ── */
+    .chart-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid var(--line);
+    }
+
+    .chart-card.dark {
+      background: var(--bg-deep);
+      border-color: rgba(255,255,255,0.06);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .chart-card.dark .card-title { color: white; }
+
+    .card-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    /* ── DOMAIN BARS ── */
+    .domain-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .domain-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .domain-code {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--rose-dark);
+      letter-spacing: 1px;
+      width: 28px;
+      flex-shrink: 0;
+    }
+
+    .domain-name {
+      font-size: 12px;
+      color: var(--ink);
+      width: 100px;
+      flex-shrink: 0;
+    }
+
+    .domain-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--rose-light);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .domain-bar-inner {
+      height: 100%;
+      background: var(--rose-dark);
+      border-radius: 99px;
+      transition: width 0.8s ease;
+    }
+
+    .domain-score {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink);
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── PERSONA ── */
+    .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .persona-title-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .persona-label { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0 !important; }
+    .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+    .tooltip-icon { width: 15px; height: 15px; border-radius: 50%; background: var(--line); color: var(--muted); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .tooltip-box { display: none; position: absolute; left: 20px; top: -4px; background: #1c1c1c; color: #fff; font-size: 11px; line-height: 1.6; padding: 8px 12px; border-radius: 8px; width: 200px; z-index: 100; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+    .tooltip-wrap:hover .tooltip-box { display: block; }
+    .persona-month-bars { display: flex; align-items: flex-end; gap: 6px; height: 60px; margin-top: 4px; }
+    .persona-month-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+    .persona-month-bar { width: 100%; background: var(--rose); border-radius: 3px 3px 0 0; min-height: 2px; }
+    .persona-month-label { font-size: 9px; color: var(--muted); }
+    .persona-month-count { font-size: 9px; color: var(--ink); font-weight: 600; }
+
+    .persona-item { }
+
+    .persona-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .persona-bars { display: flex; flex-direction: column; gap: 6px; }
+
+    .persona-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .persona-bar-name {
+      width: 60px;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+
+    .persona-bar-wrap {
+      flex: 1;
+      height: 4px;
+      background: var(--rose-light);
+      border-radius: 99px;
+    }
+
+    .persona-bar-fill {
+      height: 100%;
+      background: var(--rose-dark);
+      border-radius: 99px;
+      transition: width 0.8s ease;
+    }
+
+    .persona-bar-count {
+      color: var(--muted);
+      width: 20px;
+      text-align: right;
+    }
+
+    /* ── RECENT TABLE ── */
+    .recent-table { width: 100%; border-collapse: collapse; }
+
+    .recent-table th {
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 0 0 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .recent-table td {
+      font-size: 13px;
+      color: var(--ink);
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+
+    .recent-table tr:last-child td { border-bottom: none; }
+
+    .score-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .score-high { background: rgba(126,171,143,0.12); color: var(--green); }
+    .score-mid { background: rgba(201,169,110,0.12); color: var(--amber); }
+    .score-low { background: rgba(184,143,126,0.12); color: var(--rose-dark); }
+
+    /* ── COACHING EFFECT ── */
+    .effect-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      gap: 12px;
+    }
+
+    .effect-empty-icon {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--rose-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .effect-empty-text {
+      font-size: 13px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    /* ── CLUSTER ── */
+    .cluster-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .cluster-item {
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(216,184,172,0.08);
+      border: 1px solid rgba(216,184,172,0.2);
+    }
+
+    .cluster-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--rose-dark);
+      margin-bottom: 4px;
+    }
+
+    .cluster-score {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .cluster-score span { font-size: 13px; color: var(--muted); font-weight: 400; }
+
+    .cluster-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+    /* ── LOADING ── */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-deep);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 9999;
+      transition: opacity 0.4s;
+    }
+
+    #loading.hide { opacity: 0; pointer-events: none; }
+
+    .loading-brand {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--rose);
+      letter-spacing: 4px;
+    }
+
+    .loading-dots { display: flex; gap: 8px; }
+
+    .loading-dots span {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--rose-dark);
+      opacity: 0.3;
+      animation: pulse 1.2s ease-in-out infinite;
+      display: block;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .loading-text { font-size: 13px; color: rgba(255,255,255,0.35); }
+
+    /* ── RADAR ── */
+    .radar-wrap { position: relative; width: 100%; max-width: 320px; margin: 0 auto; }
+
+    @media (max-width: 1200px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 로딩 -->
+<div id="loading">
+  <div class="loading-brand">momstone</div>
+  <div class="loading-dots">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="loading-text">데이터를 불러오는 중이에요</div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">momstone</div>
+
+  <div class="sidebar-label">대시보드</div>
+  <a class="sidebar-item active" href="#overview">
+    <span class="dot"></span> 개요
+  </a>
+  <a class="sidebar-item" href="#domains">
+    <span class="dot"></span> 도메인 분석
+  </a>
+  <a class="sidebar-item" href="#persona">
+    <span class="dot"></span> 페르소나
+  </a>
+  <a class="sidebar-item" href="#effect">
+    <span class="dot"></span> 코칭 효과
+  </a>
+  <a class="sidebar-item" href="#recent">
+    <span class="dot"></span> 최근 진단
+  </a>
+
+  <div class="sidebar-label" style="margin-top:auto;">코치</div>
+  <div style="font-size:12px; color:rgba(255,255,255,0.3); padding:8px 12px;">
+    Bora Coach<br>
+    <span style="font-size:10px;">coachborabora@gmail.com</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">코치 대시보드</div>
+      <div class="topbar-sub" id="last-updated">데이터 불러오는 중...</div>
+    </div>
+    <button class="refresh-btn" onclick="loadData()">
+      ↻ 새로고침
+    </button>
+  </div>
+
+  <!-- KPI -->
+  <section id="overview">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">총 진단 수</div>
+        <div class="kpi-value" id="kpi-total">—</div>
+        <div class="kpi-note">누적 리듬 체크 완료</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">전체 리듬 평균</div>
+        <div class="kpi-value" id="kpi-avg">—<span>/5</span></div>
+        <div class="kpi-note">11개 도메인 평균</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">이번 달 진단</div>
+        <div class="kpi-value" id="kpi-month">—</div>
+        <div class="kpi-note" id="kpi-month-note">이번 달 신규</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">재진단 완료</div>
+        <div class="kpi-value" id="kpi-repeat">—</div>
+        <div class="kpi-note">3개월 후 재진단</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 도메인 + 레이더 -->
+  <section id="domains">
+    <div class="grid-3">
+      <div class="chart-card">
+        <div class="card-title">도메인별 평균 점수</div>
+        <div class="card-sub">전체 참여자 기준 11개 영역 평균</div>
+        <div class="domain-list" id="domain-list"></div>
+      </div>
+      <div>
+        <div class="chart-card" style="margin-bottom:20px;">
+          <div class="card-title">리듬 지도</div>
+          <div class="card-sub">전체 평균 레이더</div>
+          <div class="radar-wrap">
+            <canvas id="radarChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="card-title">가장 낮은 영역 TOP 3</div>
+          <div class="card-sub">가장 주의가 필요한 도메인</div>
+          <div id="lowest-domains" style="display:flex;flex-direction:column;gap:10px;margin-top:4px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 클러스터 + 페르소나 -->
+  <section id="persona">
+    <div class="grid-2">
+      <div class="chart-card">
+        <div class="card-title">4개 클러스터 평균</div>
+        <div class="card-sub">연관 도메인 그룹별 흐름</div>
+        <div class="cluster-grid" id="cluster-grid"></div>
+      </div>
+      <div class="chart-card">
+        <div class="card-title">참여자 페르소나</div>
+        <div class="card-sub">연령대 및 활동 유형 분포</div>
+        <div class="persona-grid" id="persona-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 코칭 효과 -->
+  <section id="effect">
+    <div class="chart-card" style="margin-bottom:20px;">
+      <div class="card-title">코칭 효과 — 3개월 전후 비교</div>
+      <div class="card-sub">동일 이메일의 재진단 데이터 기반</div>
+      <div id="effect-area"></div>
+    </div>
+  </section>
+
+  <!-- 최근 진단 -->
+  <section id="recent">
+    <div class="chart-card">
+      <div class="card-title">최근 진단 현황</div>
+      <div class="card-sub">최근 10명의 리듬 체크 요약</div>
+      <table class="recent-table">
+        <thead>
+          <tr>
+            <th>닉네임</th>
+            <th>연령대</th>
+                        <th>전체평균</th>
+            <th>최저도메인</th>
+            <th>날짜</th>
+          </tr>
+        </thead>
+        <tbody id="recent-body"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
+
+const DOMAINS = [
+  { code: 'EB', kr: '심리 상태',    en: 'Emotional Balance' },
+  { code: 'EN', kr: '에너지 관리',  en: 'Energy Management' },
+  { code: 'RE', kr: '회복탄력성',   en: 'Resilience' },
+  { code: 'SM', kr: '강점·동기',    en: 'Strengths & Motivation' },
+  { code: 'ID', kr: '정체감·역할통합', en: 'Identity Integration' },
+  { code: 'RS', kr: '관계 자원',    en: 'Relational Support' },
+  { code: 'VA', kr: '가치·의미',    en: 'Values Alignment' },
+  { code: 'SC', kr: '자기연민',     en: 'Self-Compassion' },
+  { code: 'VG', kr: '비전·성장의지', en: 'Vision & Growth' },
+  { code: 'TP', kr: '시간·우선순위', en: 'Time & Priority' },
+  { code: 'LS', kr: '삶의 만족도',  en: 'Life Satisfaction' },
+];
+
+const CLUSTERS = [
+  { name: '감정·에너지', keys: ['EB','EN'], desc: 'Emotional Flow' },
+  { name: '회복·정체감', keys: ['RE','SM','ID'], desc: 'Resilience Flow' },
+  { name: '의미·만족',   keys: ['VA','VG','LS'], desc: 'Meaning Flow' },
+  { name: '에너지 지수', keys: ['RS','SC','TP'], desc: 'Energy Index' },
+];
+
+let radarChart = null;
+
+async function loadData() {
+  dismissLoading();
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?dashboard=true`);
+    const json = await res.json();
+    if (json.result !== 'success') throw new Error(json.message);
+    if (json.data && json.data.length > 0) {
+      console.log('KEY LIST:', Object.keys(json.data[0]));
+      console.log('ROW SAMPLE:', JSON.stringify(json.data[0]));
+    }
+    renderData(json.data);
+  } catch(err) {
+    console.error('데이터 로드 오류:', err);
+    renderData(null);
+  }
+}
+
+// 여러 키명을 시도하는 헬퍼
+function getField(r, ...keys) {
+  for (const k of keys) {
+    if (r[k] !== undefined && r[k] !== null && r[k] !== '') return String(r[k]);
+  }
+  return '';
+}
+
+function renderData(rows) {
+
+  const now = new Date();
+  document.getElementById('last-updated').textContent =
+    `마지막 업데이트: ${now.toLocaleDateString('ko-KR')} ${now.toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'})}`;
+
+  // 운영 시작일 필터 (2026-05-05 이후) + test 닉네임 제외
+  const START_DATE = new Date(2026, 4, 5); // 2026-05-05 (월은 0-indexed)
+  rows = rows.filter(r => {
+    const rawTs = getField(r, 'timestamp','Timestamp','타임스탬프','Date','date','제출시간','응답시간','createdAt');
+    const d = new Date(rawTs);
+    const isAfterStart = !isNaN(d) && d >= START_DATE;
+    const nick = getField(r, 'Name','nickname','닉네임','Nickname','nick','이름');
+    const isNotTest = !nick.toLowerCase().includes('test');
+    return isAfterStart && isNotTest;
+  });
+
+  if (!rows || rows.length === 0) {
+    renderEmpty();
+    return;
+  }
+
+  // ── KPI ──────────────────────────────────────────────────────────
+  const total = rows.length;
+  document.getElementById('kpi-total').textContent = total;
+
+  // 전체 평균
+  const allAvgs = rows.map(r => domainAvg(r));
+  const overallAvg = avg(allAvgs);
+  document.getElementById('kpi-avg').innerHTML = `${overallAvg.toFixed(1)}<span>/5</span>`;
+
+  // 이번 달
+  const thisMonth = now.getMonth();
+  const thisYear = now.getFullYear();
+  const monthCount = rows.filter(r => {
+    const d = new Date(r.timestamp);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  }).length;
+  document.getElementById('kpi-month').textContent = monthCount;
+
+  // 재진단 (같은 이메일 2회 이상)
+  const emailMap = {};
+  rows.forEach(r => {
+    if (r.email) emailMap[r.email] = (emailMap[r.email] || 0) + 1;
+  });
+  const repeatCount = Object.values(emailMap).filter(v => v >= 2).length;
+  document.getElementById('kpi-repeat').textContent = repeatCount;
+
+  // ── 도메인 평균 ──────────────────────────────────────────────────
+  const domainAvgs = DOMAINS.map(d => {
+    const vals = rows.map(r => parseFloat(r[`${d.code}_score`]) || 0).filter(v => v > 0);
+    return { ...d, avg: vals.length ? avg(vals) : 0 };
+  });
+
+  const domainList = document.getElementById('domain-list');
+  domainList.innerHTML = domainAvgs.map(d => `
+    <div class="domain-row">
+      <div class="domain-code">${d.code}</div>
+      <div class="domain-name">${d.kr}</div>
+      <div class="domain-bar-wrap">
+        <div class="domain-bar-inner" style="width:${(d.avg/5)*100}%"></div>
+      </div>
+      <div class="domain-score">${d.avg.toFixed(1)}</div>
+    </div>
+  `).join('');
+
+  // ── 레이더 차트 ───────────────────────────────────────────────────
+  const radarData = domainAvgs.map(d => (d.avg / 5) * 100);
+  const radarLabels = domainAvgs.map(d => d.kr);
+
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: radarLabels,
+      datasets: [{
+        data: radarData,
+        backgroundColor: 'rgba(184,143,126,0.15)',
+        borderColor: '#b88f7e',
+        borderWidth: 2,
+        pointBackgroundColor: '#b88f7e',
+        pointRadius: 3,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false },
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          pointLabels: { font: { size: 9, family: 'Satoshi' }, color: '#888' }
+        }
+      }
+    }
+  });
+
+  // ── TOP 3 낮은 도메인 ─────────────────────────────────────────────
+  const sorted = [...domainAvgs].sort((a, b) => a.avg - b.avg);
+  const lowestEl = document.getElementById('lowest-domains');
+  lowestEl.innerHTML = sorted.slice(0, 3).map((d, i) => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);">
+      <div style="font-size:18px;font-weight:700;color:var(--rose-dark);width:20px;">${i+1}</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink);">${d.kr}</div>
+        <div style="font-size:11px;color:var(--muted);">${d.en}</div>
+      </div>
+      <div style="margin-left:auto;font-size:16px;font-weight:700;color:var(--rose-dark);">${d.avg.toFixed(1)}</div>
+    </div>
+  `).join('');
+
+  // ── 클러스터 ─────────────────────────────────────────────────────
+  const clusterGrid = document.getElementById('cluster-grid');
+  clusterGrid.innerHTML = CLUSTERS.map(c => {
+    const vals = c.keys.flatMap(k => rows.map(r => parseFloat(r[`${k}_score`]) || 0).filter(v => v > 0));
+    const score = vals.length ? avg(vals) : 0;
+    return `
+      <div class="cluster-item">
+        <div class="cluster-name">${c.name}</div>
+        <div class="cluster-score">${score.toFixed(1)}<span>/5</span></div>
+        <div class="cluster-desc">${c.desc}</div>
+      </div>
+    `;
+  }).join('');
+
+  // ── 페르소나 ─────────────────────────────────────────────────────
+  const ageMap = countBy(rows.map(r => ({...r, age: getField(r,'age','Year','연령대','Age','ageGroup','나이')})), 'age');
+
+  // 최저 도메인 분포
+  const lowestDomainMap = countBy(rows.map(r => ({...r, lowestDomain: getField(r,'최저도메인 이름','최저 도메인','lowest_domain') || (() => {
+    const domScores = ['EB','EN','RE','SM','ID','RS','VA','SC','VG','TP','LS'].map(code => ({code, val: parseFloat(r[code+'_score'])||0}));
+    domScores.sort((a,b)=>a.val-b.val);
+    return domScores[0]?.code || '';
+  })()})), 'lowestDomain');
+
+  // 리셋 포인트 분포
+  const resetMap = countBy(rows.map(r => ({...r, reset: getField(r,'Reset_Point','reset_point','리셋포인트') || '미확인'})), 'reset');
+
+  // 월별 참여 추이
+  const monthMap = {};
+  rows.forEach(r => {
+    const ts = getField(r,'timestamp','Timestamp','타임스탬프','Date','date');
+    const d = new Date(ts);
+    if (!isNaN(d)) {
+      const key = (d.getMonth()+1) + '월';
+      monthMap[key] = (monthMap[key]||0) + 1;
+    }
+  });
+  const monthKeys = Object.keys(monthMap).sort((a,b) => parseInt(a)-parseInt(b));
+  const monthMax = Math.max(...Object.values(monthMap), 1);
+
+  const personaGrid = document.getElementById('persona-grid');
+  personaGrid.innerHTML = `
+    <div class="persona-item">
+      <div class="persona-title-row">
+        <div class="persona-label">연령대</div>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-box">어떤 연령대가 주로 오는지 파악해 마케팅 타겟과 메시지를 조정하는 데 활용해요.</div>
+        </div>
+      </div>
+      <div class="persona-bars">${renderPersonaBars(ageMap, total)}</div>
+    </div>
+    <div class="persona-item">
+      <div class="persona-title-row">
+        <div class="persona-label">최저 도메인</div>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-box">참여자들이 공통적으로 약한 영역을 파악해 코칭 커리큘럼 설계와 콘텐츠 방향 결정에 활용해요.</div>
+        </div>
+      </div>
+      <div class="persona-bars">${renderPersonaBars(lowestDomainMap, total)}</div>
+    </div>
+    <div class="persona-item">
+      <div class="persona-title-row">
+        <div class="persona-label">리셋 포인트</div>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-box">참여자들이 어떤 계기로 진단을 받으러 왔는지 파악해 랜딩페이지 카피와 광고 메시지 최적화에 활용해요.</div>
+        </div>
+      </div>
+      <div class="persona-bars">${renderPersonaBars(resetMap, total)}</div>
+    </div>
+    <div class="persona-item">
+      <div class="persona-title-row">
+        <div class="persona-label">월별 참여 추이</div>
+        <div class="tooltip-wrap">
+          <div class="tooltip-icon">?</div>
+          <div class="tooltip-box">언제 참여자가 몰리는지 파악해 프로모션 타이밍과 운영 계획 수립에 활용해요.</div>
+        </div>
+      </div>
+      <div class="persona-month-bars">
+        ${monthKeys.map(m => `
+          <div class="persona-month-col">
+            <div class="persona-month-count">${monthMap[m]}</div>
+            <div class="persona-month-bar" style="height:${Math.round((monthMap[m]/monthMax)*50)}px;"></div>
+            <div class="persona-month-label">${m}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // ── 코칭 효과 ─────────────────────────────────────────────────────
+  const effectArea = document.getElementById('effect-area');
+  const paired = findPairs(rows, emailMap);
+
+  if (paired.length === 0) {
+    effectArea.innerHTML = `
+      <div class="effect-empty">
+        <div class="effect-empty-icon">🌱</div>
+        <div class="effect-empty-text">
+          아직 재진단 데이터가 없어요.<br>
+          3개월 후 재진단이 완료되면 코칭 효과가 자동으로 표시돼요.
+        </div>
+      </div>
+    `;
+  } else {
+    const avgBefore = avg(paired.map(p => p.before));
+    const avgAfter  = avg(paired.map(p => p.after));
+    const diff = avgAfter - avgBefore;
+    effectArea.innerHTML = `
+      <div style="display:flex;gap:32px;align-items:center;padding:20px 0;">
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">코칭 전</div>
+          <div style="font-size:48px;font-weight:700;color:var(--ink);">${avgBefore.toFixed(1)}<span style="font-size:20px;color:var(--muted);">/5</span></div>
+        </div>
+        <div style="font-size:32px;color:var(--rose-dark);">→</div>
+        <div style="text-align:center;">
+          <div style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">코칭 후</div>
+          <div style="font-size:48px;font-weight:700;color:var(--green);">${avgAfter.toFixed(1)}<span style="font-size:20px;color:var(--muted);">/5</span></div>
+        </div>
+        <div style="margin-left:auto;padding:20px 28px;background:rgba(126,171,143,0.1);border-radius:16px;text-align:center;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">평균 향상</div>
+          <div style="font-size:36px;font-weight:700;color:var(--green);">+${diff.toFixed(1)}</div>
+          <div style="font-size:12px;color:var(--muted);">${paired.length}명 기준</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ── 최근 진단 ─────────────────────────────────────────────────────
+  const recent = [...rows].sort((a, b) => new Date(getField(b,'timestamp','Timestamp','타임스탬프','Date','date','제출시간','응답시간','createdAt')) - new Date(getField(a,'timestamp','Timestamp','타임스탬프','Date','date','제출시간','응답시간','createdAt'))).slice(0, 10);
+  const tbody = document.getElementById('recent-body');
+  tbody.innerHTML = recent.map(r => {
+    const a = domainAvg(r);
+    const scoreClass = a >= 3.5 ? 'score-high' : a >= 2.5 ? 'score-mid' : 'score-low';
+    const domScores = DOMAINS.map(d => ({ code: d.code, kr: d.kr, val: parseFloat(r[`${d.code}_score`]) || 0 }));
+    const lowest = domScores.sort((a,b) => a.val - b.val)[0];
+    const date = new Date(getField(r,'timestamp','Timestamp','타임스탬프','Date','date','제출시간','응답시간','createdAt')).toLocaleDateString('ko-KR', {month:'short', day:'numeric'});
+    return `
+      <tr>
+        <td style="font-weight:600;">${getField(r,'Name','nickname','닉네임','Nickname','nick','이름') || '—'}</td>
+        <td style="color:var(--muted);">${getField(r,'age','Year','연령대','Age','ageGroup','나이') || '—'}</td>
+        <td><span class="score-chip ${scoreClass}">${a.toFixed(1)}</span></td>
+        <td style="font-size:12px;color:var(--rose-dark);">${lowest.kr}</td>
+        <td style="color:var(--muted);">${date}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderEmpty() {
+  document.getElementById('kpi-total').textContent = '0';
+  document.getElementById('kpi-avg').innerHTML = '—';
+  document.getElementById('kpi-month').textContent = '0';
+  document.getElementById('kpi-repeat').textContent = '0';
+  document.getElementById('domain-list').innerHTML = '<div style="color:var(--muted);font-size:13px;padding:20px 0;">아직 데이터가 없어요.</div>';
+  document.getElementById('effect-area').innerHTML = '<div class="effect-empty"><div class="effect-empty-icon">🌱</div><div class="effect-empty-text">아직 데이터가 없어요.</div></div>';
+  document.getElementById('recent-body').innerHTML = '<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px;">아직 진단 데이터가 없어요.</td></tr>';
+}
+
+// ── 유틸 ────────────────────────────────────────────────────────────
+function avg(arr) {
+  return arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : 0;
+}
+
+function domainAvg(r) {
+  const vals = DOMAINS.map(d => parseFloat(r[`${d.code}_score`]) || 0).filter(v => v > 0);
+  return vals.length ? avg(vals) : 0;
+}
+
+function countBy(rows, key) {
+  const map = {};
+  rows.forEach(r => {
+    const val = r[key] || '미응답';
+    map[val] = (map[val] || 0) + 1;
+  });
+  return map;
+}
+
+function renderPersonaBars(map, total) {
+  return Object.entries(map)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 5)
+    .map(([name, count]) => `
+      <div class="persona-bar-row">
+        <div class="persona-bar-name">${name}</div>
+        <div class="persona-bar-wrap">
+          <div class="persona-bar-fill" style="width:${(count/total)*100}%"></div>
+        </div>
+        <div class="persona-bar-count">${count}</div>
+      </div>
+    `).join('');
+}
+
+function findPairs(rows, emailMap) {
+  const paired = [];
+  const repeatEmails = Object.entries(emailMap).filter(([,v]) => v >= 2).map(([k]) => k);
+  repeatEmails.forEach(email => {
+    const userRows = rows.filter(r => r.email === email).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp));
+    if (userRows.length >= 2) {
+      paired.push({
+        before: domainAvg(userRows[0]),
+        after:  domainAvg(userRows[userRows.length - 1])
+      });
+    }
+  });
+  return paired;
+}
+
+function dismissLoading() {
+  const el = document.getElementById('loading');
+  el.classList.add('hide');
+  setTimeout(() => {
+    el.remove();
+    // 로딩 완료 후 비밀번호 체크
+    const saved = sessionStorage.getItem('momstone_dash_auth');
+    if (saved !== 'ok') {
+      const pw = prompt('Momstone 코치 대시보드\n\n비밀번호를 입력해주세요.');
+      if (pw === 'momstone2026') {
+        sessionStorage.setItem('momstone_dash_auth', 'ok');
+      } else {
+        document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Satoshi,sans-serif;color:#888;font-size:14px;">접근 권한이 없어요.</div>';
+      }
+    }
+  }, 450);
+}
+
+// 시작
+loadData();
+</script>
+
+</body>
+</html>

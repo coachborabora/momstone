@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나의 리듬 리포트 | Momstone</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --rose: #d8b8ac;
+      --rose-dark: #b88f7e;
+      --rose-light: #f0e4de;
+      --ink: #171717;
+      --ink-soft: #1e1e1e;
+      --muted: #666;
+      --line: rgba(0,0,0,0.08);
+      --bg: #ffffff;
+      --bg-soft: #f8f5f3;
+      --bg-deep: #111111;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Satoshi', sans-serif; background: var(--bg); color: var(--ink-soft); line-height: 1.8; -webkit-font-smoothing: antialiased; }
+
+    /* PRINT */
+    @media print {
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      body { background: white; }
+      .cover { min-height: auto; padding: 60px 40px; }
+    }
+
+    /* NAV */
+    .topbar { background: var(--bg-deep); color: rgba(255,255,255,0.5); padding: 10px 24px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+    .topbar-brand { color: var(--rose); font-weight: 700; }
+    .print-btn { background: var(--rose-dark); color: white; border: none; padding: 6px 16px; border-radius: 50px; font-size: 11px; font-family: 'Satoshi', sans-serif; cursor: pointer; font-weight: 700; letter-spacing: 1px; transition: 0.2s; }
+    .print-btn:hover { background: var(--rose); }
+
+    /* COVER */
+    .cover { background: linear-gradient(160deg, #0f0f0f 0%, #1c1a19 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 80px 48px; position: relative; overflow: hidden; }
+    .cover::before { content: ""; position: absolute; width: 500px; height: 500px; border-radius: 50%; background: rgba(216,184,172,0.05); top: -200px; right: -150px; }
+    .cover::after { content: ""; position: absolute; width: 300px; height: 300px; border-radius: 50%; background: rgba(216,184,172,0.04); bottom: -100px; left: -80px; }
+    .cover-inner { max-width: 640px; position: relative; z-index: 1; }
+    .cover-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose); font-weight: 700; margin-bottom: 20px; }
+    .cover-title { font-size: clamp(36px, 6vw, 56px); font-weight: 300; color: white; line-height: 1.1; margin-bottom: 24px; }
+    .cover-title strong { font-weight: 700; color: var(--rose); }
+    .cover-meta { display: flex; gap: 32px; margin-top: 48px; }
+    .cover-meta-item { }
+    .cover-meta-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+    .cover-meta-value { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 500; }
+    .cover-divider { width: 48px; height: 2px; background: var(--rose-dark); margin: 32px 0; }
+    .cover-desc { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.9; max-width: 42ch; }
+
+    /* SECTION WRAPPER */
+    .section { max-width: 800px; margin: 0 auto; padding: 72px 24px; }
+    .section-sm { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+
+    /* SECTION LABEL */
+    .section-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-dark); font-weight: 700; margin-bottom: 12px; }
+    .section-title { font-size: clamp(22px, 4vw, 32px); font-weight: 500; color: var(--ink); margin-bottom: 8px; line-height: 1.2; }
+    .section-sub { font-size: 14px; color: var(--muted); line-height: 1.9; margin-bottom: 40px; }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--line); max-width: 800px; margin: 0 auto; }
+
+    /* RADAR */
+    .radar-wrap { max-width: 480px; margin: 0 auto 40px; }
+
+    /* STABILITY CARD */
+    .stability-card { background: var(--bg-deep); border-radius: 20px; padding: 32px; margin-top: 32px; display: flex; align-items: center; gap: 32px; }
+    .stability-score { font-size: 56px; font-weight: 700; color: var(--rose); line-height: 1; }
+    .stability-score span { font-size: 20px; color: rgba(255,255,255,0.4); font-weight: 400; }
+    .stability-text { }
+    .stability-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+    .stability-summary { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.8; }
+
+    /* CLUSTER GRID */
+    .cluster-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .cluster-card { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+    .cluster-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .cluster-name { font-size: 12px; font-weight: 700; color: var(--ink); letter-spacing: 0.5px; }
+    .cluster-score { font-size: 24px; font-weight: 700; color: var(--rose-dark); }
+    .cluster-bar-bg { height: 4px; background: var(--line); border-radius: 4px; margin-bottom: 12px; }
+    .cluster-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--rose-dark), var(--rose)); }
+    .cluster-summary { font-size: 12px; color: var(--muted); line-height: 1.75; }
+
+    /* HIGHLIGHT CARD */
+    .highlight-card { border-radius: 20px; padding: 32px; margin-bottom: 16px; }
+    .highlight-card.low { background: linear-gradient(135deg, #1c1a19, #241f1d); border: 1px solid rgba(216,184,172,0.15); }
+    .highlight-card.reset { background: var(--rose-light); border: 1px solid rgba(184,143,126,0.2); }
+    .highlight-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+    .highlight-card.low .highlight-label { color: var(--rose); }
+    .highlight-card.reset .highlight-label { color: var(--rose-dark); }
+    .highlight-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }
+    .highlight-card.low .highlight-title { color: white; }
+    .highlight-card.reset .highlight-title { color: var(--ink); }
+    .highlight-text { font-size: 13px; line-height: 1.85; }
+    .highlight-card.low .highlight-text { color: rgba(255,255,255,0.65); }
+    .highlight-card.reset .highlight-text { color: var(--ink-soft); }
+
+    /* DOMAIN CARDS */
+    .domain-list { display: grid; gap: 24px; }
+    .domain-card { background: var(--bg); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; transition: box-shadow 0.2s; }
+    .domain-card:hover { box-shadow: 0 12px 32px rgba(0,0,0,0.07); }
+    .domain-header { padding: 24px 28px 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); }
+    .domain-name-wrap { }
+    .domain-code { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--rose-dark); margin-bottom: 4px; }
+    .domain-name-kr { font-size: 18px; font-weight: 600; color: var(--ink); line-height: 1.2; }
+    .domain-name-en { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .domain-score-wrap { text-align: right; flex-shrink: 0; }
+    .domain-score { font-size: 32px; font-weight: 700; color: var(--rose-dark); line-height: 1; }
+    .domain-score-max { font-size: 12px; color: var(--muted); }
+    .domain-stage { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px; margin-top: 6px; }
+    .stage-A { background: #e8f5e9; color: #2e7d32; }
+    .stage-B { background: #e3f2fd; color: #1565c0; }
+    .stage-C { background: #fff8e1; color: #f57f17; }
+    .stage-D { background: #fbe9e7; color: #bf360c; }
+    .stage-E { background: #f3e5f5; color: #6a1b9a; }
+    .domain-body { padding: 24px 28px; display: grid; gap: 18px; }
+    .domain-field { }
+    .domain-field-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .domain-field-text { font-size: 13px; color: var(--ink-soft); line-height: 1.8; }
+    .domain-expression { font-size: 13px; color: var(--rose-dark); font-weight: 500; background: var(--rose-light); padding: 8px 14px; border-radius: 8px; display: inline-block; }
+    .domain-emotions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .emotion-tag { font-size: 11px; padding: 4px 10px; border-radius: 50px; background: var(--bg-soft); border: 1px solid var(--line); color: var(--muted); }
+    .domain-question { font-size: 14px; color: var(--ink); font-style: italic; line-height: 1.7; padding-left: 14px; border-left: 3px solid var(--rose-dark); }
+    .domain-action { font-size: 13px; color: var(--ink-soft); line-height: 1.9; white-space: pre-line; }
+    .domain-bar-wrap { margin-top: 4px; height: 4px; background: var(--line); border-radius: 4px; }
+    .domain-bar { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--rose-dark), var(--rose)); }
+
+    /* CTA */
+    .cta-section { background: linear-gradient(160deg, #0f0f0f, #1c1a19); padding: 80px 24px; text-align: center; }
+    .cta-inner { max-width: 520px; margin: 0 auto; }
+    .cta-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose); font-weight: 700; margin-bottom: 16px; }
+    .cta-title { font-size: clamp(22px, 4vw, 32px); font-weight: 500; color: white; line-height: 1.3; margin-bottom: 12px; }
+    .cta-sub { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.9; margin-bottom: 32px; }
+    .btn-cta { display: inline-flex; align-items: center; gap: 8px; padding: 16px 36px; background: var(--rose-dark); color: white; border-radius: 999px; font-size: 15px; font-weight: 700; font-family: 'Satoshi', sans-serif; text-decoration: none; transition: 0.2s; }
+    .btn-cta:hover { background: var(--rose); }
+    .cta-note { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 14px; }
+
+    /* FOOTER */
+    footer { background: #080808; padding: 24px; text-align: center; }
+    .footer-brand { font-size: 14px; color: var(--rose); letter-spacing: 3px; font-weight: 500; }
+    .footer-copy { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+    /* ERROR */
+    .error-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+    .error-title { font-size: 24px; font-weight: 500; color: var(--ink); margin-bottom: 8px; }
+    .error-sub { font-size: 14px; color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .cover { padding: 60px 24px; }
+      .cluster-grid { grid-template-columns: 1fr; }
+      .stability-card { flex-direction: column; gap: 16px; }
+      .domain-header { flex-direction: column; gap: 12px; }
+      .domain-score-wrap { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar no-print">
+  <span class="topbar-brand">momstone</span>
+  <button class="print-btn" onclick="window.print()">PDF 저장</button>
+</div>
+
+<div id="app"></div>
+
+<script>
+// ─── Apps Script URL ─────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
+
+// ─── 데이터 파싱 ─────────────────────────────────────────────────────────────
+function parseData(r) {
+  const get = (k, def='') => (r[k] !== undefined && r[k] !== null && r[k] !== '') ? String(r[k]) : def;
+  const num = (k) => parseFloat(get(k, '0')) || 0;
+
+  return {
+    name:       get('Name', '익명'),
+    date:       get('Date', new Date().toLocaleDateString('ko-KR')),
+    stability:  num('Overall Average_score'),
+    stability_summary: get('Stability_summary', ''),
+    overall_avg: (function() {
+      const keys = ['EB_score','EN_score','RE_score','SM_score','ID_score','RS_score','VA_score','SC_score','VG_score','TP_score','LS_score'];
+      const vals = keys.map(k => parseFloat(r[k]) || 0);
+      return Math.round((vals.reduce((a,b) => a+b, 0) / vals.length) * 10) / 10;
+    })(),
+
+    ef_score:   num('EF_score'),
+    ef_summary: get('EF_Summary', ''),
+    rf_score:   num('RF_score'),
+    rf_summary: get('RF_Summary', ''),
+    mf_score:   num('MF_score'),
+    mf_summary: get('MF_Summary', ''),
+    ei_score:   num('EI_score'),
+    ei_summary: get('EI_Summary', ''),
+
+    lowest:      get('최저도메인 이름', ''),
+    reset_point:  get('Reset_Point', ''),
+    reset_reason: get('Reset_Reason', ''),
+    reset_signal: get('Reset_Signal', ''),
+    reset_action: get('Reset_Action', ''),
+    reset_bridge: get('Reset_Bridge', ''),
+
+    domains: [
+      { code:'EB', kr:'심리 상태', en:'Emotional Balance',
+        score: num('EB_score'), stage: get('EF_stage',''),
+        expression: get('EB_expression',''), summary: get('EB_summary',''),
+        emotions: get('EB_emotions',''), question: get('EB_question',''), action: get('EB_action','') },
+      { code:'EN', kr:'에너지 관리', en:'Energy Management',
+        score: num('EN_score'), stage: get('EN_stage',''),
+        expression: get('EN_expression',''), summary: get('EN_summary',''),
+        emotions: get('EN_emotions',''), question: get('EN_question',''), action: get('EN_action','') },
+      { code:'RE', kr:'회복탄력성', en:'Resilience',
+        score: num('RE_score'), stage: get('RE_stage',''),
+        expression: get('RE_expression',''), summary: get('RE_summary',''),
+        emotions: get('RE_emotions',''), question: get('RE_question',''), action: get('RE_action','') },
+      { code:'SM', kr:'강점·동기', en:'Strengths & Motivation',
+        score: num('SM_score'), stage: get('SM_stage',''),
+        expression: get('SM_expression',''), summary: get('SM_summary',''),
+        emotions: get('SM_emotions',''), question: get('SM_question',''), action: get('SM_action','') },
+      { code:'ID', kr:'정체감·역할통합', en:'Identity Integration',
+        score: num('ID_score'), stage: get('ID_stage',''),
+        expression: get('ID_expression',''), summary: get('ID_summary',''),
+        emotions: get('ID_emotions',''), question: get('ID_question',''), action: get('ID_action','') },
+      { code:'RS', kr:'관계 자원', en:'Relational Support',
+        score: num('RS_score'), stage: get('RS_stage',''),
+        expression: get('RS_expression',''), summary: get('RS_summary',''),
+        emotions: get('RS_emotions',''), question: get('RS_question',''), action: get('RS_action','') },
+      { code:'VA', kr:'가치·의미', en:'Values Alignment',
+        score: num('VA_score'), stage: get('VA_stage',''),
+        expression: get('VA_expression',''), summary: get('VA_summary',''),
+        emotions: get('VA_emotions',''), question: get('VA_question',''), action: get('VA_action','') },
+      { code:'SC', kr:'자기연민', en:'Self-Compassion',
+        score: num('SC_score'), stage: get('SC_stage',''),
+        expression: get('SC_expression',''), summary: get('SC_summary',''),
+        emotions: get('SC_emotions',''), question: get('SC_question',''), action: get('SC_action','') },
+      { code:'VG', kr:'비전·성장의지', en:'Vision & Growth',
+        score: num('VG_score'), stage: get('VG_stage',''),
+        expression: get('VG_expression',''), summary: get('VG_summary',''),
+        emotions: get('VG_emotions',''), question: get('VG_question',''), action: get('VG_action','') },
+      { code:'TP', kr:'시간·우선순위', en:'Time & Priority',
+        score: num('TP_score'), stage: get('TP_stage',''),
+        expression: get('TP_expression',''), summary: get('TP_summary',''),
+        emotions: get('TP_emotions',''), question: get('TP_question',''), action: get('TP_action','') },
+      { code:'LS', kr:'삶의 만족도', en:'Life Satisfaction',
+        score: num('LS_score'), stage: get('LS_stage',''),
+        expression: get('LS_expression',''), summary: get('LS_summary',''),
+        emotions: get('LS_emotions',''), question: get('LS_question',''), action: get('LS_action','') },
+    ]
+  };
+}
+
+function stageClass(stage) {
+  const s = (stage || '').charAt(0).toUpperCase();
+  return 'stage-' + (s || 'C');
+}
+
+function stageLabel(stage) {
+  const map = {
+    'A': 'Flowing Harmony', 'B': 'Balanced Awareness',
+    'C': 'Transitional Flow', 'D': 'Fragmented Rhythm', 'E': 'Silent Exhaustion'
+  };
+  return map[stage] || stage;
+}
+
+function pct(score) {
+  return Math.round((score / 5) * 100);
+}
+
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function render() {
+  const params = new URLSearchParams(window.location.search);
+  const row = params.get('row');
+
+  let d;
+
+  if (row) {
+    document.getElementById('app').innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Satoshi,sans-serif;color:#666;font-size:15px;">리포트를 불러오는 중...</div>';
+    
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}`);
+        const json = await res.json();
+        if (json.result !== 'success') throw new Error(json.message);
+        const parsed = parseData(json.data);
+        d = parsed;
+        break;
+      } catch(err) {
+        if (attempt === 2) {
+          document.getElementById('app').innerHTML = `<div class="error-wrap"><div class="error-title">데이터를 불러올 수 없어요</div><div class="error-sub">${err.message}</div></div>`;
+          return;
+        }
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
+
+    if (!d) {
+      document.getElementById('app').innerHTML = '<div class="error-wrap"><div class="error-title">리포트 준비 중이에요</div><div class="error-sub">잠시 후 페이지를 새로고침해주세요.</div></div>';
+      return;
+    }
+  } else {
+    // row 파라미터 없으면 샘플 데이터로 미리보기
+    const hasData = false;
+    if (!hasData) {
+    const sampleUrl = '?name=미리보기&date=2026-04-29&stability=3.6' +
+      '&stability_summary=전반적인 흐름은 유지되고 있지만, 한두 영역에서 피로나 부담이 느껴질 수 있는 시기예요.' +
+      '&ef=3.3&ef_summary=감정과 에너지를 알고는 있지만, 버티느라 나를 돌보는 일이 자주 뒤로 밀려요.' +
+      '&rf=3.0&rf_summary=회복과 정체감이 흔들릴 때가 있지만, 다시 일어서고 싶다는 마음이 자라고 있는 시기예요.' +
+      '&mf=3.7&mf_summary=삶의 의미와 방향을 알고는 있지만 현실의 피로로 그 감각이 때때로 흐릿해지는 전환기예요.' +
+      '&ei=3.0&ei_summary=해야 할 일과 책임이 많아 우선순위가 자주 뒤섞이지만, 균형을 다시 잡고 싶은 마음이 커지고 있어요.' +
+      '&lowest=관계 자원 (Relational Support)' +
+      '&reset_point=Boundary Reset' +
+      '&reset_reason=해야 할 일을 다 하고 있는데 자꾸 무언가가 벅차다면 — 일의 양보다 경계의 문제일 수 있어요. 받아들여야 할 것과 내가 지켜야 할 것의 경계가 흐려진 거예요.' +
+      '&reset_signal=이건 11개 리듬 영역 중 관계 자원과 자기연민이 동시에 신호를 보내고 있다는 뜻이에요.' +
+      '&reset_action=평소라면 그냥 받아들였을 한 가지에 오늘은 잠깐 멈춰보세요.' +
+      '&eb=3&eb_stage=C&eb_expression=감정 인식은 되지만 반응 조절이 흔들리는 상태' +
+      '&eb_summary=감정이 올라오는 건 알아요. 다만 그 감정과 함께 있는 시간이 짧아요.' +
+      '&eb_emotions=혼란 · 예민함 · 조급함 · 불안 · 긴장' +
+      '&eb_question="지금 이 감정이 보내는 신호는 무엇인가요?"' +
+      '&eb_action=✅ 감정이 강하게 올라올 때 3분 멈추기 | ✅ 무슨 신호일까? 되묻기 | ✅ 오늘 감정 한 단어로 기록하기' +
+      '&en=3&en_stage=C&en_expression=에너지 지속성이 불규칙하고 회복이 뒤로 밀리는 상태' +
+      '&en_summary=집중과 휴식의 리듬이 어긋나 있어요. 버텨야 한다는 모드로 오래 달리면 에너지가 예고 없이 끊겨요.' +
+      '&en_emotions=피로 · 조급함 · 압박감 · 불안 · 초조' +
+      '&en_question="지금 나를 가장 많이 소모시키는 것, 실제로 꼭 해야 하는 일인가요?"' +
+      '&en_action=✅ 하루 1회 5분 아무것도 안 하기 | ✅ 에너지 누수 활동 하나 기록하기 | ✅ 나를 지치게 하는 일 하나 덜어내기' +
+      '&re=4&re_stage=B&re_expression=복원력은 있지만 균형 복귀에 시간이 걸리는 상태' +
+      '&re_summary=어려운 상황에서도 일상을 유지하려는 힘이 있어요.' +
+      '&re_emotions=인내 · 성찰 · 집중 · 조급함 · 긴장' +
+      '&re_question="균형을 되찾으려 할 때, 나를 가장 방해하는 것은 무엇인가요?"' +
+      '&re_action=✅ 오늘 균형을 유지한 순간 기록하기 | ✅ 복귀를 늦추는 기준 하나 점검하기 | ✅ 심호흡 5회 후 다음 행동 결정하기' +
+      '&sm=4&sm_stage=B&sm_expression=강점은 알지만 동기 방향이 외부 기준으로 기울어진 상태' +
+      '&sm_summary=무엇을 잘하는지 기본적인 감각은 있어요. 다만 최근에는 잘해야 한다는 방향으로 동기가 기울어지고 있어요.' +
+      '&sm_emotions=성실함 · 집중 · 의무감 · 내적 긴장 · 조율 중' +
+      '&sm_question="지금 나를 움직이게 하는 것이 내부에서 오는 건가요, 외부에서 오는 건가요?"' +
+      '&sm_action=✅ 내가 원하는 이유 3가지 적기 | ✅ 해야 한다를 하고 싶다로 바꿔보기 | ✅ 강점이 살아났던 순간 기록하기' +
+      '&id=3&id_stage=C&id_expression=역할 경계가 흔들리며 자기 정의가 재편되는 과도기' +
+      '&id_summary=여러 역할 사이에서 나는 어디에 있지라는 질문이 자주 올라오는 시기예요.' +
+      '&id_emotions=혼란 · 갈등 · 피로 · 모호함 · 재편 중' +
+      '&id_question="지금 역할들 중 가장 나답지 않다고 느끼는 것은 무엇인가요?"' +
+      '&id_action=✅ 현재 역할 목록 써보기 | ✅ 나답다/나답지 않다 표시하기 | ✅ 그냥 나로 있는 시간 허락하기' +
+      '&rs=2&rs_stage=D&rs_expression=상호작용에서 에너지 소진이 크고 연결 기능이 저하된 상태' +
+      '&rs_summary=주는 방향의 상호작용에 오래 서 있었어요. 사람을 만나고 돌아왔는데 마음이 더 무거운 이유예요.' +
+      '&rs_emotions=피로 · 부담 · 단절감 · 방어적 · 상호작용 회피' +
+      '&rs_question="관계에서 가장 많이 감추고 있는 감정은 무엇인가요?"' +
+      '&rs_action=✅ 신뢰할 수 있는 한 명에게 솔직하게 마음 나누기 | ✅ 괜찮지 않다고 표현 연습하기 | ✅ 관계에서 물러서는 시간 허락하기' +
+      '&va=4&va_stage=B&va_expression=가치는 알지만 현실 선택과 정렬이 흔들리는 상태' +
+      '&va_summary=의미 있는 방향으로 살고 싶다는 기준이 있어요. 현실적 요구가 겹칠 때 가치 정렬이 흔들려요.' +
+      '&va_emotions=진지함 · 성찰 · 내적 갈등 · 책임감 · 의문' +
+      '&va_question="지금 내 선택 중 가치와 가장 어긋나 있는 것은 무엇인가요?"' +
+      '&va_action=✅ 핵심 가치 3가지 적기 | ✅ 가치와 어긋난 선택 하나 기록하기 | ✅ 가치 중심으로 바꾸려면 무엇이 필요한지 적기' +
+      '&sc=4&sc_stage=B&sc_expression=자기 수용과 자기비판이 공존하며 내적 기준을 조율하는 상태' +
+      '&sc_summary=더 잘할 수 있었을까라는 생각이 종종 올라오지만, 그래도 꽤 해냈다는 인식도 공존해요.' +
+      '&sc_emotions=진지함 · 책임감 · 자각 · 균형 탐색 · 조율 중' +
+      '&sc_question="지금 나에게 적용하는 기준을 타인에게 적용한다면 어떤 느낌인가요?"' +
+      '&sc_action=✅ 해야 한다를 원한다로 바꾸기 | ✅ 실수에서 배운 점 1가지 적기 | ✅ 내적 기준 확인하기' +
+      '&vg=3&vg_stage=C&vg_expression=성장 방향이 흐려지고 의지가 재편되는 과도기' +
+      '&vg_summary=성장하고 싶은 마음은 있어요. 근데 방향이 예전만큼 선명하지 않아요.' +
+      '&vg_emotions=혼란 · 불확실 · 답답함 · 피로 · 방향 재편 중' +
+      '&vg_question="지금 가장 오래 시선이 머무는 방향은 어디인가요?"' +
+      '&vg_action=✅ 중요하게 여기는 것 3가지 정리 | ✅ 1년 전과 지금 비교 | ✅ 지금 여기 머물기 허락하기' +
+      '&tp=3&tp_stage=C&tp_expression=우선순위는 알지만 자원 배분 실천이 자꾸 밀리는 상태' +
+      '&tp_summary=무엇이 중요한지는 알아요. 근데 급한 일에 밀려 중요한 일이 오늘도 뒤로 갔어요.' +
+      '&tp_emotions=피로 · 조급함 · 압박감 · 혼란 · 배분 분산' +
+      '&tp_question="오늘 가장 많은 자원을 쓴 일이 실제로 가장 중요한 일이었나요?"' +
+      '&tp_action=✅ 에너지 배분 목록 만들기 | ✅ 나를 위한 시간 10분 고정 | ✅ 정말 내가 해야 하는 일인지 묻기' +
+      '&ls=4&ls_stage=B&ls_expression=삶의 만족감은 있지만 의미감이 더 깊어지길 원하는 상태' +
+      '&ls_summary=감사한 부분이 분명히 있고, 동시에 조금 더 나답게 살고 싶다는 바람도 있어요.' +
+      '&ls_emotions=안정 · 성찰 · 호기심 · 아쉬움 · 의미 탐색 중' +
+      '&ls_question="지금 삶에서 조금 더 의미 있게 만들고 싶은 영역은 어디인가요?"' +
+      '&ls_action=✅ 감사한 것 & 더 원하는 것 적기 | ✅ 의무를 의미로 바꾸고 싶은 일 찾기 | ✅ 만족도 점수 매기기';
+      window.location.href = sampleUrl;
+      return;
+    }
+  }
+
+  const labels = d.domains.map(dom => dom.kr.split('·')[0].trim());
+  const scores = d.domains.map(dom => dom.score);
+
+  const clusters = [
+    { name: 'Emotional Flow', kr: '감정·에너지', score: d.ef_score, summary: d.ef_summary },
+    { name: 'Resilience Flow', kr: '회복·정체감', score: d.rf_score, summary: d.rf_summary },
+    { name: 'Meaning Flow', kr: '의미·만족', score: d.mf_score, summary: d.mf_summary },
+    { name: 'Energy Index', kr: '에너지 지수', score: d.ei_score, summary: d.ei_summary },
+  ];
+
+  document.getElementById('app').innerHTML = `
+
+    <!-- COVER -->
+    <div class="cover">
+      <div class="cover-inner">
+        <div class="cover-eyebrow">Momstone · Rhythm Report</div>
+        <div class="cover-title">
+          <strong>${esc(d.name)}</strong>님의<br>리듬 리포트
+        </div>
+        <div class="cover-divider"></div>
+        <div class="cover-desc">
+          11개 영역에 걸친 당신만의 리듬 지도입니다.<br>
+          이 리포트는 코치와 함께 읽을 때 가장 깊이 열려요.
+        </div>
+        <div class="cover-meta">
+          <div class="cover-meta-item">
+            <div class="cover-meta-label">Date</div>
+            <div class="cover-meta-value">${esc(d.date)}</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="cover-meta-label">Overall Average</div>
+            <div class="cover-meta-value">${d.overall_avg.toFixed(1)} / 5.0</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="cover-meta-label">Domains</div>
+            <div class="cover-meta-value">11개 영역</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 전체 리듬 지도 -->
+    <div class="section page-break">
+      <div class="section-label">나의 리듬 지도</div>
+      <div class="section-title">11개 영역 전체 리듬</div>
+      <div class="section-sub">각 영역의 현재 리듬 상태를 한눈에 볼 수 있어요.</div>
+      <div class="radar-wrap">
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div class="stability-card">
+        <div>
+          <div class="stability-score">${d.overall_avg.toFixed(1)}<span>/5</span></div>
+        </div>
+        <div class="stability-text">
+          <div class="stability-label">전체 리듬 평균 (Overall Average)</div>
+          <div class="stability-summary">${esc(d.stability_summary)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 클러스터 -->
+    <div class="section">
+      <div class="section-label">리듬 클러스터</div>
+      <div class="section-title">4개 영역 그룹 요약</div>
+      <div class="section-sub">연관된 도메인들을 묶어 더 큰 흐름을 읽어드려요.</div>
+      <div class="cluster-grid">
+        ${clusters.map(c => `
+          <div class="cluster-card">
+            <div class="cluster-header">
+              <div>
+                <div class="cluster-name">${c.kr}</div>
+                <div style="font-size:11px;color:var(--muted);">${c.name}</div>
+              </div>
+              <div class="cluster-score">${c.score.toFixed(1)}</div>
+            </div>
+            <div class="cluster-bar-bg">
+              <div class="cluster-bar-fill" style="width:${pct(c.score)}%"></div>
+            </div>
+            <div class="cluster-summary">${esc(c.summary)}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 주목할 영역 -->
+    <div class="section">
+      <div class="section-label">지금 주목할 영역</div>
+      <div class="section-title">가장 먼저 들여다볼 곳</div>
+      <div class="section-sub">지금 가장 신호를 보내고 있는 영역이에요.</div>
+
+      ${d.lowest ? `
+      <div class="highlight-card low" style="margin-bottom:16px;">
+        <div class="highlight-label">최저 도메인</div>
+        <div class="highlight-title">${esc(d.lowest)}</div>
+        <div class="highlight-text">지금 11개 영역 중 이 영역이 가장 강하게 신호를 보내고 있어요. 다른 영역들과 어떻게 연결되는지 코치와 함께 들여다보면 더 선명해져요.</div>
+      </div>` : ''}
+
+      ${d.reset_point ? `
+      <div class="highlight-card reset">
+        <div class="highlight-label">Reset Point · ${esc(d.reset_point)}</div>
+        <div class="highlight-title">${esc(d.reset_reason.split('—')[0] || d.reset_point)}</div>
+        <div class="highlight-text" style="margin-bottom:14px;">${esc(d.reset_reason)}</div>
+        ${d.reset_signal ? `<div class="highlight-text" style="font-style:italic;opacity:0.8;">${esc(d.reset_signal)}</div>` : ''}
+        ${d.reset_action ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(184,143,126,0.3);">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--rose-dark);margin-bottom:8px;font-weight:700;">오늘의 액션</div>
+          <div class="highlight-text">${esc(d.reset_action)}</div>
+        </div>` : ''}
+      </div>` : ''}
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 도메인 상세 -->
+    <div class="section">
+      <div class="section-label">도메인 상세 리포트</div>
+      <div class="section-title">11개 영역 전체 분석</div>
+      <div class="section-sub">각 영역의 현재 상태, 감정, 코칭 질문, 액션플랜이에요.</div>
+      <div class="domain-list">
+        ${d.domains.map(dom => `
+          <div class="domain-card">
+            <div class="domain-header">
+              <div class="domain-name-wrap">
+                <div class="domain-code">${dom.code}</div>
+                <div class="domain-name-kr">${esc(dom.kr)}</div>
+                <div class="domain-name-en">${esc(dom.en)}</div>
+                ${dom.stage ? `<div class="domain-stage ${stageClass(dom.stage)}">${stageLabel(dom.stage)}</div>` : ''}
+              </div>
+              <div class="domain-score-wrap">
+                <div class="domain-score">${dom.score.toFixed(1)}<span class="domain-score-max">/5</span></div>
+                <div class="domain-bar-wrap" style="width:80px;">
+                  <div class="domain-bar" style="width:${pct(dom.score)}%"></div>
+                </div>
+              </div>
+            </div>
+            <div class="domain-body">
+              ${dom.expression ? `
+              <div class="domain-field">
+                <div class="domain-field-label">리듬 상태</div>
+                <div class="domain-expression">${esc(dom.expression)}</div>
+              </div>` : ''}
+              ${dom.summary ? `
+              <div class="domain-field">
+                <div class="domain-field-label">요약 해석</div>
+                <div class="domain-field-text">${esc(dom.summary)}</div>
+              </div>` : ''}
+              ${dom.emotions ? `
+              <div class="domain-field">
+                <div class="domain-field-label">감정 키워드</div>
+                <div class="domain-emotions">
+                  ${dom.emotions.split('·').map(e => `<span class="emotion-tag">${esc(e.trim())}</span>`).join('')}
+                </div>
+              </div>` : ''}
+              ${dom.question ? `
+              <div class="domain-field">
+                <div class="domain-field-label">코칭 질문</div>
+                <div class="domain-question">${esc(dom.question)}</div>
+              </div>` : ''}
+              ${dom.action ? `
+              <div class="domain-field">
+                <div class="domain-field-label">액션 플랜</div>
+                <div class="domain-action">${esc(dom.action.replace(/ \| /g, '\n'))}</div>
+              </div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+
+    <footer>
+      <div class="footer-brand">momstone</div>
+      <div class="footer-copy">© 2026 Momstone. All rights reserved.</div>
+    </footer>
+  `;
+
+  // 레이더 차트 렌더링
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '나의 리듬',
+        data: scores,
+        backgroundColor: 'rgba(216,184,172,0.18)',
+        borderColor: '#b88f7e',
+        borderWidth: 2,
+        pointBackgroundColor: '#b88f7e',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 5,
+          ticks: { stepSize: 1, font: { size: 10 }, color: '#999', backdropColor: 'transparent' },
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          angleLines: { color: 'rgba(0,0,0,0.06)' },
+          pointLabels: { font: { size: 11, family: 'Satoshi' }, color: '#444' }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.raw}/5` } }
+      }
+    }
+  });
+}
+
+render();
+</script>
+</body>
+</html>
