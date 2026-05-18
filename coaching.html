@@ -566,6 +566,20 @@
       line-height: 1.9;
       word-break: keep-all;
     }
+
+    /* ── PAGE TRANSITION ── */
+    body {
+      animation: fadeIn 0.35s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    body.fade-out {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
   </style>
 </head>
 <body>
@@ -937,6 +951,17 @@
       trigger.classList.add('open');
     }
   }
+
+  // Page transition
+  document.querySelectorAll('a[href]').forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('http') || href.startsWith('javascript')) return;
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      document.body.classList.add('fade-out');
+      setTimeout(() => { window.location.href = href; }, 250);
+    });
+  });
 </script>
 
 </body>

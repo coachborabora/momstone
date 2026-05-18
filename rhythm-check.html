@@ -331,6 +331,20 @@
       .journey,.pathways-grid{grid-template-columns:1fr;}
       .concept-card,.experience-copy,.receive-card,.outcome-col,.reset-card{padding:26px 22px;}
     }
+
+    /* ── PAGE TRANSITION ── */
+    body {
+      animation: fadeIn 0.35s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    body.fade-out {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
   </style>
 </head>
 <body>
