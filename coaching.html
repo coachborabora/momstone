@@ -534,7 +534,7 @@
       opacity: 0;
     }
     .topic-panel.active {
-      max-height: 300px;
+      max-height: 800px;
       opacity: 1;
     }
     .topic-panel-inner {
@@ -550,21 +550,54 @@
       letter-spacing: .16em;
       text-transform: uppercase;
       color: var(--rose-dark);
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
-    .topic-panel-q {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--ink);
-      line-height: 1.5;
-      margin-bottom: 12px;
+    .topic-panel .acc-lead {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 2;
       word-break: keep-all;
+      margin-bottom: 20px;
     }
-    .topic-panel-body {
+    .topic-panel .acc-stats {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .topic-panel .stat-pill {
+      background: rgba(216,184,172,0.1);
+      border: 1px solid rgba(184,143,126,0.2);
+      border-radius: 12px;
+      padding: 10px 16px;
+    }
+    .topic-panel .stat-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--rose-cta);
+      letter-spacing: -.02em;
+      line-height: 1;
+    }
+    .topic-panel .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+      word-break: keep-all;
+      margin-top: 4px;
+    }
+    .topic-panel .acc-body-text {
       font-size: 14px;
       color: var(--muted);
-      line-height: 1.9;
+      line-height: 2;
       word-break: keep-all;
+      margin-bottom: 14px;
+    }
+    .topic-panel .acc-source {
+      font-size: 11px;
+      color: rgba(120,100,90,0.4);
+      text-align: right;
+      letter-spacing: .04em;
+      margin-top: 14px;
     }
 
     /* ── PAGE TRANSITION ── */
@@ -607,11 +640,9 @@
     <span class="ko">Momstone 코칭 프로그램</span>
     <span style="flex:1;max-width:48px;height:1px;background:rgba(216,184,172,0.4);display:inline-block;"></span>
   </div>
-  <h1 class="ko">당신의 리듬에 맞는<br>코칭이 있습니다.</h1>
-  <p class="hero-sub ko">방식도, 주제도, 깊이도 — 지금의 나에게 필요한 것부터 시작합니다.</p>
-  <a href="https://calendly.com/coachborabora/30min" target="_blank" rel="noopener" class="btn-cta ko">
-    Discovery Session 신청하기 ↗
-  </a>
+  <h1 class="ko">잘 살아가고 있는데,<br>왜 자꾸 중심이 흐려지는 걸까요?</h1>
+  <p class="hero-sub ko">감정, 에너지, 관계, 방향의 흐름 안에서<br>지금의 나를 다시 읽어가는 코칭.</p>
+  <a href="diagnostic.html" class="btn-cta ko">리듬체크 시작하기 →</a>
 </header>
 
 <!-- STAGE 1: HOW WE WORK -->
@@ -681,84 +712,14 @@
           <button class="topic-chip ko topic-btn" onclick="toggleTopic(this, 'expat')">Expat & Returnee</button>
         </div>
 
+
         <!-- Topic Detail Panels -->
         <div class="topic-panels">
-
-          <div class="topic-panel" id="panel-career">
-            <div class="topic-panel-inner">
-              <div class="topic-panel-title ko">Career Coaching</div>
-              <p class="topic-panel-q ko">이직인지, 전직인지, 아니면 그냥 쉬어야 하는 건지 모르겠어요.</p>
-              <p class="topic-panel-body ko">방향이 흐릿할 때 성급한 결정은 더 큰 혼란을 만들어요. 이직이 답인지, 커리어 방향 자체를 바꿔야 하는 건지 — 그 구분부터 함께 시작합니다. 20~40대 직장인 <strong style="color:var(--rose-cta);">69.5%</strong>가 이직을 고려 중인 시대, 중요한 건 방향입니다.</p>
-            </div>
-          </div>
-
-          <div class="topic-panel" id="panel-leadership">
-            <div class="topic-panel-inner">
-              <div class="topic-panel-title ko">Leadership Coaching</div>
-              <p class="topic-panel-q ko">리더가 됐는데, 아무도 알려주지 않았어요.</p>
-              <p class="topic-panel-body ko">성과로 올라왔지만 사람을 이끄는 건 전혀 다른 기술이에요. 영향력, 경계, 피드백 — 혼자 터득하기엔 너무 오래 걸립니다. Leadership Coaching은 나만의 리더십 언어를 찾고, 영향력을 설계하는 과정입니다.</p>
-            </div>
-          </div>
 
           <div class="topic-panel" id="panel-workingmom">
             <div class="topic-panel-inner">
               <div class="topic-panel-title ko">Working Mom Coaching</div>
-              <p class="topic-panel-q ko">열심히 일하고, 열심히 키우는데 왜 이렇게 공허한가요?</p>
-              <p class="topic-panel-body ko">한국 워킹맘은 하루 <strong style="color:var(--rose-cta);">187분</strong>의 가사노동을 감당하면서 커리어를 유지해요. 남편의 <strong style="color:var(--rose-cta);">3.5배</strong>. 이건 의지의 문제가 아니에요. 두 역할을 동시에 감당하면서 정작 '나'는 어디에 있는지 잊게 되는 구조입니다. Working Mom Coaching은 그 흐름을 먼저 읽습니다.</p>
-            </div>
-          </div>
-
-          <div class="topic-panel" id="panel-parental">
-            <div class="topic-panel-inner">
-              <div class="topic-panel-title ko">Parental Leave Coaching</div>
-              <p class="topic-panel-q ko">돌아가고 싶은데, 잘 할 수 있을지 모르겠어요.</p>
-              <p class="topic-panel-body ko">육아휴직 후 복직은 단순한 일터 복귀가 아닙니다. 달라진 우선순위, 흔들린 자신감, 바뀐 역할을 다시 정렬하는 시간이에요. 2025년 육아휴직자 <strong style="color:var(--rose-cta);">37% 증가</strong>, 복직 앞에서 길을 잃는 사람도 함께 늘고 있어요.</p>
-            </div>
-          </div>
-
-          <div class="topic-panel" id="panel-burnout">
-            <div class="topic-panel-inner">
-              <div class="topic-panel-title ko">Burnout Recovery Coaching</div>
-              <p class="topic-panel-q ko">쉬었는데도 회복이 안 돼요.</p>
-              <p class="topic-panel-body ko">번아웃은 갑자기 오지 않습니다. 오래전부터 반복되던 작은 신호들이 쌓인 거예요. 한국 직장인 <strong style="color:var(--rose-cta);">10명 중 7명</strong>이 번아웃을 경험했고, 30대에서는 <strong style="color:var(--rose-cta);">75%</strong>에 달해요. 그 신호가 어디서 시작됐는지부터 함께 봅니다.</p>
-            </div>
-          </div>
-
-          <div class="topic-panel" id="panel-expat">
-            <div class="topic-panel-inner">
-              <div class="topic-panel-title ko">Expat & Returnee Coaching</div>
-              <p class="topic-panel-q ko">어디에도 완전히 속하지 못하는 느낌이에요.</p>
-              <p class="topic-panel-body ko">해외 발령, 귀국, 이문화 적응 — 이 과정은 정체감의 재정립이에요. 어디서 왔고, 지금 어디에 있고, 어디로 가는지를 새롭게 정리해야 하는 시기입니다. 글로벌 HR <strong style="color:var(--rose-cta);">15년</strong>의 경험이 이 여정을 함께합니다.</p>
-            </div>
-          </div>
-
-        </div><!-- /topic-panels -->
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- STAGE 2: WHO WE ARE FOR -->
-<section id="painpoints">
-  <div class="section-inner">
-    <div class="header">
-      <div class="section-kicker ko">Who We Are For</div>
-      <h2 class="ko">지금 당신은<br>어떤 지점에 서 있나요?</h2>
-      <p class="lead ko">아래 질문 중 하나라도 마음에 걸린다면, 그게 시작점입니다.</p>
-    </div>
-
-    <div class="accordion">
-
-      <!-- 1. Working Mom -->
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-question ko">열심히 일하고, 열심히 키우는데 왜 이렇게 공허한가요?</span>
-          <span class="acc-icon">+</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p class="acc-lead ko">커리어와 육아 사이에서 자책과 소진이 반복되는 건 의지의 문제가 아닙니다. 두 역할을 동시에 감당하면서 정작 '나'는 어디에 있는지 잊게 되는 구조입니다.</p>
+              <p class="acc-lead ko">커리어와 육아 사이에서 자책과 소진이 반복되는 건 의지의 문제가 아닙니다. 두 역할을 동시에 감당하면서 정작 '나'는 어디에 있는지 잊게 되는 구조입니다.</p>
             <div class="acc-stats">
               <div class="stat-pill">
                 <span class="stat-num">187분</span>
@@ -769,21 +730,15 @@
                 <span class="stat-label">남편 대비<br>가사노동 불균형</span>
               </div>
             </div>
-            <p class="acc-body-text ko">OECD 최하위 수준의 불균형 속에서도 커리어를 포기하지 않으려는 사람들. Working Mom Coaching은 그 흐름을 먼저 읽고, 나다운 방식으로 다시 설계합니다.</p>
+            <p class="acc-body-text ko">Working Mom Coaching은 그 흐름을 먼저 읽고, 나다운 방식으로 다시 설계합니다.</p>
             <p class="acc-source">출처: OECD Time Use Statistics, Statistics Korea</p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 2. Parental Leave -->
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-question ko">돌아가고 싶은데, 잘 할 수 있을지 모르겠어요.</span>
-          <span class="acc-icon">+</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p class="acc-lead ko">육아휴직 후 복직은 단순한 일터 복귀가 아닙니다. 달라진 우선순위, 흔들린 자신감, 바뀐 역할을 다시 정렬하는 시간입니다.</p>
+          <div class="topic-panel" id="panel-parental">
+            <div class="topic-panel-inner">
+              <div class="topic-panel-title ko">Parental Leave Coaching</div>
+              <p class="acc-lead ko">육아휴직 후 복직은 단순한 일터 복귀가 아닙니다. 달라진 우선순위, 흔들린 자신감, 바뀐 역할을 다시 정렬하는 시간입니다.</p>
             <div class="acc-stats">
               <div class="stat-pill">
                 <span class="stat-num">37%</span>
@@ -796,19 +751,13 @@
             </div>
             <p class="acc-body-text ko">빠르게 늘어나는 육아휴직자만큼, 복직 앞에서 길을 잃는 사람도 늘고 있어요. Parental Leave Coaching은 복직 전후의 정체감 재정립을 함께합니다.</p>
             <p class="acc-source">출처: The Korea Herald, 2025. 8</p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 3. Career Transition -->
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-question ko">이직인지, 전직인지, 아니면 그냥 쉬어야 하는 건지 모르겠어요.</span>
-          <span class="acc-icon">+</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p class="acc-lead ko">방향이 흐릿할 때 성급한 결정은 더 큰 혼란을 만들어요. 지금 흔들리는 게 어디서 시작됐는지 먼저 보는 것이 중요합니다.</p>
+          <div class="topic-panel" id="panel-career">
+            <div class="topic-panel-inner">
+              <div class="topic-panel-title ko">Career Coaching</div>
+              <p class="acc-lead ko">방향이 흐릿할 때 성급한 결정은 더 큰 혼란을 만들어요. 지금 흔들리는 게 어디서 시작됐는지 먼저 보는 것이 중요합니다.</p>
             <div class="acc-stats">
               <div class="stat-pill">
                 <span class="stat-num">10명 중 8명</span>
@@ -821,19 +770,13 @@
             </div>
             <p class="acc-body-text ko">이직이 답인지, 커리어 방향 자체를 바꿔야 하는 건지, 아니면 지금의 나를 먼저 이해해야 하는 건지 — Career Coaching은 그 구분부터 함께 시작합니다.</p>
             <p class="acc-source">출처: 원티드랩 2025 채용 트렌드 서베이, 한국경영자총협회 2024</p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 4. Leadership -->
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-question ko">리더가 됐는데, 아무도 알려주지 않았어요.</span>
-          <span class="acc-icon">+</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p class="acc-lead ko">성과로 올라왔지만 사람을 이끄는 건 전혀 다른 기술이에요. 영향력, 경계, 피드백 — 혼자 터득하기엔 너무 오래 걸립니다.</p>
+          <div class="topic-panel" id="panel-leadership">
+            <div class="topic-panel-inner">
+              <div class="topic-panel-title ko">Leadership Coaching</div>
+              <p class="acc-lead ko">성과로 올라왔지만 사람을 이끄는 건 전혀 다른 기술이에요. 영향력, 경계, 피드백 — 혼자 터득하기엔 너무 오래 걸립니다.</p>
             <div class="acc-stats">
               <div class="stat-pill">
                 <span class="stat-num">8.3%</span>
@@ -842,19 +785,13 @@
             </div>
             <p class="acc-body-text ko">한국에서 리더십은 하향식 지시에서 코칭 중심으로 빠르게 전환되고 있어요. Leadership Coaching은 나만의 리더십 언어를 찾고, 영향력을 설계하는 과정입니다.</p>
             <p class="acc-source">출처: Future Market Insights, 2026; NNRoad Work Culture Report, 2025</p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 5. Burnout -->
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-question ko">쉬었는데도 회복이 안 돼요.</span>
-          <span class="acc-icon">+</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p class="acc-lead ko">번아웃은 갑자기 오지 않습니다. 오래전부터 반복되던 작은 신호들이 쌓인 거예요. 그 신호가 어디서 시작됐는지부터 함께 봅니다.</p>
+          <div class="topic-panel" id="panel-burnout">
+            <div class="topic-panel-inner">
+              <div class="topic-panel-title ko">Burnout Recovery</div>
+              <p class="acc-lead ko">번아웃은 갑자기 오지 않습니다. 오래전부터 반복되던 작은 신호들이 쌓인 거예요. 그 신호가 어디서 시작됐는지부터 함께 봅니다.</p>
             <div class="acc-stats">
               <div class="stat-pill">
                 <span class="stat-num">10명 중 7명</span>
@@ -867,41 +804,68 @@
             </div>
             <p class="acc-body-text ko">Burnout Recovery Coaching은 증상을 다루기 전에, 반복되는 패턴의 뿌리를 먼저 읽습니다. 리듬체크의 Reset Point가 가장 직접적으로 연결되는 영역입니다.</p>
             <p class="acc-source">출처: 잡코리아 번아웃 증후군 경험 설문조사</p>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- 6. Expat -->
-      <div class="acc-item">
-        <button class="acc-trigger" onclick="toggleAcc(this)">
-          <span class="acc-question ko">어디에도 완전히 속하지 못하는 느낌이에요.</span>
-          <span class="acc-icon">+</span>
-        </button>
-        <div class="acc-body">
-          <div class="acc-content">
-            <p class="acc-lead ko">해외 발령, 귀국, 이문화 적응 — 이 과정은 정체감의 재정립이에요. 어디서 왔고, 지금 어디에 있고, 어디로 가는지를 새롭게 정리해야 하는 시기입니다.</p>
+          <div class="topic-panel" id="panel-expat">
+            <div class="topic-panel-inner">
+              <div class="topic-panel-title ko">Expat & Returnee</div>
+              <p class="acc-lead ko">해외 발령, 귀국, 이문화 적응 — 어디서 왔고, 지금 어디에 있는지를 새롭게 정리해야 하는 시기입니다.</p>
             <div class="acc-stats">
               <div class="stat-pill">
-                <span class="stat-num">15년</span>
-                <span class="stat-label">글로벌 HR<br>현장 경험</span>
+                <span class="stat-num">98%</span>
+                <span class="stat-label">번아웃 증상을 경험한<br>해외 거주자</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-num">9명 중 8명</span>
+                <span class="stat-label">고립감·외로움을<br>느끼는 해외 거주자</span>
               </div>
             </div>
-            <p class="acc-body-text ko">글로벌 HR 15년의 경험이 이 여정을 함께합니다. Expat & Returnee Coaching은 문화적 경계 사이에서 나만의 중심을 다시 찾는 과정입니다.</p>
-            <p class="acc-source">출처: Momstone Coaching Experience</p>
+            <p class="acc-body-text ko">Expat & Returnee Coaching은 문화적 경계 사이에서 나만의 중심을 다시 찾는 과정입니다.</p>
+            <p class="acc-source">출처: Cigna 360 Global Well-Being Survey, 2022</p>
+            </div>
           </div>
-        </div>
+
+        </div><!-- /topic-panels -->
+
       </div>
 
-    </div><!-- /accordion -->
+    </div>
   </div>
 </section>
+
+<!-- QUIET AUTHORITY -->
+<section style="padding:96px 24px;background:var(--bg-soft);">
+  <div style="max-width:620px;margin:0 auto;text-align:center;">
+    <div class="section-kicker ko" style="margin-bottom:14px;">Why Rhythm?</div>
+    <h2 class="ko" style="font-size:clamp(26px,3.5vw,38px);font-weight:500;line-height:1.3;letter-spacing:-.03em;color:var(--ink);margin-bottom:36px;">Momstone는 왜<br>'흐름'을 이야기할까요?</h2>
+    <p class="ko" style="font-size:16px;color:var(--muted);line-height:2.1;word-break:keep-all;margin-bottom:24px;">
+      15년간 글로벌 조직 안에서<br>
+      수많은 리더와 팀,<br>
+      커리어 전환 앞의 불안,<br>
+      오래 버틴 끝의 번아웃,<br>
+      관계 속 긴장과 방향의 흔들림을 가까이에서 보아왔습니다.
+    </p>
+    <p class="ko" style="font-size:16px;color:var(--muted);line-height:2.1;word-break:keep-all;margin-bottom:24px;">
+      사람들은 종종 하나의 문제만 해결하려 하지만,<br>
+      실제로는 삶의 여러 흐름이 함께 흔들리고 있는<br>
+      경우가 많았습니다.
+    </p>
+    <p class="ko" style="font-size:16px;color:var(--ink);line-height:2.1;word-break:keep-all;font-weight:500;">
+      Momstone Coaching은<br>
+      그 연결 패턴을 함께 읽어가는 과정에서 시작되었습니다.
+    </p>
+  </div>
+</section>
+
+<div style="height:1px;background:var(--line);margin:0 24px;"></div>
 
 <!-- DARK CTA -->
 <section id="dark-cta">
   <div class="dark-cta-inner">
     <div class="dark-cta-kicker ko">Discovery Session</div>
     <h2 class="ko">데이터는 현상을 보여주지만,<br>해답은 대화 속에 있습니다.</h2>
-    <p class="dark-cta-sub ko">혼자 안고 있던 질문들,<br>이제 함께 꺼내보세요.</p>
+    <p class="dark-cta-sub ko">혼자서는 잘 보이지 않던 흐름이,<br>대화 안에서 조금 더 선명해질 수 있습니다.</p>
     <a href="https://calendly.com/coachborabora/30min" target="_blank" rel="noopener" class="btn-cta ko">
       Discovery Session 신청하기 ↗
     </a>
