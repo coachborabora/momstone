@@ -974,7 +974,7 @@
 
 /* FOUNDER image refinement — smaller, quieter presence */
 .founder-grid {
-  grid-template-columns: minmax(220px, 0.66fr) minmax(0, 1.34fr);
+  grid-template-columns: 0.66fr 1.34fr;
   align-items: start;
 }
 .founder-img {
@@ -998,10 +998,17 @@
   object-position: center top;
 }
 @media (max-width: 920px) {
+  .founder-grid {
+    grid-template-columns: 1fr;
+  }
   .founder-img {
+    order: 1;
     margin: 42px auto 0;
     max-width: 320px;
     min-height: auto;
+  }
+  .founder-content {
+    order: 2;
   }
   .founder-img img {
     min-height: 0;
