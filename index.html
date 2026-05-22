@@ -174,8 +174,9 @@
       white-space: nowrap;
     }
     .nav-cta-solid:hover { opacity: .88; color: white !important; }
-    @media (max-width: 640px) {
-      .nav-links a:not(.nav-cta-btn):not(.nav-cta-solid) { display: none; }
+    @media (max-width: 920px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
     }
     .brand { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; color: var(--ink); }
     .brand-icon { width: 28px; height: 28px; object-fit: contain; }
@@ -606,8 +607,6 @@
     .mobile-nav .close-btn { position: absolute; top: 20px; right: 24px; font-size: 28px; cursor: pointer; background: none; border: none; color: var(--ink); }
 
     @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .hamburger { display: flex; }
       h1 { font-size: 32px; }
       h2 { font-size: 26px; }
       section { padding: 64px 20px; }
@@ -974,7 +973,7 @@
 
 /* FOUNDER image refinement — smaller, quieter presence */
 .founder-grid {
-  grid-template-columns: 0.66fr 1.34fr;
+  grid-template-columns: minmax(220px, 0.66fr) minmax(0, 1.34fr);
   align-items: start;
 }
 .founder-img {
@@ -998,17 +997,10 @@
   object-position: center top;
 }
 @media (max-width: 920px) {
-  .founder-grid {
-    grid-template-columns: 1fr;
-  }
   .founder-img {
-    order: 1;
     margin: 42px auto 0;
     max-width: 320px;
     min-height: auto;
-  }
-  .founder-content {
-    order: 2;
   }
   .founder-img img {
     min-height: 0;
