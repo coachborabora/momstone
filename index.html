@@ -174,8 +174,9 @@
       white-space: nowrap;
     }
     .nav-cta-solid:hover { opacity: .88; color: white !important; }
-    @media (max-width: 640px) {
-      .nav-links a:not(.nav-cta-btn):not(.nav-cta-solid) { display: none; }
+    @media (max-width: 920px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
     }
     .brand { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; color: var(--ink); }
     .brand-icon { width: 28px; height: 28px; object-fit: contain; }
@@ -605,11 +606,9 @@
     .mobile-nav a { font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: 1px; text-transform: uppercase; }
     .mobile-nav .close-btn { position: absolute; top: 20px; right: 24px; font-size: 28px; cursor: pointer; background: none; border: none; color: var(--ink); }
 
-    @media (max-width: 920px) {
+    @media (max-width: 640px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
-    }
-    @media (max-width: 640px) {
       h1 { font-size: 32px; }
       h2 { font-size: 26px; }
       section { padding: 64px 20px; }
@@ -976,7 +975,7 @@
 
 /* FOUNDER image refinement — smaller, quieter presence */
 .founder-grid {
-  grid-template-columns: minmax(220px, 0.66fr) minmax(0, 1.34fr);
+  grid-template-columns: 0.66fr 1.34fr;
   align-items: start;
 }
 .founder-img {
@@ -1000,8 +999,13 @@
   object-position: center top;
 }
 @media (max-width: 920px) {
+  .founder-grid {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
   .founder-img {
-    margin: 42px auto 0;
+    order: -1;
+    margin: 32px auto 0;
     max-width: 320px;
     min-height: auto;
   }
@@ -1009,16 +1013,10 @@
     min-height: 0;
     max-height: 420px;
   }
-}
-@media (max-width: 640px) {
-  .founder-img {
-    margin-top: 34px;
-    max-width: 260px;
-    min-height: auto;
-  }
-  .founder-img img {
-    min-height: 0;
-    max-height: 340px;
+  .founder-text-polished {
+    padding-top: 34px;
+    padding-bottom: 44px;
+    gap: 11px;
   }
 }
 
@@ -1062,8 +1060,13 @@
 @media (max-width: 920px) {
   .founder-grid {
     min-height: auto;
+    grid-template-columns: 1fr;
+  }
+  .founder-img {
+    order: -1;
   }
   .founder-text-polished {
+    order: 1;
     padding-top: 34px;
     padding-bottom: 44px;
     gap: 11px;
