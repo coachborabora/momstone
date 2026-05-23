@@ -113,11 +113,13 @@
     @media (max-width: 640px) {
       .nav-links a:not(.nav-cta-btn):not(.nav-cta-solid) { display: none; }
     }
-    .hamburger{display:none;background:none;border:0;width:40px;height:40px;cursor:pointer;}
-    .hamburger span{display:block;width:20px;height:2px;background:var(--ink);margin:5px auto;border-radius:2px;}
-    .mobile-nav{display:none;position:fixed;inset:0;background:rgba(255,255,255,.98);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:22px;padding:32px;}
+    .hamburger{display:none;background:none;border:0;width:40px;height:40px;cursor:pointer;margin-left:auto;position:relative;z-index:101;}
+    .hamburger span{display:block;width:20px;height:2px;background:rgba(255,255,255,0.85);margin:5px auto;border-radius:2px;}
+    @media (max-width: 920px) { .hamburger { display: block !important; } }
+    .mobile-nav{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(17,17,17,0.98);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:22px;padding:32px;}
     .mobile-nav.open{display:flex;}
-    .mobile-nav a{font-size:18px;font-weight:700;text-align:center;}
+    .mobile-nav a{font-size:18px;font-weight:700;text-align:center;color:rgba(255,255,255,0.9);text-decoration:none;}
+    .mobile-nav .close-btn{position:absolute;top:20px;right:24px;font-size:28px;cursor:pointer;background:none;border:none;color:rgba(255,255,255,0.8);}
     .close-btn{position:absolute;top:20px;right:22px;border:0;background:none;font-size:28px;cursor:pointer;color:var(--ink);}
 
     /* ── BUTTONS ── */
@@ -634,5 +636,26 @@
     <div style="margin-top:10px;font-size:11px;opacity:.6;word-break:keep-all;">본 사이트의 모든 콘텐츠는 Momstone의 지적 재산입니다. 무단 복제·상업적 활용을 금합니다.</div>
   </footer>
 
+<script>
+  const mobileNav = document.getElementById('mobileNav');
+  document.body.appendChild(mobileNav);
+  const hamburger = document.querySelector('.hamburger');
+  const closeBtn = mobileNav.querySelector('.close-btn');
+  hamburger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    mobileNav.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+  closeBtn.addEventListener('click', function() {
+    mobileNav.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+  mobileNav.querySelectorAll('a').forEach(function(a) {
+    a.addEventListener('click', function() {
+      mobileNav.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+</script>
 </body>
 </html>

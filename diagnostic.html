@@ -200,17 +200,7 @@
 <body class="korean">
 <script>
   (function() {
-    var lang = navigator.language || navigator.userLanguage || 'ko';
-    if (!lang.startsWith('ko')) {
-      document.body.classList.remove('korean');
-      document.body.classList.add('english');
-      document.addEventListener('DOMContentLoaded', function() {
-        var btnEn = document.getElementById('btn-en');
-        var btnKo = document.getElementById('btn-ko');
-        if (btnEn) btnEn.classList.add('active');
-        if (btnKo) btnKo.classList.remove('active');
-      });
-    }
+    // 항상 한국어로 시작
   })();
 </script>
 
