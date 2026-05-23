@@ -174,10 +174,6 @@
       white-space: nowrap;
     }
     .nav-cta-solid:hover { opacity: .88; color: white !important; }
-    @media (max-width: 920px) {
-      .nav-links { display: none; }
-      .hamburger { display: flex; }
-    }
     .brand { display: flex; align-items: center; gap: 8px; font-size: 17px; font-weight: 700; letter-spacing: 0.08em; text-transform: lowercase; color: var(--ink); }
     .brand-icon { width: 28px; height: 28px; object-fit: contain; }
 
@@ -606,7 +602,7 @@
     .mobile-nav a { font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: 1px; text-transform: uppercase; }
     .mobile-nav .close-btn { position: absolute; top: 20px; right: 24px; font-size: 28px; cursor: pointer; background: none; border: none; color: var(--ink); }
 
-    @media (max-width: 640px) {
+    @media (max-width: 920px) {
       .nav-links { display: none; }
       .hamburger { display: flex; }
       h1 { font-size: 32px; }
@@ -658,7 +654,7 @@
       max-width: var(--max);
       margin: 0 auto;
       display: grid;
-      grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+      grid-template-columns: 0.66fr 1.34fr;
       gap: 0;
       min-height: 640px;
       align-items: stretch;
@@ -809,19 +805,21 @@
         grid-template-columns: 1fr;
       }
       .founder-img {
-        min-height: 360px;
-        max-height: 520px;
+        order: -1;
+        min-height: 280px;
+        max-height: 420px;
       }
       .founder-img img {
-        min-height: 360px;
-        max-height: 520px;
+        min-height: 0;
+        max-height: 420px;
         object-fit: contain;
+      }
+      .founder-text-polished {
+        order: 1;
+        padding: 44px 28px 52px;
       }
       .founder-title {
         max-width: 14ch;
-      }
-      .founder-text-polished {
-        padding: 44px 28px 52px;
       }
     }
     @media (max-width: 640px) {
