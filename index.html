@@ -1653,20 +1653,6 @@ a.testi-toggle{
 </footer>
 
 <script>
-  function setLang(lang) {
-    if (lang === 'ko') {
-      document.body.classList.add('korean');
-      document.body.classList.remove('english');
-      document.getElementById('btn-ko').classList.add('active');
-      document.getElementById('btn-en').classList.remove('active');
-    } else {
-      document.body.classList.remove('korean');
-      document.body.classList.add('english');
-      document.getElementById('btn-en').classList.add('active');
-      document.getElementById('btn-ko').classList.remove('active');
-    }
-  }
-  setLang('ko');
   document.querySelectorAll('.faq-q').forEach(q => {
     q.addEventListener('click', () => {
       const item = q.parentElement;
