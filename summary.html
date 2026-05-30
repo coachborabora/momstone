@@ -189,7 +189,25 @@
       .domain-header { flex-direction: column; gap: 12px; }
       .domain-score-wrap { text-align: left; }
     }
-  </style>
+  
+    /* LANG TOGGLE */
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+    .lang-toggle a {
+      color: rgba(255,255,255,.35);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .lang-toggle a:hover { color: rgba(255,255,255,.75); }
+    .lang-toggle .lang-active { color: rgba(255,255,255,.85); cursor: default; pointer-events: none; }
+    .lang-toggle .lang-sep { color: rgba(255,255,255,.2); font-weight: 300; }
+    </style>
 </head>
 <body class="loading">
 
@@ -206,6 +224,7 @@
   <button class="topbar-home" onclick="goHome()">← 홈</button>
   <span class="topbar-brand">momstone</span>
   <button class="print-btn" onclick="window.print()">PDF 저장</button>
+  <div class="lang-toggle"><span class="lang-active">KO</span><span class="lang-sep"> · </span><a href="/en/summary.html">EN</a></div>
 </div>
 
 <!-- PDF 확인 팝업 -->

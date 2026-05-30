@@ -620,7 +620,34 @@
       transform: translateY(-6px);
       transition: opacity 0.25s ease, transform 0.25s ease;
     }
-  </style>
+  
+    /* LANG TOGGLE */
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      margin-right: 4px;
+    }
+    .lang-toggle a {
+      color: rgba(255,255,255,.35);
+      text-decoration: none;
+      transition: color .2s;
+      padding: 2px 0;
+    }
+    .lang-toggle a:hover { color: rgba(255,255,255,.75); }
+    .lang-toggle .lang-active {
+      color: rgba(255,255,255,.9);
+      cursor: default;
+      pointer-events: none;
+    }
+    .lang-toggle .lang-sep {
+      color: rgba(255,255,255,.2);
+      font-weight: 300;
+    }
+    </style>
 </head>
 <body>
 
@@ -633,6 +660,11 @@
     </a>
     <div class="nav-links">
       <a href="index.html">홈</a>
+      <div class="lang-toggle">
+        <span class="lang-active">KO</span>
+        <span class="lang-sep">·</span>
+        <a href="/en/coaching.html">EN</a>
+      </div>
       <span class="nav-sep"></span>
       <a href="rhythm-check.html" class="nav-cta-btn">✦ 리듬체크</a>
       <a href="https://calendly.com/coachborabora/30min" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--rose-dark);text-decoration:none;white-space:nowrap;">✦ 디스커버리 세션</a>

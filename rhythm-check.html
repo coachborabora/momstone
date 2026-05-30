@@ -347,7 +347,34 @@
       transform: translateY(-6px);
       transition: opacity 0.25s ease, transform 0.25s ease;
     }
-  </style>
+  
+    /* LANG TOGGLE */
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      margin-right: 4px;
+    }
+    .lang-toggle a {
+      color: rgba(255,255,255,.35);
+      text-decoration: none;
+      transition: color .2s;
+      padding: 2px 0;
+    }
+    .lang-toggle a:hover { color: rgba(255,255,255,.75); }
+    .lang-toggle .lang-active {
+      color: rgba(255,255,255,.9);
+      cursor: default;
+      pointer-events: none;
+    }
+    .lang-toggle .lang-sep {
+      color: rgba(255,255,255,.2);
+      font-weight: 300;
+    }
+    </style>
 </head>
 <body>
 
