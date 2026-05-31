@@ -314,6 +314,14 @@ const CLUSTERS = [
   { name:'Energy Index',     scoreKey:'EI_score',  summaryKey:'EI_Summary' },
 ];
 
+const BAND_DESC = {
+  "A": "Rhythm flows with ease. Strengths are active, recovery is functioning. This is a season to deepen.",
+  "B": "Rhythm is mostly stable, but certain areas need attention. Awareness is high — alignment is the work.",
+  "C": "In transition. Multiple areas are shifting simultaneously. The direction is there but the footing is unsteady.",
+  "D": "Rhythm is fragmented. Key functions have weakened. Recovery resources need to be secured first.",
+  "E": "Deep exhaustion. Core functions are at an extreme low. Stabilization and safety come before any exploration."
+};
+
 const BAND_NAMES = {
   A: 'Flowing Harmony', B: 'Balanced Awareness',
   C: 'Transitional Flow', D: 'Fragmented Rhythm', E: 'Silent Exhaustion'
@@ -386,6 +394,9 @@ function renderReport(d, row) {
     (domainScoreVals.length ? Math.round(domainScoreVals.reduce((a,b)=>a+b,0)/domainScoreVals.length * 100)/100 : 0);
   const band = get(d,'Band', '');
   const bandName = BAND_NAMES[band] || '';
+  const rhythmTypeEN = get(d,'Rhythm_Type_EN', bandName);
+  const riskPoint = get(d,'Risk_Point','');
+  const bufferMessage = get(d,'Buffer_Message','');
 
   // New analysis
   const strengthGap = get(d,'Strength_Gap','—');
