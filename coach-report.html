@@ -388,8 +388,8 @@ function renderReport(d, row) {
   const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko';
 
   // Domain scores
-  const scores = domainScoreVals;
   const domainScoreVals = DOMAINS.map(dom => parseFloat(get(d, dom.code+'_score', 0)));
+  const scores = domainScoreVals;
   const overall = parseFloat(get(d,'Overall_Avg', 0)) || 
     (domainScoreVals.length ? Math.round(domainScoreVals.reduce((a,b)=>a+b,0)/domainScoreVals.length * 100)/100 : 0);
   const band = get(d,'Band', '');
