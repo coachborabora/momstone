@@ -315,12 +315,96 @@ const CLUSTERS = [
   { name:'Energy Index',     scoreKey:'EI_score',  summaryKey:'EI_Summary' },
 ];
 
+const UI = {
+  en: {
+    sessionProfile: 'Session Profile',
+    participantOverview: 'Participant Overview',
+    rhythmMap: 'Full Rhythm Across 11 Domains',
+    sessionOpener: 'Music Soundtrack + Opening',
+    sessionOpenerSub: 'Use this to open the session before introducing any numbers.',
+    soundtrackLabel: "🎵 TODAY'S RHYTHM SOUNDTRACK",
+    strengthDrain: 'Gap Analysis',
+    strengthDrainSub: 'Top 3 flowing domains vs bottom 3 depleted domains.',
+    strengthDomains: '✦ STRENGTH DOMAINS',
+    depletedDomains: '⚠ DEPLETED DOMAINS',
+    strengthGap: 'STRENGTH GAP',
+    coachingAnalysis: 'Key Indicators',
+    vulnIndex: 'VULNERABILITY INDEX',
+    coachReadiness: 'COACHING READINESS',
+    relSelf: 'RELATIONAL-SELF DYNAMIC',
+    clusterBalance: 'CLUSTER BALANCE',
+    domainDetail: 'Each domain includes interpretation, coaching question, action plan, and recommended intervention from Reflection DB.',
+    interpretation: 'INTERPRETATION',
+    coachingQuestion: 'COACHING QUESTION',
+    actionPlan: 'ACTION PLAN',
+    interventionGuide: 'COACHING INTERVENTION GUIDE',
+    resetPoint: 'RESET POINT',
+    resetReason: 'RESET REASON',
+    resetSignal: 'RESET SIGNAL',
+    todayAction: "TODAY'S ACTION",
+    coachNotes: 'Pre-Session Memo',
+    coachNotesSub: "Your notes here won't be saved — print or copy before closing.",
+    coachNotesPlaceholder: 'Session observations, hypotheses, questions to explore…',
+    overall: 'Overall Average',
+    band: 'Band',
+    rhythmType: 'Rhythm Pattern',
+    scBuffer: 'SC Buffer',
+  },
+  ko: {
+    sessionProfile: '세션 프로파일',
+    participantOverview: '참여자 개요',
+    rhythmMap: '11개 영역 전체 리듬',
+    sessionOpener: '오늘의 리듬 사운드트랙 + 오프닝',
+    sessionOpenerSub: '숫자를 꺼내기 전, 이것으로 세션을 여세요.',
+    soundtrackLabel: '🎵 오늘의 리듬 사운드트랙',
+    strengthDrain: '강점-고갈 갭 분석',
+    strengthDrainSub: '상위 3개 흐르는 영역 vs 하위 3개 고갈 영역',
+    strengthDomains: '✦ 강점 영역',
+    depletedDomains: '⚠ 고갈 영역',
+    strengthGap: '강점 갭',
+    coachingAnalysis: '핵심 지표',
+    vulnIndex: '취약성 지수',
+    coachReadiness: '코칭 준비도',
+    relSelf: '관계-자기 역동',
+    clusterBalance: '클러스터 균형',
+    domainDetail: '각 도메인의 해석, 코칭 질문, 액션 플랜, Reflection DB 코칭 개입 가이드가 포함되어 있어요.',
+    interpretation: '해석',
+    coachingQuestion: '코칭 질문',
+    actionPlan: '액션 플랜',
+    interventionGuide: '코칭 개입 가이드',
+    resetPoint: '리셋 포인트',
+    resetReason: '리셋 이유',
+    resetSignal: '리셋 신호',
+    todayAction: '오늘의 액션',
+    coachNotes: '세션 전 메모',
+    coachNotesSub: '여기 작성한 내용은 저장되지 않아요. 닫기 전에 출력하거나 복사해두세요.',
+    coachNotesPlaceholder: '세션 관찰, 가설, 탐색할 질문들…',
+    overall: '전체 평균',
+    band: '밴드',
+    rhythmType: '리듬 패턴',
+    scBuffer: 'SC 버퍼',
+  }
+};
+
+const BAND_NAMES_KO = {
+  A: '조화로운 흐름', B: '균형 잡힌 자각',
+  C: '전환기의 리듬', D: '흐름의 단절', E: '조용한 소진'
+};
+
 const BAND_DESC = {
   "A": "Rhythm flows with ease. Strengths are active, recovery is functioning. This is a season to deepen.",
   "B": "Rhythm is mostly stable, but certain areas need attention. Awareness is high — alignment is the work.",
   "C": "In transition. Multiple areas are shifting simultaneously. The direction is there but the footing is unsteady.",
   "D": "Rhythm is fragmented. Key functions have weakened. Recovery resources need to be secured first.",
   "E": "Deep exhaustion. Core functions are at an extreme low. Stabilization and safety come before any exploration."
+};
+
+const BAND_DESC_KO = {
+  "A": "리듬이 자연스럽게 흐르고 있어요. 강점이 활성화돼 있고 회복도 작동하고 있어요. 깊이를 더해가는 계절이에요.",
+  "B": "대체로 안정적이지만 일부 영역에 주의가 필요해요. 자각은 높아요 — 지금은 정렬의 작업이에요.",
+  "C": "전환기 중에 있어요. 여러 영역이 동시에 이동하고 있어요. 방향은 있지만 발판이 아직 불안정해요.",
+  "D": "리듬이 단절되어 있어요. 핵심 기능들이 약해졌어요. 회복 자원을 먼저 확보해야 해요.",
+  "E": "깊은 소진 상태예요. 핵심 기능이 극도로 낮아져 있어요. 탐색보다 안정화와 안전이 먼저예요."
 };
 
 const BAND_NAMES = {
@@ -394,7 +478,7 @@ function renderReport(d, row) {
   const overall = parseFloat(get(d,'Overall_Avg', 0)) || 
     (domainScoreVals.length ? Math.round(domainScoreVals.reduce((a,b)=>a+b,0)/domainScoreVals.length * 100)/100 : 0);
   const band = get(d,'Band', '');
-  const bandName = BAND_NAMES[band] || '';
+  const bandName = (lang === 'en' ? BAND_NAMES : BAND_NAMES_KO)[band] || '';
   const rhythmTypeEN = get(d,'Rhythm_Type_EN', bandName);
   const riskPoint = get(d,'Risk_Point','');
   const bufferMessage = get(d,'Buffer_Message','');
@@ -439,8 +523,8 @@ function renderReport(d, row) {
   let html = `
   <!-- ① PROFILE -->
   <div class="section">
-    <div class="section-kicker">Session Profile</div>
-    <div class="section-title">Participant Overview</div>
+    <div class="section-kicker">${{ui.sessionProfile}}</div>
+    <div class="section-title">${{ui.participantOverview}}</div>
     <div class="section-sub">Row ${row} · Submitted ${get(d,'Date','—')}</div>
     <div class="profile-grid">
       <div class="profile-item"><div class="profile-label">Name</div><div class="profile-value">${esc(get(d,'Name','—'))}</div></div>
@@ -454,8 +538,8 @@ function renderReport(d, row) {
 
   <!-- ② RADAR -->
   <div class="section">
-    <div class="section-kicker">Rhythm Map</div>
-    <div class="section-title">Full Rhythm Across 11 Domains</div>
+    <div class="section-kicker">${{lang === 'en' ? 'Rhythm Map' : '리듬 지도'}}</div>
+    <div class="section-title">${{ui.rhythmMap}}</div>
     <div class="radar-wrap">
       <canvas id="radarChart" style="max-height:360px;"></canvas>
       <div class="radar-meta">
@@ -469,11 +553,11 @@ function renderReport(d, row) {
 
   <!-- ③ SESSION OPENER -->
   <div class="section">
-    <div class="section-kicker">Session Opener Guide</div>
-    <div class="section-title">Music Soundtrack + Opening</div>
-    <div class="section-sub">Use this to open the session before introducing any numbers.</div>
+    <div class="section-kicker">${{lang === 'en' ? 'Session Opener Guide' : '세션 오프너 가이드'}}</div>
+    <div class="section-title">${{ui.sessionOpener}}</div>
+    <div class="section-sub">${{ui.sessionOpenerSub}}</div>
     <div class="music-card">
-      <div class="music-opener-label">🎵 Today's Rhythm Soundtrack</div>
+      <div class="music-opener-label">${{ui.soundtrackLabel}}</div>
       <div class="music-tracks">
         ${musicKeys.map(m => `
           <div class="music-track">
@@ -492,21 +576,21 @@ function renderReport(d, row) {
 
   <!-- ④ STRENGTH-DRAIN GAP -->
   <div class="section">
-    <div class="section-kicker">Strength-Drain Profile</div>
-    <div class="section-title">Gap Analysis</div>
-    <div class="section-sub">Top 3 flowing domains vs bottom 3 depleted domains.</div>
+    <div class="section-kicker">${{lang === 'en' ? 'Strength-Drain Profile' : '강점-고갈 프로파일'}}</div>
+    <div class="section-title">${{ui.strengthDrain}}</div>
+    <div class="section-sub">${{ui.strengthDrainSub}}</div>
     <div class="gap-domains">
       <div class="gap-col strength">
-        <div class="gap-col-label">✦ Strength Domains</div>
+        <div class="gap-col-label">${{ui.strengthDomains}}</div>
         ${top3.map(d => `<div class="gap-domain-item"><span>${esc(d.en)}</span><span class="gap-score strength">${d.score.toFixed(1)}</span></div>`).join('')}
       </div>
       <div class="gap-col drain">
-        <div class="gap-col-label">⚠ Depleted Domains</div>
+        <div class="gap-col-label">${{ui.depletedDomains}}</div>
         ${bottom3.map(d => `<div class="gap-domain-item"><span>${esc(d.en)}</span><span class="gap-score drain">${d.score.toFixed(1)}</span></div>`).join('')}
       </div>
     </div>
     <div class="analysis-card" style="margin-top:0;">
-      <div class="ac-label">Strength Gap</div>
+      <div class="ac-label">${{ui.strengthGap}}</div>
       <div class="ac-value">${strengthGap}</div>
       <div class="ac-text">${esc(strengthGapLabel)}</div>
     </div>
@@ -514,26 +598,26 @@ function renderReport(d, row) {
 
   <!-- ⑤⑥⑦⑧ ANALYSIS GRID -->
   <div class="section">
-    <div class="section-kicker">Coaching Analysis</div>
-    <div class="section-title">Key Indicators</div>
+    <div class="section-kicker">${{lang === 'en' ? 'Coaching Analysis' : '코칭 분석'}}</div>
+    <div class="section-title">${{ui.coachingAnalysis}}</div>
     <div class="analysis-grid">
       <div class="analysis-card ${vulnClass}">
-        <div class="ac-label">Vulnerability Index</div>
+        <div class="ac-label">${{ui.vulnIndex}}</div>
         <div class="ac-value ${vulnClass}">${vulnIndex} <span style="font-size:16px;font-weight:400;color:var(--muted)">/ 10</span></div>
         <div class="ac-text">${esc(vulnLabel)}</div>
       </div>
       <div class="analysis-card ${readyClass}">
-        <div class="ac-label">Coaching Readiness</div>
+        <div class="ac-label">${{ui.coachReadiness}}</div>
         <div class="ac-value ${readyClass}">${coachReady} <span style="font-size:16px;font-weight:400;color:var(--muted)">/ 5</span></div>
         <div class="ac-text">${esc(coachReadyLabel)}</div>
       </div>
       <div class="analysis-card">
-        <div class="ac-label">Relational-Self Dynamic</div>
+        <div class="ac-label">${{ui.relSelf}}</div>
         <div class="ac-value">${relSelf}</div>
         <div class="ac-text">${esc(relSelfLabel)}</div>
       </div>
       <div class="analysis-card">
-        <div class="ac-label">Cluster Balance</div>
+        <div class="ac-label">${{ui.clusterBalance}}</div>
         <div class="cluster-grid" style="margin-top:8px;">
           ${CLUSTERS.map(c => {
             const sc = parseFloat(get(d, c.scoreKey, 0));
@@ -550,9 +634,9 @@ function renderReport(d, row) {
 
   <!-- ⑨ DOMAIN DETAIL + REFLECTION GUIDE -->
   <div class="section">
-    <div class="section-kicker">Domain Detail + Coaching Guide</div>
-    <div class="section-title">11 Domains — Full Analysis</div>
-    <div class="section-sub">Each domain includes interpretation, coaching question, action plan, and recommended intervention from Reflection DB.</div>
+    <div class="section-kicker">${{lang === 'en' ? 'Domain Detail + Coaching Guide' : '도메인 상세 + 코칭 가이드'}}</div>
+    <div class="section-title">${{lang === 'en' ? '11 Domains — Full Analysis' : '11개 영역 전체 분석'}}</div>
+    <div class="section-sub">${{ui.domainDetail}}</div>
     ${DOMAINS.map(dom => {
       const score = parseFloat(get(d, dom.code+'_score', 0));
       const domBand = get(d, dom.code+'_stage_code', band);
@@ -586,7 +670,7 @@ function renderReport(d, row) {
         </div>
         ${reflections.length ? `
         <div class="reflection-guide">
-          <div class="rg-label">Coaching Intervention Guide</div>
+          <div class="rg-label">${{ui.interventionGuide}}</div>
           <div class="rg-items">
             ${reflections.map(r => `
               <div class="rg-item">
@@ -608,21 +692,21 @@ function renderReport(d, row) {
     <div class="section-kicker">Reset Point</div>
     <div class="section-title">${esc(get(d,'Reset_Point','—'))}</div>
     <div class="analysis-card" style="margin-top:16px;">
-      <div class="ac-label">Reset Reason</div>
+      <div class="ac-label">${{ui.resetReason}}</div>
       <div class="ac-text" style="font-size:14px;color:var(--ink);margin-bottom:16px;">${esc(get(d,'Reset_Reason','—'))}</div>
-      <div class="ac-label">Reset Signal</div>
+      <div class="ac-label">${{ui.resetSignal}}</div>
       <div class="ac-text" style="font-size:14px;color:var(--ink);margin-bottom:16px;">${esc(get(d,'Reset_Signal','—'))}</div>
-      <div class="ac-label">Today's Action</div>
+      <div class="ac-label">${{ui.todayAction}}</div>
       <div class="ac-text" style="font-size:14px;color:var(--ink);">${esc(get(d,'Reset_Action','—'))}</div>
     </div>
   </div>
 
   <!-- ⑪ COACH MEMO -->
   <div class="section">
-    <div class="section-kicker">Coach Notes</div>
-    <div class="section-title">Pre-Session Memo</div>
-    <div class="section-sub">Your notes here won't be saved — print or copy before closing.</div>
-    <textarea class="memo-area" placeholder="Session observations, hypotheses, questions to explore…"></textarea>
+    <div class="section-kicker">${{lang === 'en' ? 'Coach Notes' : '코치 노트'}}</div>
+    <div class="section-title">${{ui.coachNotes}}</div>
+    <div class="section-sub">${{ui.coachNotesSub}}</div>
+    <textarea class="memo-area" placeholder="${{ui.coachNotesPlaceholder}}"></textarea>
   </div>
   `;
 
