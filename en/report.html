@@ -306,7 +306,7 @@ async function render() {
     
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}`);
+        const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}&lang=en`);
         const json = await res.json();
         if (json.result !== 'success') throw new Error(json.message);
         const parsed = parseData(json.data);
