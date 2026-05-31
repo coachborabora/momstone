@@ -308,10 +308,10 @@ const DOMAINS = [
 ];
 
 const CLUSTERS = [
-  { name:'Emotional Flow',   scoreKey:'EF',        summaryKey:'EF_summary' },
-  { name:'Resilience Flow',  scoreKey:'RF',        summaryKey:'RF_summary' },
-  { name:'Meaning Flow',     scoreKey:'MF',        summaryKey:'MF_summary' },
-  { name:'Energy Index',     scoreKey:'EI',        summaryKey:'EI_summary' },
+  { name:'Emotional Flow',   scoreKey:'EF_score',  summaryKey:'EF_Summary' },
+  { name:'Resilience Flow',  scoreKey:'RF_score',  summaryKey:'RF_Summary' },
+  { name:'Meaning Flow',     scoreKey:'MF_score',  summaryKey:'MF_Summary' },
+  { name:'Energy Index',     scoreKey:'EI_score',  summaryKey:'EI_Summary' },
 ];
 
 const BAND_NAMES = {
@@ -380,10 +380,12 @@ function renderReport(d, row) {
   const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko';
 
   // Domain scores
-  const scores = DOMAINS.map(dom => parseFloat(get(d, dom.code+'_score', 0)));
-  const overall = parseFloat(get(d,'Overall_Avg', 0));
-  const band = get(d,'Band','');
-  const bandName = get(d,'BandName', BAND_NAMES[band] || '');
+  const scores = domainScoreVals;
+  const domainScoreVals = DOMAINS.map(dom => parseFloat(get(d, dom.code+'_score', 0)));
+  const overall = parseFloat(get(d,'Overall_Avg', 0)) || 
+    (domainScoreVals.length ? Math.round(domainScoreVals.reduce((a,b)=>a+b,0)/domainScoreVals.length * 100)/100 : 0);
+  const band = get(d,'Band', '');
+  const bandName = BAND_NAMES[band] || '';
 
   // New analysis
   const strengthGap = get(d,'Strength_Gap','—');
@@ -396,7 +398,7 @@ function renderReport(d, row) {
   const relSelfLabel = get(d,'Relational_Self_Label','');
 
   // Top 3 / Bottom 3
-  const domainScores = DOMAINS.map((dom,i) => ({ ...dom, score: scores[i] }));
+  const domainScores = DOMAINS.map((dom,i) => ({ ...dom, score: domainScoreVals[i] }));
   const sorted = [...domainScores].sort((a,b) => b.score - a.score);
   const top3 = sorted.slice(0,3);
   const bottom3 = sorted.slice(-3).reverse();
@@ -540,11 +542,11 @@ function renderReport(d, row) {
     <div class="section-sub">Each domain includes interpretation, coaching question, action plan, and recommended intervention from Reflection DB.</div>
     ${DOMAINS.map(dom => {
       const score = parseFloat(get(d, dom.code+'_score', 0));
-      const domBand = get(d, dom.code+'_stage', band);
-      const summary = get(d, dom.code+'_Summary', '');
-      const question = get(d, dom.code+'_Question', '');
-      const action = get(d, dom.code+'_Action', '');
-      const focus = get(d, dom.code+'_Focus', '');
+      const domBand = get(d, dom.code+'_stage_code', band);
+      const summary = get(d, dom.code+'_summary', '');
+      const question = get(d, dom.code+'_question', '');
+      const action = get(d, dom.code+'_action', '');
+      const focus = get(d, dom.code+'_focus', '');
 
       // Reflection DB entries for this domain+band
       const reflections = REFLECTION_DB.filter(e =>
