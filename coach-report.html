@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coach Report | Momstone</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #171717;
+      --muted: #888;
+      --rose: #d8b8ac;
+      --rose-dark: #c9826a;
+      --bg: #faf8f6;
+      --card: #ffffff;
+      --border: #ede8e4;
+      --coach-accent: #2d4a3e;
+      --coach-light: #f0f4f2;
+      --warn: #c9826a;
+      --warn-light: #fdf3ef;
+      --good: #3d6b5a;
+      --good-light: #eef4f1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Satoshi', sans-serif; background: var(--bg); color: var(--ink); }
+
+    /* ACCESS GATE */
+    #gate {
+      position: fixed; inset: 0; background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; flex-direction: column; gap: 24px;
+    }
+    .gate-brand { font-size: 13px; letter-spacing: 4px; color: var(--rose); font-weight: 700; }
+    .gate-title { font-size: 22px; color: #fff; font-weight: 500; }
+    .gate-sub { font-size: 13px; color: rgba(255,255,255,.4); }
+    .gate-input {
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15);
+      border-radius: 10px; padding: 14px 20px; color: #fff; font-size: 15px;
+      font-family: 'Satoshi', sans-serif; width: 280px; outline: none;
+      text-align: center; letter-spacing: 2px;
+    }
+    .gate-input:focus { border-color: var(--rose); }
+    .gate-btn {
+      background: var(--rose-dark); color: #fff; border: none; border-radius: 10px;
+      padding: 13px 32px; font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: 'Satoshi', sans-serif; width: 280px;
+    }
+    .gate-error { font-size: 13px; color: #e07070; }
+
+    /* LOADING */
+    #loading-screen {
+      position: fixed; inset: 0; background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; z-index: 100;
+    }
+    .loading-brand { font-size: 13px; letter-spacing: 4px; color: var(--rose); font-weight: 700; }
+    .loading-spinner {
+      width: 28px; height: 28px; border: 2px solid rgba(255,255,255,.1);
+      border-top-color: var(--rose); border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    .loading-text { font-size: 13px; color: rgba(255,255,255,.4); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TOPBAR */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--ink); padding: 14px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-brand { font-size: 12px; letter-spacing: 3px; color: var(--rose); font-weight: 700; }
+    .topbar-badge {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      background: var(--coach-accent); color: #fff; padding: 4px 12px;
+      border-radius: 999px; font-weight: 700;
+    }
+    .print-btn {
+      background: transparent; border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.7); padding: 7px 16px; border-radius: 8px;
+      font-size: 12px; cursor: pointer; font-family: 'Satoshi', sans-serif;
+    }
+
+    /* LAYOUT */
+    #app { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* SECTIONS */
+    .section { margin-bottom: 48px; }
+    .section-kicker {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--coach-accent); font-weight: 700; margin-bottom: 8px;
+    }
+    .section-title { font-size: 26px; font-weight: 500; letter-spacing: -.02em; margin-bottom: 6px; }
+    .section-sub { font-size: 14px; color: var(--muted); margin-bottom: 24px; }
+
+    /* PROFILE CARD */
+    .profile-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    .profile-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+    }
+    .profile-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .profile-value { font-size: 15px; font-weight: 600; color: var(--ink); }
+
+    /* RADAR */
+    .radar-wrap {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 32px; margin-bottom: 16px;
+    }
+    .radar-meta {
+      display: flex; gap: 24px; margin-top: 16px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .radar-meta-item { font-size: 13px; color: var(--muted); }
+    .radar-meta-item strong { color: var(--ink); }
+
+    /* MUSIC CARD */
+    .music-card {
+      background: var(--ink); border-radius: 16px; padding: 28px 32px;
+      margin-bottom: 12px;
+    }
+    .music-opener-label {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--rose); font-weight: 700; margin-bottom: 16px;
+    }
+    .music-tracks { display: flex; flex-direction: column; gap: 14px; }
+    .music-track {
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .music-domain-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      background: rgba(255,255,255,.08); color: var(--rose);
+      padding: 4px 10px; border-radius: 6px; white-space: nowrap; flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .music-text { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.7; }
+    .opener-question {
+      background: rgba(255,255,255,.06); border-left: 3px solid var(--rose);
+      padding: 14px 18px; border-radius: 0 10px 10px 0; margin-top: 20px;
+    }
+    .opener-q-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--rose); margin-bottom: 6px; }
+    .opener-q-text { font-size: 14px; color: rgba(255,255,255,.85); font-style: italic; line-height: 1.7; }
+
+    /* ANALYSIS CARDS */
+    .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media(max-width:600px) { .analysis-grid { grid-template-columns: 1fr; } }
+    .analysis-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+    }
+    .analysis-card.warn { border-color: #e8c4b4; background: var(--warn-light); }
+    .analysis-card.good { border-color: #b4d4c8; background: var(--good-light); }
+    .ac-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); font-weight: 700; margin-bottom: 8px;
+    }
+    .ac-value { font-size: 36px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .ac-value.warn { color: var(--warn); }
+    .ac-value.good { color: var(--good); }
+    .ac-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+    /* GAP PROFILE */
+    .gap-domains {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+    }
+    .gap-col { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .gap-col.strength { border-color: #b4d4c8; }
+    .gap-col.drain { border-color: #e8c4b4; }
+    .gap-col-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 12px; }
+    .gap-col.strength .gap-col-label { color: var(--good); }
+    .gap-col.drain .gap-col-label { color: var(--warn); }
+    .gap-domain-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .gap-domain-item:last-child { border-bottom: none; }
+    .gap-score { font-weight: 700; }
+    .gap-score.strength { color: var(--good); }
+    .gap-score.drain { color: var(--warn); }
+
+    /* CLUSTER */
+    .cluster-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    .cluster-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .cluster-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+    .cluster-score { font-size: 28px; font-weight: 700; color: var(--ink); }
+    .cluster-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; margin: 10px 0; }
+    .cluster-bar { height: 4px; border-radius: 2px; background: var(--rose-dark); }
+    .cluster-summary { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* DOMAIN DETAIL */
+    .domain-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; margin-bottom: 16px;
+    }
+    .domain-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+    .domain-code { font-size: 10px; letter-spacing: 2px; font-weight: 700; color: var(--muted); }
+    .domain-name { font-size: 18px; font-weight: 700; margin-top: 2px; }
+    .domain-score-wrap { text-align: right; }
+    .domain-score { font-size: 32px; font-weight: 700; }
+    .domain-band {
+      display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      padding: 3px 10px; border-radius: 999px; margin-top: 4px;
+    }
+    .band-A { background: #eef4f1; color: var(--good); }
+    .band-B { background: #f0f4f2; color: #4a7a6a; }
+    .band-C { background: #fdf8ef; color: #a07840; }
+    .band-D { background: #fdf3ef; color: var(--warn); }
+    .band-E { background: #fdeaea; color: #c04040; }
+
+    .domain-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+    .domain-field-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); font-weight: 700; margin-bottom: 4px;
+    }
+    .domain-field-text { font-size: 13px; color: var(--ink); line-height: 1.8; }
+
+    /* REFLECTION GUIDE */
+    .reflection-guide {
+      background: var(--coach-light); border: 1px solid #c8dcd5;
+      border-radius: 12px; padding: 20px; margin-top: 16px;
+    }
+    .rg-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--coach-accent); font-weight: 700; margin-bottom: 14px;
+    }
+    .rg-items { display: flex; flex-direction: column; gap: 10px; }
+    .rg-item { display: flex; gap: 10px; align-items: flex-start; }
+    .rg-type {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      background: var(--coach-accent); color: #fff;
+      padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .rg-meta { font-size: 11px; color: var(--coach-accent); margin-bottom: 2px; opacity: .7; }
+    .rg-text { font-size: 13px; color: var(--ink); line-height: 1.7; }
+
+    /* COACH MEMO */
+    .memo-area {
+      width: 100%; min-height: 160px; padding: 18px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; font-family: 'Satoshi', sans-serif;
+      font-size: 14px; color: var(--ink); resize: vertical; outline: none;
+      line-height: 1.8;
+    }
+    .memo-area:focus { border-color: var(--rose-dark); }
+
+    /* PRINT */
+    @media print {
+      .topbar { display: none; }
+      .reflection-guide { break-inside: avoid; }
+      .domain-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ACCESS GATE -->
+<div id="gate">
+  <div class="gate-brand">MOMSTONE</div>
+  <div class="gate-title">Coach Report</div>
+  <div class="gate-sub">Restricted access — coaches only</div>
+  <input class="gate-input" type="password" id="gate-input" placeholder="Enter access code" />
+  <button class="gate-btn" onclick="checkGate()">Access Report →</button>
+  <div class="gate-error" id="gate-error" style="display:none;">Incorrect access code</div>
+</div>
+
+<!-- LOADING -->
+<div id="loading-screen" style="display:none;">
+  <div class="loading-brand">MOMSTONE</div>
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading coach report…</div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar" style="display:none;">
+  <div class="topbar-brand">momstone</div>
+  <div class="topbar-badge">COACH REPORT</div>
+  <button class="print-btn" onclick="window.print()">Save as PDF</button>
+</div>
+
+<!-- MAIN -->
+<div id="app" style="display:none;"></div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
+const ACCESS_TOKEN = 'momstone2026';
+
+const REFLECTION_DB = [{"domain": "EB", "band": "A", "type": "Question", "tone": "Soothing", "theme": "Awareness", "modality": "Journaling", "intensity": "Light", "text": "When you slow down, which emotion shows up first and what does it want you to notice?"}, {"domain": "EB", "band": "A", "type": "Action", "tone": "Inviting", "theme": "Presence", "modality": "Micro-pause", "intensity": "Light", "text": "Once today, place a hand on your heart and name your feeling without judging it."}, {"domain": "EB", "band": "A", "type": "Reflection", "tone": "Reflective", "theme": "Integration", "modality": "Narrative", "intensity": "Light", "text": "Your emotions and attention are cooperating; there is room to listen before reacting."}, {"domain": "EB", "band": "B", "type": "Question", "tone": "Reflective", "theme": "Labeling", "modality": "Journaling", "intensity": "Light", "text": "What name would you give to the mood that visited most often this week?"}, {"domain": "EB", "band": "B", "type": "Action", "tone": "Practical", "theme": "Emotion-tracking", "modality": "Routine", "intensity": "Light", "text": "Write one sentence each night: “Today I felt ___ when ___.”"}, {"domain": "EB", "band": "B", "type": "Reflection", "tone": "Empowering", "theme": "Clarity", "modality": "Narrative", "intensity": "Light", "text": "You can find the feeling and hold it; structure will help you keep that habit."}, {"domain": "EB", "band": "C", "type": "Question", "tone": "Curious", "theme": "Meaning", "modality": "Reframing", "intensity": "Medium", "text": "What is this feeling trying to protect or point you toward right now?"}, {"domain": "EB", "band": "C", "type": "Action", "tone": "Grounding", "theme": "Regulation", "modality": "Breathwork", "intensity": "Light", "text": "When emotion swells, pause for 3 breaths; say: “Noticing is enough.”"}, {"domain": "EB", "band": "C", "type": "Reflection", "tone": "Reflective", "theme": "Change", "modality": "Narrative", "intensity": "Medium", "text": "You’re shifting from reaction to awareness; a steady naming practice will stabilize the change."}, {"domain": "EB", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Safety", "modality": "Somatic", "intensity": "Light", "text": "When feelings blur, what body signal (tight shoulders, breath) do you notice first?"}, {"domain": "EB", "band": "D", "type": "Action", "tone": "Gentle", "theme": "Containment", "modality": "Body-scan", "intensity": "Light", "text": "Do a 60-second body scan and write one word about what the body says."}, {"domain": "EB", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Permission", "modality": "Narrative", "intensity": "Light", "text": "Disconnection is a signal to slow, not to push; simple sensing rebuilds trust."}, {"domain": "EB", "band": "E", "type": "Question", "tone": "Compassionate", "theme": "Rest", "modality": "Kind-self-talk", "intensity": "Light", "text": "If your feelings could rest, what would they ask you to put down for now?"}, {"domain": "EB", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Recovery", "modality": "Micro-rest", "intensity": "Light", "text": "Choose a 5-minute no-input window (no phone, no talk) and soften the breath."}, {"domain": "EB", "band": "E", "type": "Reflection", "tone": "Reassuring", "theme": "Recovery", "modality": "Narrative", "intensity": "Light", "text": "Numbness is a pause, not an absence; gentleness is the first bridge back."}, {"domain": "EN", "band": "A", "type": "Question", "tone": "Curious", "theme": "Energy-awareness", "modality": "Check-in", "intensity": "Light", "text": "What patterns help your energy return quickly when it dips?"}, {"domain": "EN", "band": "A", "type": "Action", "tone": "Practical", "theme": "Routine", "modality": "Rhythm", "intensity": "Light", "text": "Protect one renewal habit you already do (sleep wind-down, short walk)."}, {"domain": "EN", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Maintenance", "modality": "Narrative", "intensity": "Light", "text": "Your energy rhythm has a reliable cadence; keep the anchors visible."}, {"domain": "EN", "band": "B", "type": "Question", "tone": "Reflective", "theme": "Load vs Fuel", "modality": "Audit", "intensity": "Medium", "text": "What drains you most this week—and what refuels you the fastest?"}, {"domain": "EN", "band": "B", "type": "Action", "tone": "Practical", "theme": "Boundary", "modality": "Schedule", "intensity": "Medium", "text": "Block a 15-minute refuel slot daily (stretch, water, daylight)."}, {"domain": "EN", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Adjustment", "modality": "Narrative", "intensity": "Light", "text": "Small, protected refuels maintain balance when pace changes."}, {"domain": "EN", "band": "C", "type": "Question", "tone": "Curious", "theme": "Trade-offs", "modality": "Priorities", "intensity": "Medium", "text": "Where could 10% less effort create 50% more rest?"}, {"domain": "EN", "band": "C", "type": "Action", "tone": "Strategic", "theme": "Subtraction", "modality": "Tiny-habit", "intensity": "Light", "text": "Drop one non-essential task this week and notice the energy return."}, {"domain": "EN", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Adaptation", "modality": "Narrative", "intensity": "Medium", "text": "Shifts in season require new pacing; subtraction is progress."}, {"domain": "EN", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Overload", "modality": "Permission", "intensity": "Light", "text": "If you offered yourself one permission slip today, what would it say?"}, {"domain": "EN", "band": "D", "type": "Action", "tone": "Restorative", "theme": "Physiology", "modality": "Hydration", "intensity": "Light", "text": "Drink water now and take 8 slow breaths with longer exhales."}, {"domain": "EN", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Stabilization", "modality": "Narrative", "intensity": "Light", "text": "Energy first, tasks second; calm physiology widens options."}, {"domain": "EN", "band": "E", "type": "Question", "tone": "Tender", "theme": "Recovery", "modality": "Compassion", "intensity": "Light", "text": "What would “bare-minimum gentle care” look like for you today?"}, {"domain": "EN", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Rest", "modality": "Micro-nap", "intensity": "Light", "text": "Try a 10-minute eyes-closed rest; no goals, just softness."}, {"domain": "EN", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Healing", "modality": "Narrative", "intensity": "Light", "text": "Rest isn’t withdrawal; it is repair."}, {"domain": "RE", "band": "A", "type": "Question", "tone": "Empowering", "theme": "Strengths", "modality": "Recall", "intensity": "Medium", "text": "Which recent moment showed you bending without breaking?"}, {"domain": "RE", "band": "A", "type": "Action", "tone": "Integrative", "theme": "Debrief", "modality": "Journal", "intensity": "Medium", "text": "Write a 3-line debrief: event, what you did, what helped."}, {"domain": "RE", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Capacity", "modality": "Narrative", "intensity": "Light", "text": "Your recovery loop is active; awareness becomes readiness."}, {"domain": "RE", "band": "B", "type": "Question", "tone": "Reflective", "theme": "Coping", "modality": "Meta-cognition", "intensity": "Medium", "text": "What helps you come back faster: support, structure, or meaning?"}, {"domain": "RE", "band": "B", "type": "Action", "tone": "Strategic", "theme": "Playbook", "modality": "Template", "intensity": "Medium", "text": "Create a tiny ‘bounce-back’ checklist for rough days."}, {"domain": "RE", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Practice", "modality": "Narrative", "intensity": "Light", "text": "Consistency, not intensity, builds durable resilience."}, {"domain": "RE", "band": "C", "type": "Question", "tone": "Curious", "theme": "Learning", "modality": "Reframe", "intensity": "Medium", "text": "What did a recent setback teach you about your pace or needs?"}, {"domain": "RE", "band": "C", "type": "Action", "tone": "Practical", "theme": "After-action", "modality": "Notes", "intensity": "Light", "text": "Capture one lesson from a challenge and a next-time tweak."}, {"domain": "RE", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Growth", "modality": "Narrative", "intensity": "Light", "text": "You’re forming new muscle memory; small loops matter."}, {"domain": "RE", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Safety", "modality": "Scope", "intensity": "Light", "text": "Where can you narrow the goal until it feels do-able?"}, {"domain": "RE", "band": "D", "type": "Action", "tone": "Gentle", "theme": "Scaling", "modality": "Task-slice", "intensity": "Light", "text": "Choose a 5-minute starter step; stop when the timer ends."}, {"domain": "RE", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Stability", "modality": "Narrative", "intensity": "Light", "text": "Safety grows when goals are right-sized."}, {"domain": "RE", "band": "E", "type": "Question", "tone": "Tender", "theme": "Kindness", "modality": "Acceptance", "intensity": "Light", "text": "What would it mean to not bounce today—and still be worthy?"}, {"domain": "RE", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Support", "modality": "Ask", "intensity": "Light", "text": "Send one message to ask for a small, specific help."}, {"domain": "RE", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Humanity", "modality": "Narrative", "intensity": "Light", "text": "Resilience includes the courage to be carried."}, {"domain": "SM", "band": "A", "type": "Question", "tone": "Reflective", "theme": "Habits", "modality": "Focus", "intensity": "Light", "text": "What small routine quietly keeps your day coherent?"}, {"domain": "SM", "band": "A", "type": "Action", "tone": "Practical", "theme": "Ritual", "modality": "Routine", "intensity": "Light", "text": "Protect one anchor time (start-up or wind-down) this week."}, {"domain": "SM", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Coherence", "modality": "Narrative", "intensity": "Light", "text": "Your systems are light but alive; they support your flow."}, {"domain": "SM", "band": "B", "type": "Question", "tone": "Curious", "theme": "Clarity", "modality": "Choice", "intensity": "Medium", "text": "Which two tasks truly move the day forward?"}, {"domain": "SM", "band": "B", "type": "Action", "tone": "Strategic", "theme": "Prioritization", "modality": "List", "intensity": "Medium", "text": "Mark 1-2 “musts,” 3 “maybes”—stop after musts."}, {"domain": "SM", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Boundaries", "modality": "Narrative", "intensity": "Light", "text": "Clarity lowers noise; limits make room for you."}, {"domain": "SM", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Trade-offs", "modality": "Time", "intensity": "Medium", "text": "What can become weekly instead of daily?"}, {"domain": "SM", "band": "C", "type": "Action", "tone": "Practical", "theme": "Batching", "modality": "Schedule", "intensity": "Medium", "text": "Batch similar tasks; add a buffer block."}, {"domain": "SM", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Refit", "modality": "Narrative", "intensity": "Light", "text": "Systems evolve with seasons; let them refit your life."}, {"domain": "SM", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Overwhelm", "modality": "Simplify", "intensity": "Light", "text": "What is the smallest helpful next step?"}, {"domain": "SM", "band": "D", "type": "Action", "tone": "Gentle", "theme": "Constraint", "modality": "Timer", "intensity": "Light", "text": "Try 10 minutes focused, then a soft pause."}, {"domain": "SM", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Self-trust", "modality": "Narrative", "intensity": "Light", "text": "Finishing small builds trust faster than starting big."}, {"domain": "SM", "band": "E", "type": "Question", "tone": "Tender", "theme": "Permission", "modality": "Kindness", "intensity": "Light", "text": "What could be dropped without harm—today only?"}, {"domain": "SM", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Stop-doing", "modality": "List", "intensity": "Light", "text": "Write a ‘not-today’ list of three items."}, {"domain": "SM", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Relief", "modality": "Narrative", "intensity": "Light", "text": "Less can be loving; emptiness can be air."}, {"domain": "ID", "band": "A", "type": "Question", "tone": "Reflective", "theme": "Identity", "modality": "Alignment", "intensity": "Medium", "text": "Where do your roles feel most like you?"}, {"domain": "ID", "band": "A", "type": "Action", "tone": "Integrative", "theme": "Values", "modality": "Note", "intensity": "Light", "text": "Name one value you protect across roles this week."}, {"domain": "ID", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Wholeness", "modality": "Narrative", "intensity": "Light", "text": "You carry one self through many roles with grace."}, {"domain": "ID", "band": "B", "type": "Question", "tone": "Curious", "theme": "Balance", "modality": "Choice", "intensity": "Medium", "text": "What role is asking for a kinder boundary?"}, {"domain": "ID", "band": "B", "type": "Action", "tone": "Practical", "theme": "Boundary", "modality": "Script", "intensity": "Medium", "text": "Draft one gentle ‘no’ or ‘not now’ sentence."}, {"domain": "ID", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Center", "modality": "Narrative", "intensity": "Light", "text": "Guarding your center protects your care."}, {"domain": "ID", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Re-authoring", "modality": "Story", "intensity": "Medium", "text": "What part of your story wants a new chapter title?"}, {"domain": "ID", "band": "C", "type": "Action", "tone": "Creative", "theme": "Story", "modality": "Rewrite", "intensity": "Medium", "text": "Write three lines: what was, what is, what’s next."}, {"domain": "ID", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Evolution", "modality": "Narrative", "intensity": "Light", "text": "Identity adjusts in motion; you are not behind."}, {"domain": "ID", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Self-regard", "modality": "Compassion", "intensity": "Light", "text": "How would you speak to a friend in your role right now?"}, {"domain": "ID", "band": "D", "type": "Action", "tone": "Gentle", "theme": "Mirror", "modality": "Affirmation", "intensity": "Light", "text": "Place one reminder of who you are where you’ll see it."}, {"domain": "ID", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Anchoring", "modality": "Narrative", "intensity": "Light", "text": "Small anchors help you remember yourself."}, {"domain": "ID", "band": "E", "type": "Question", "tone": "Tender", "theme": "Enoughness", "modality": "Worth", "intensity": "Light", "text": "Where could you be ‘just you’ for a while?"}, {"domain": "ID", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Self-permission", "modality": "Pause", "intensity": "Light", "text": "Choose one role to put on the shelf for a day."}, {"domain": "ID", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Being", "modality": "Narrative", "intensity": "Light", "text": "You are someone before you are something."}, {"domain": "RS", "band": "A", "type": "Question", "tone": "Grateful", "theme": "Connection", "modality": "Support", "intensity": "Light", "text": "Which relationship has quietly supported you this week?"}, {"domain": "RS", "band": "A", "type": "Action", "tone": "Appreciative", "theme": "Thanks", "modality": "Message", "intensity": "Light", "text": "Send a 2-line thank-you to someone who eased your day."}, {"domain": "RS", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Network", "modality": "Narrative", "intensity": "Light", "text": "You’re resourced; support flows both ways."}, {"domain": "RS", "band": "B", "type": "Question", "tone": "Curious", "theme": "Ask vs Give", "modality": "Balance", "intensity": "Medium", "text": "Where could you ask a little more and give a little less?"}, {"domain": "RS", "band": "B", "type": "Action", "tone": "Practical", "theme": "Request", "modality": "Specific", "intensity": "Medium", "text": "Make one clear, small ask with a when/how."}, {"domain": "RS", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Mutuality", "modality": "Narrative", "intensity": "Light", "text": "Letting others help is belonging too."}, {"domain": "RS", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Boundaries", "modality": "Clarity", "intensity": "Medium", "text": "What boundary would make care feel lighter?"}, {"domain": "RS", "band": "C", "type": "Action", "tone": "Practical", "theme": "Limit", "modality": "Phrase", "intensity": "Medium", "text": "Try one boundary phrase: “I’m at capacity today.”"}, {"domain": "RS", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Fit", "modality": "Narrative", "intensity": "Light", "text": "Caring fits better when edges are shaped."}, {"domain": "RS", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Overcommit", "modality": "Reality", "intensity": "Light", "text": "Where are you saying ‘yes’ faster than you mean it?"}, {"domain": "RS", "band": "D", "type": "Action", "tone": "Gentle", "theme": "Delay", "modality": "Rule", "intensity": "Light", "text": "Add a ‘pause before yes’ rule for 24 hours."}, {"domain": "RS", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Repair", "modality": "Narrative", "intensity": "Light", "text": "Pausing protects trust—yours and theirs."}, {"domain": "RS", "band": "E", "type": "Question", "tone": "Tender", "theme": "Protection", "modality": "Space", "intensity": "Light", "text": "Who feels safe enough for you to be silent with?"}, {"domain": "RS", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Quiet", "modality": "Presence", "intensity": "Light", "text": "Share quiet time with someone who doesn’t need you to perform."}, {"domain": "RS", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Sanctuary", "modality": "Narrative", "intensity": "Light", "text": "Support can be stillness, not only doing."}, {"domain": "VA", "band": "A", "type": "Question", "tone": "Reflective", "theme": "Meaning", "modality": "Priority", "intensity": "Medium", "text": "Which value guided your best moment this week?"}, {"domain": "VA", "band": "A", "type": "Action", "tone": "Integrative", "theme": "Value-act", "modality": "Commit", "intensity": "Medium", "text": "Do one small act that honors that value today."}, {"domain": "VA", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Alignment", "modality": "Narrative", "intensity": "Light", "text": "Your choices and values are in conversation."}, {"domain": "VA", "band": "B", "type": "Question", "tone": "Curious", "theme": "Fit", "modality": "Trade-off", "intensity": "Medium", "text": "Where does your day misalign with what matters most?"}, {"domain": "VA", "band": "B", "type": "Action", "tone": "Practical", "theme": "Tweak", "modality": "Schedule", "intensity": "Medium", "text": "Move one small task to make room for a value moment."}, {"domain": "VA", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Realignment", "modality": "Narrative", "intensity": "Light", "text": "Tiny realignments accumulate into relief."}, {"domain": "VA", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Discovery", "modality": "Curiosity", "intensity": "Medium", "text": "What value is becoming more important this season?"}, {"domain": "VA", "band": "C", "type": "Action", "tone": "Exploratory", "theme": "Try-out", "modality": "Experiment", "intensity": "Medium", "text": "Try a 30-minute activity that nourishes that value."}, {"domain": "VA", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Shift", "modality": "Narrative", "intensity": "Light", "text": "Meaning shifts as life shifts; that’s honest growth."}, {"domain": "VA", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Conflict", "modality": "Tension", "intensity": "Light", "text": "Where do you feel pulled between should and want?"}, {"domain": "VA", "band": "D", "type": "Action", "tone": "Gentle", "theme": "Reduce", "modality": "Obligation", "intensity": "Light", "text": "Trade one ‘should’ for one ‘want’ this week."}, {"domain": "VA", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Permission", "modality": "Narrative", "intensity": "Light", "text": "Permission restores integrity."}, {"domain": "VA", "band": "E", "type": "Question", "tone": "Tender", "theme": "Spark", "modality": "Rekindle", "intensity": "Light", "text": "What tiny thing still feels quietly meaningful?"}, {"domain": "VA", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Meaning-micro", "modality": "Moment", "intensity": "Light", "text": "Give 5 minutes to that spark with no outcome needed."}, {"domain": "VA", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Ember", "modality": "Narrative", "intensity": "Light", "text": "Even embers warm when protected."}, {"domain": "SC", "band": "A", "type": "Question", "tone": "Compassionate", "theme": "Friendship", "modality": "Voice", "intensity": "Light", "text": "How do you speak to yourself when you succeed?"}, {"domain": "SC", "band": "A", "type": "Action", "tone": "Gentle", "theme": "Kind-note", "modality": "Message", "intensity": "Light", "text": "Write a kind sentence to yourself you’d send a friend."}, {"domain": "SC", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Warmth", "modality": "Narrative", "intensity": "Light", "text": "Warm inner talk keeps courage soft and steady."}, {"domain": "SC", "band": "B", "type": "Question", "tone": "Reflective", "theme": "Tone", "modality": "Awareness", "intensity": "Light", "text": "When stress rises, how does your inner tone change?"}, {"domain": "SC", "band": "B", "type": "Action", "tone": "Practical", "theme": "Swap", "modality": "Language", "intensity": "Light", "text": "Replace one harsh phrase with a neutral one today."}, {"domain": "SC", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Practice", "modality": "Narrative", "intensity": "Light", "text": "Language is a habit; practice reshapes it."}, {"domain": "SC", "band": "C", "type": "Question", "tone": "Curious", "theme": "Need", "modality": "Fairness", "intensity": "Medium", "text": "What need goes unmet when you’re hardest on yourself?"}, {"domain": "SC", "band": "C", "type": "Action", "tone": "Gentle", "theme": "Need-naming", "modality": "Journal", "intensity": "Light", "text": "List three needs; honor one in a simple way."}, {"domain": "SC", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Kindness", "modality": "Narrative", "intensity": "Light", "text": "Self-kindness grows when needs are seen."}, {"domain": "SC", "band": "D", "type": "Question", "tone": "Tender", "theme": "Enoughness", "modality": "Acceptance", "intensity": "Light", "text": "Where could you be imperfect and still safe?"}, {"domain": "SC", "band": "D", "type": "Action", "tone": "Restorative", "theme": "Stop-rule", "modality": "Limit", "intensity": "Light", "text": "Call time on self-critique after 2 minutes; redirect to breath."}, {"domain": "SC", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Safety", "modality": "Narrative", "intensity": "Light", "text": "Safety first; then growth returns."}, {"domain": "SC", "band": "E", "type": "Question", "tone": "Compassionate", "theme": "Permission", "modality": "Rest", "intensity": "Light", "text": "What would a merciful friend offer you today?"}, {"domain": "SC", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Comfort", "modality": "Ritual", "intensity": "Light", "text": "Choose one comfort ritual (warm drink, blanket, quiet)."}, {"domain": "SC", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Worth", "modality": "Narrative", "intensity": "Light", "text": "You deserve care without performance."}, {"domain": "VG", "band": "A", "type": "Question", "tone": "Reflective", "theme": "Direction", "modality": "Clarity", "intensity": "Medium", "text": "Which direction feels bright and simple right now?"}, {"domain": "VG", "band": "A", "type": "Action", "tone": "Practical", "theme": "Step", "modality": "Commit", "intensity": "Medium", "text": "Name one 15-minute step toward it this week."}, {"domain": "VG", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Trajectory", "modality": "Narrative", "intensity": "Light", "text": "Momentum begins with small faithful steps."}, {"domain": "VG", "band": "B", "type": "Question", "tone": "Curious", "theme": "Focus", "modality": "Choice", "intensity": "Medium", "text": "What would you say yes to if you had one more hour?"}, {"domain": "VG", "band": "B", "type": "Action", "tone": "Strategic", "theme": "Time-swap", "modality": "Plan", "intensity": "Medium", "text": "Swap one low-value task for one progress task."}, {"domain": "VG", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Selection", "modality": "Narrative", "intensity": "Light", "text": "Clarity grows as choices narrow."}, {"domain": "VG", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Possibility", "modality": "Experiment", "intensity": "Medium", "text": "What future are you willing to audition?"}, {"domain": "VG", "band": "C", "type": "Action", "tone": "Exploratory", "theme": "Prototype", "modality": "Tiny-test", "intensity": "Medium", "text": "Run a 30-minute prototype of one idea."}, {"domain": "VG", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Becoming", "modality": "Narrative", "intensity": "Light", "text": "Trying is part of deciding."}, {"domain": "VG", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Overwhelm", "modality": "Scale", "intensity": "Light", "text": "How small could the next step be and still be real?"}, {"domain": "VG", "band": "D", "type": "Action", "tone": "Practical", "theme": "Constraint", "modality": "Timer", "intensity": "Light", "text": "Set a 7-minute timer and touch the goal once."}, {"domain": "VG", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Permission", "modality": "Narrative", "intensity": "Light", "text": "Tiny contact keeps the path warm."}, {"domain": "VG", "band": "E", "type": "Question", "tone": "Tender", "theme": "Hope", "modality": "Spark", "intensity": "Light", "text": "What hope is quiet but not gone?"}, {"domain": "VG", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Hope-micro", "modality": "Notice", "intensity": "Light", "text": "Collect one sign of life moving in your favor."}, {"domain": "VG", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Season", "modality": "Narrative", "intensity": "Light", "text": "Rest can also be a direction."}, {"domain": "TP", "band": "A", "type": "Question", "tone": "Reflective", "theme": "Focus", "modality": "Flow", "intensity": "Medium", "text": "When does time feel friendly to you?"}, {"domain": "TP", "band": "A", "type": "Action", "tone": "Practical", "theme": "Theme-day", "modality": "Schedule", "intensity": "Medium", "text": "Give one hour a clear theme and protect it."}, {"domain": "TP", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Synchrony", "modality": "Narrative", "intensity": "Light", "text": "Your pace and priorities cooperate."}, {"domain": "TP", "band": "B", "type": "Question", "tone": "Curious", "theme": "Trade-off", "modality": "Choice", "intensity": "Medium", "text": "What priority matters most this week—and what will wait?"}, {"domain": "TP", "band": "B", "type": "Action", "tone": "Strategic", "theme": "2-column", "modality": "List", "intensity": "Medium", "text": "Make a ‘Now / Not now’ list for today."}, {"domain": "TP", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Discernment", "modality": "Narrative", "intensity": "Light", "text": "Discernment is focus without force."}, {"domain": "TP", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Fit", "modality": "Capacity", "intensity": "Medium", "text": "What could be done weekly instead of daily?"}, {"domain": "TP", "band": "C", "type": "Action", "tone": "Practical", "theme": "Batching", "modality": "Calendar", "intensity": "Medium", "text": "Batch admin tasks and add a buffer block."}, {"domain": "TP", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "Right-sizing", "modality": "Narrative", "intensity": "Light", "text": "Right-sized plans restore momentum."}, {"domain": "TP", "band": "D", "type": "Question", "tone": "Soothing", "theme": "Overload", "modality": "Reduce", "intensity": "Light", "text": "What is safe to cancel today?"}, {"domain": "TP", "band": "D", "type": "Action", "tone": "Gentle", "theme": "One-thing", "modality": "Focus", "intensity": "Light", "text": "Pick one thing; finish it kindly."}, {"domain": "TP", "band": "D", "type": "Reflection", "tone": "Reassuring", "theme": "Relief", "modality": "Narrative", "intensity": "Light", "text": "Finishing one is stronger than starting three."}, {"domain": "TP", "band": "E", "type": "Question", "tone": "Tender", "theme": "Compassion", "modality": "Realism", "intensity": "Light", "text": "What would your day look like with half the commitments?"}, {"domain": "TP", "band": "E", "type": "Action", "tone": "Restorative", "theme": "Clear-space", "modality": "Remove", "intensity": "Light", "text": "Cancel one non-essential plan and breathe."}, {"domain": "TP", "band": "E", "type": "Reflection", "tone": "Affirming", "theme": "Grace", "modality": "Narrative", "intensity": "Light", "text": "Space is medicine for pace."}, {"domain": "LS", "band": "A", "type": "Question", "tone": "Reflective", "theme": "Gratitude", "modality": "Meaning", "intensity": "Light", "text": "Where do you feel quietly satisfied in your life right now?"}, {"domain": "LS", "band": "A", "type": "Action", "tone": "Integrative", "theme": "Savoring", "modality": "Presence", "intensity": "Light", "text": "Linger 30 seconds longer in one good moment today."}, {"domain": "LS", "band": "A", "type": "Reflection", "tone": "Affirming", "theme": "Contentment", "modality": "Narrative", "intensity": "Light", "text": "Satisfaction grows where attention stays."}, {"domain": "LS", "band": "B", "type": "Question", "tone": "Curious", "theme": "Balance", "modality": "Shift", "intensity": "Medium", "text": "What would make life 10% more spacious this week?"}, {"domain": "LS", "band": "B", "type": "Action", "tone": "Practical", "theme": "Tweak", "modality": "Plan", "intensity": "Medium", "text": "Swap one draining item for one nourishing one."}, {"domain": "LS", "band": "B", "type": "Reflection", "tone": "Encouraging", "theme": "Adjustment", "modality": "Narrative", "intensity": "Light", "text": "Small exchanges reshape the day."}, {"domain": "LS", "band": "C", "type": "Question", "tone": "Reflective", "theme": "Recalibration", "modality": "Focus", "intensity": "Medium", "text": "What part of life wants a little more light?"}, {"domain": "LS", "band": "C", "type": "Action", "tone": "Exploratory", "theme": "Add-good", "modality": "Micro", "intensity": "Light", "text": "Add one small good thing (song, sun, friend)."}, {"domain": "LS", "band": "C", "type": "Reflection", "tone": "Normalizing", "theme": "In-between", "modality": "Narrative", "intensity": "Light", "text": "Becoming satisfied is also a path."}];
+
+const DOMAINS = [
+  { code:'EB', en:'Emotional Balance' },
+  { code:'EN', en:'Energy Management' },
+  { code:'RE', en:'Resilience' },
+  { code:'SM', en:'Strengths & Motivation' },
+  { code:'ID', en:'Identity Integration' },
+  { code:'RS', en:'Relational Support' },
+  { code:'VA', en:'Values Alignment' },
+  { code:'SC', en:'Self-Compassion' },
+  { code:'VG', en:'Vision & Growth' },
+  { code:'TP', en:'Time & Priority' },
+  { code:'LS', en:'Life Satisfaction' },
+];
+
+const CLUSTERS = [
+  { name:'Emotional Flow',   scoreKey:'EF',        summaryKey:'EF_summary' },
+  { name:'Resilience Flow',  scoreKey:'RF',        summaryKey:'RF_summary' },
+  { name:'Meaning Flow',     scoreKey:'MF',        summaryKey:'MF_summary' },
+  { name:'Energy Index',     scoreKey:'EI',        summaryKey:'EI_summary' },
+];
+
+const BAND_NAMES = {
+  A: 'Flowing Harmony', B: 'Balanced Awareness',
+  C: 'Transitional Flow', D: 'Fragmented Rhythm', E: 'Silent Exhaustion'
+};
+
+// ─── ACCESS GATE ─────────────────────────────────────────────────────────────
+function checkGate() {
+  const val = document.getElementById('gate-input').value.trim();
+  if (val === ACCESS_TOKEN) {
+    document.getElementById('gate').style.display = 'none';
+    const params = new URLSearchParams(window.location.search);
+    const row = params.get('row');
+    if (row) {
+      document.getElementById('loading-screen').style.display = 'flex';
+      loadReport(parseInt(row));
+    } else {
+      document.getElementById('app').innerHTML = '<div style="padding:60px;text-align:center;color:#888;">No row parameter in URL. Use ?row=XX&token=momstone2026</div>';
+      document.getElementById('app').style.display = 'block';
+      document.getElementById('topbar').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('gate-error').style.display = 'block';
+  }
+}
+
+document.getElementById('gate-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkGate();
+});
+
+// Auto-check token in URL
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('token') === ACCESS_TOKEN) {
+    document.getElementById('gate').style.display = 'none';
+    const row = params.get('row');
+    if (row) {
+      document.getElementById('loading-screen').style.display = 'flex';
+      loadReport(parseInt(row));
+    }
+  }
+})();
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+function get(d, k, fallback='') { return d[k] !== undefined && d[k] !== '' ? d[k] : fallback; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+async function loadReport(row) {
+  try {
+    const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko';
+    const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}&lang=${lang}`);
+    const json = await res.json();
+    if (json.result !== 'success') throw new Error(json.message);
+    renderReport(json.data, row);
+  } catch(err) {
+    document.getElementById('loading-screen').style.display = 'none';
+    document.getElementById('app').innerHTML = `<div style="padding:60px;text-align:center;color:#888;">Unable to load report: ${err.message}</div>`;
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('topbar').style.display = 'flex';
+  }
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function renderReport(d, row) {
+  const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko';
+
+  // Domain scores
+  const scores = DOMAINS.map(dom => parseFloat(get(d, dom.code+'_score', 0)));
+  const overall = parseFloat(get(d,'Overall_Avg', 0));
+  const band = get(d,'Band','');
+  const bandName = get(d,'BandName', BAND_NAMES[band] || '');
+
+  // New analysis
+  const strengthGap = get(d,'Strength_Gap','—');
+  const strengthGapLabel = get(d,'Strength_Gap_Label','');
+  const vulnIndex = get(d,'Vulnerability_Index','—');
+  const vulnLabel = get(d,'Vulnerability_Label','');
+  const coachReady = get(d,'Coaching_Readiness','—');
+  const coachReadyLabel = get(d,'Coaching_Readiness_Label','');
+  const relSelf = get(d,'Relational_Self_Dynamic','—');
+  const relSelfLabel = get(d,'Relational_Self_Label','');
+
+  // Top 3 / Bottom 3
+  const domainScores = DOMAINS.map((dom,i) => ({ ...dom, score: scores[i] }));
+  const sorted = [...domainScores].sort((a,b) => b.score - a.score);
+  const top3 = sorted.slice(0,3);
+  const bottom3 = sorted.slice(-3).reverse();
+
+  // Music summaries
+  const musicKeys = [
+    { key:'EF_music_summary', label:'Emotional Flow' },
+    { key:'RF_music_summary', label:'Resilience Flow' },
+    { key:'MF_music_summary', label:'Meaning Flow' },
+    { key:'EI_music_summary', label:'Energy Index' },
+    { key:'Stability_music_summary', label:'Stability' },
+  ];
+
+  // Opener question — pick from lowest domain's Reflection_DB Question
+  const lowestDom = bottom3[0];
+  const openerEntry = REFLECTION_DB.find(e =>
+    e.domain === lowestDom.code && e.band === band && e.type === 'Question'
+  );
+
+  const vulnNum = parseFloat(vulnIndex);
+  const vulnClass = vulnNum >= 7 ? 'warn' : vulnNum >= 5 ? 'warn' : '';
+  const readyNum = parseFloat(coachReady);
+  const readyClass = readyNum >= 4 ? 'good' : readyNum >= 3 ? '' : 'warn';
+
+  let html = `
+  <!-- ① PROFILE -->
+  <div class="section">
+    <div class="section-kicker">Session Profile</div>
+    <div class="section-title">Participant Overview</div>
+    <div class="section-sub">Row ${row} · Submitted ${get(d,'Date','—')}</div>
+    <div class="profile-grid">
+      <div class="profile-item"><div class="profile-label">Name</div><div class="profile-value">${esc(get(d,'Name','—'))}</div></div>
+      <div class="profile-item"><div class="profile-label">Age Group</div><div class="profile-value">${esc(get(d,'Age','—'))}</div></div>
+      <div class="profile-item"><div class="profile-label">Activity</div><div class="profile-value">${esc(get(d,'Activity','—'))}</div></div>
+      <div class="profile-item"><div class="profile-label">Focus Topic</div><div class="profile-value">${esc(get(d,'Topic','—'))}</div></div>
+      <div class="profile-item"><div class="profile-label">Language</div><div class="profile-value">${lang === 'en' ? 'English' : '한국어'}</div></div>
+      <div class="profile-item"><div class="profile-label">Overall</div><div class="profile-value" style="color:var(--rose-dark)">${overall.toFixed(1)} / 5.0</div></div>
+    </div>
+  </div>
+
+  <!-- ② RADAR -->
+  <div class="section">
+    <div class="section-kicker">Rhythm Map</div>
+    <div class="section-title">Full Rhythm Across 11 Domains</div>
+    <div class="radar-wrap">
+      <canvas id="radarChart" style="max-height:360px;"></canvas>
+      <div class="radar-meta">
+        <div class="radar-meta-item">Overall <strong>${overall.toFixed(2)}</strong></div>
+        <div class="radar-meta-item">Band <strong>${band}</strong></div>
+        <div class="radar-meta-item">Rhythm Type <strong>${esc(bandName)}</strong></div>
+        <div class="radar-meta-item">Reset Point <strong>${esc(get(d,'Reset_Point','—'))}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ SESSION OPENER -->
+  <div class="section">
+    <div class="section-kicker">Session Opener Guide</div>
+    <div class="section-title">Music Soundtrack + Opening</div>
+    <div class="section-sub">Use this to open the session before introducing any numbers.</div>
+    <div class="music-card">
+      <div class="music-opener-label">🎵 Today's Rhythm Soundtrack</div>
+      <div class="music-tracks">
+        ${musicKeys.map(m => `
+          <div class="music-track">
+            <div class="music-domain-badge">${m.label}</div>
+            <div class="music-text">${esc(get(d, m.key, '—'))}</div>
+          </div>
+        `).join('')}
+      </div>
+      ${openerEntry ? `
+      <div class="opener-question">
+        <div class="opener-q-label">Recommended Opening Question · ${lowestDom.en}</div>
+        <div class="opener-q-text">"${esc(openerEntry.text)}"</div>
+      </div>` : ''}
+    </div>
+  </div>
+
+  <!-- ④ STRENGTH-DRAIN GAP -->
+  <div class="section">
+    <div class="section-kicker">Strength-Drain Profile</div>
+    <div class="section-title">Gap Analysis</div>
+    <div class="section-sub">Top 3 flowing domains vs bottom 3 depleted domains.</div>
+    <div class="gap-domains">
+      <div class="gap-col strength">
+        <div class="gap-col-label">✦ Strength Domains</div>
+        ${top3.map(d => `<div class="gap-domain-item"><span>${esc(d.en)}</span><span class="gap-score strength">${d.score.toFixed(1)}</span></div>`).join('')}
+      </div>
+      <div class="gap-col drain">
+        <div class="gap-col-label">⚠ Depleted Domains</div>
+        ${bottom3.map(d => `<div class="gap-domain-item"><span>${esc(d.en)}</span><span class="gap-score drain">${d.score.toFixed(1)}</span></div>`).join('')}
+      </div>
+    </div>
+    <div class="analysis-card" style="margin-top:0;">
+      <div class="ac-label">Strength Gap</div>
+      <div class="ac-value">${strengthGap}</div>
+      <div class="ac-text">${esc(strengthGapLabel)}</div>
+    </div>
+  </div>
+
+  <!-- ⑤⑥⑦⑧ ANALYSIS GRID -->
+  <div class="section">
+    <div class="section-kicker">Coaching Analysis</div>
+    <div class="section-title">Key Indicators</div>
+    <div class="analysis-grid">
+      <div class="analysis-card ${vulnClass}">
+        <div class="ac-label">Vulnerability Index</div>
+        <div class="ac-value ${vulnClass}">${vulnIndex} <span style="font-size:16px;font-weight:400;color:var(--muted)">/ 10</span></div>
+        <div class="ac-text">${esc(vulnLabel)}</div>
+      </div>
+      <div class="analysis-card ${readyClass}">
+        <div class="ac-label">Coaching Readiness</div>
+        <div class="ac-value ${readyClass}">${coachReady} <span style="font-size:16px;font-weight:400;color:var(--muted)">/ 5</span></div>
+        <div class="ac-text">${esc(coachReadyLabel)}</div>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-label">Relational-Self Dynamic</div>
+        <div class="ac-value">${relSelf}</div>
+        <div class="ac-text">${esc(relSelfLabel)}</div>
+      </div>
+      <div class="analysis-card">
+        <div class="ac-label">Cluster Balance</div>
+        <div class="cluster-grid" style="margin-top:8px;">
+          ${CLUSTERS.map(c => {
+            const sc = parseFloat(get(d, c.scoreKey, 0));
+            return `<div class="cluster-card">
+              <div class="cluster-name">${c.name}</div>
+              <div class="cluster-score">${sc.toFixed(1)}</div>
+              <div class="cluster-bar-wrap"><div class="cluster-bar" style="width:${(sc/5)*100}%"></div></div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑨ DOMAIN DETAIL + REFLECTION GUIDE -->
+  <div class="section">
+    <div class="section-kicker">Domain Detail + Coaching Guide</div>
+    <div class="section-title">11 Domains — Full Analysis</div>
+    <div class="section-sub">Each domain includes interpretation, coaching question, action plan, and recommended intervention from Reflection DB.</div>
+    ${DOMAINS.map(dom => {
+      const score = parseFloat(get(d, dom.code+'_score', 0));
+      const domBand = get(d, dom.code+'_stage', band);
+      const summary = get(d, dom.code+'_Summary', '');
+      const question = get(d, dom.code+'_Question', '');
+      const action = get(d, dom.code+'_Action', '');
+      const focus = get(d, dom.code+'_Focus', '');
+
+      // Reflection DB entries for this domain+band
+      const reflections = REFLECTION_DB.filter(e =>
+        e.domain === dom.code && e.band === (domBand || band)
+      );
+
+      return `<div class="domain-card">
+        <div class="domain-header">
+          <div>
+            <div class="domain-code">${dom.code}</div>
+            <div class="domain-name">${esc(dom.en)}</div>
+          </div>
+          <div class="domain-score-wrap">
+            <div class="domain-score" style="color:${score>=4?'var(--good)':score>=3?'var(--ink)':score>=2?'var(--warn)':'#c04040'}">${score.toFixed(1)}</div>
+            <div class="domain-band band-${domBand || band}">${domBand || band} · ${BAND_NAMES[domBand || band] || ''}</div>
+          </div>
+        </div>
+        <div class="domain-fields">
+          ${summary ? `<div><div class="domain-field-label">Interpretation</div><div class="domain-field-text">${esc(summary)}</div></div>` : ''}
+          ${question ? `<div><div class="domain-field-label">Coaching Question</div><div class="domain-field-text">${esc(question)}</div></div>` : ''}
+          ${action ? `<div><div class="domain-field-label">Action Plan</div><div class="domain-field-text">${esc(action)}</div></div>` : ''}
+          ${focus ? `<div><div class="domain-field-label">Coaching Focus</div><div class="domain-field-text">${esc(focus)}</div></div>` : ''}
+        </div>
+        ${reflections.length ? `
+        <div class="reflection-guide">
+          <div class="rg-label">Coaching Intervention Guide</div>
+          <div class="rg-items">
+            ${reflections.map(r => `
+              <div class="rg-item">
+                <div class="rg-type">${r.type}</div>
+                <div>
+                  <div class="rg-meta">${r.tone} · ${r.modality} · ${r.intensity}</div>
+                  <div class="rg-text">${esc(r.text)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>` : ''}
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- ⑩ RESET POINT -->
+  <div class="section">
+    <div class="section-kicker">Reset Point</div>
+    <div class="section-title">${esc(get(d,'Reset_Point','—'))}</div>
+    <div class="analysis-card" style="margin-top:16px;">
+      <div class="ac-label">Reset Reason</div>
+      <div class="ac-text" style="font-size:14px;color:var(--ink);margin-bottom:16px;">${esc(get(d,'Reset_Reason','—'))}</div>
+      <div class="ac-label">Reset Signal</div>
+      <div class="ac-text" style="font-size:14px;color:var(--ink);margin-bottom:16px;">${esc(get(d,'Reset_Signal','—'))}</div>
+      <div class="ac-label">Today's Action</div>
+      <div class="ac-text" style="font-size:14px;color:var(--ink);">${esc(get(d,'Reset_Action','—'))}</div>
+    </div>
+  </div>
+
+  <!-- ⑪ COACH MEMO -->
+  <div class="section">
+    <div class="section-kicker">Coach Notes</div>
+    <div class="section-title">Pre-Session Memo</div>
+    <div class="section-sub">Your notes here won't be saved — print or copy before closing.</div>
+    <textarea class="memo-area" placeholder="Session observations, hypotheses, questions to explore…"></textarea>
+  </div>
+  `;
+
+  document.getElementById('app').innerHTML = html;
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('loading-screen').style.display = 'none';
+
+  // Radar chart
+  setTimeout(() => {
+    const ctx = document.getElementById('radarChart');
+    if (!ctx) return;
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: DOMAINS.map(d => d.en.split(' ')[0]),
+        datasets: [{
+          label: 'Rhythm',
+          data: scores,
+          backgroundColor: 'rgba(201,130,106,0.12)',
+          borderColor: 'rgba(201,130,106,0.8)',
+          pointBackgroundColor: '#c9826a',
+          borderWidth: 2,
+          pointRadius: 4,
+        }]
+      },
+      options: {
+        scales: { r: {
+          min: 0, max: 5,
+          ticks: { stepSize: 1, font: { size: 10 }, color: '#aaa' },
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          pointLabels: { font: { size: 11 }, color: '#555' }
+        } },
+        plugins: { legend: { display: false } },
+        responsive: true,
+      }
+    });
+  }, 100);
+}
+</script>
+</body>
+</html>
