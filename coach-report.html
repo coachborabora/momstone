@@ -722,17 +722,30 @@ function renderReport(d, row) {
     const ctx = document.getElementById('radarChart');
     if (!ctx) return;
     new Chart(ctx, {
+      // Cluster color mapping
+      // EB(0) EN(1) RE(2) SM(3) ID(4) RS(5) VA(6) SC(7) VG(8) TP(9) LS(10)
+      // EF: EB, EN, SC, SM / RF: RE, ID, RS / MF: VA, VG, LS / EI: EN, TP
+      const EF = 'rgba(201,130,106,0.95)';  // rose
+      const RF = 'rgba(106,158,138,0.95)';  // sage green
+      const MF = 'rgba(155,130,196,0.95)';  // lavender
+      const EI = 'rgba(196,164,90,0.95)';   // warm amber
+
+      const CLUSTER_COLORS = [EF, EF, RF, EF, RF, RF, MF, EF, MF, EI, MF];
+
       type: 'radar',
       data: {
         labels: DOMAINS.map(d => lang === 'ko' ? [d.en, `(${d.ko})`] : d.en),
         datasets: [{
           label: 'Rhythm',
           data: scores,
-          backgroundColor: 'rgba(201,130,106,0.12)',
-          borderColor: 'rgba(201,130,106,0.8)',
-          pointBackgroundColor: '#c9826a',
-          borderWidth: 2,
-          pointRadius: 4,
+          backgroundColor: 'rgba(201,130,106,0.08)',
+          borderColor: 'rgba(201,130,106,0.4)',
+          borderWidth: 1.5,
+          borderDash: [4,3],
+          pointBackgroundColor: CLUSTER_COLORS,
+          pointBorderColor: CLUSTER_COLORS,
+          pointRadius: 7,
+          pointHoverRadius: 9,
         }]
       },
       options: {
@@ -742,10 +755,44 @@ function renderReport(d, row) {
           grid: { color: 'rgba(0,0,0,0.06)' },
           pointLabels: { font: { size: lang === 'ko' ? 9 : 11 }, color: '#555' }
         } },
-        plugins: { legend: { display: false } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => {
+                const clusters = ['EF','EF','RF','EF','RF','RF','MF','EF','MF','EI','MF'];
+                return `${ctx.parsed.r} / 5.0 · ${clusters[ctx.dataIndex]}`;
+              }
+            }
+          }
+        },
         responsive: true,
       }
     });
+
+    // Cluster legend
+    const legendEl = document.createElement('div');
+    legendEl.style.cssText = 'display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;';
+    const legendItems = lang === 'ko'
+      ? [
+          { color: EF, label: 'Emotional Flow (감정 흐름)' },
+          { color: RF, label: 'Resilience Flow (회복 흐름)' },
+          { color: MF, label: 'Meaning Flow (의미 흐름)' },
+          { color: EI, label: 'Energy Index (에너지 지수)' },
+        ]
+      : [
+          { color: EF, label: 'Emotional Flow' },
+          { color: RF, label: 'Resilience Flow' },
+          { color: MF, label: 'Meaning Flow' },
+          { color: EI, label: 'Energy Index' },
+        ];
+    legendItems.forEach(item => {
+      const div = document.createElement('div');
+      div.style.cssText = 'display:flex;align-items:center;gap:6px;';
+      div.innerHTML = `<span style="width:10px;height:10px;border-radius:50%;background:${item.color};display:inline-block;"></span><span style="color:#555;">${item.label}</span>`;
+      legendEl.appendChild(div);
+    });
+    ctx.parentElement.appendChild(legendEl);
   }, 100);
 }
 </script>
