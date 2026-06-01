@@ -721,17 +721,15 @@ function renderReport(d, row) {
   setTimeout(() => {
     const ctx = document.getElementById('radarChart');
     if (!ctx) return;
+    // Cluster color mapping
+    // EB(0) EN(1) RE(2) SM(3) ID(4) RS(5) VA(6) SC(7) VG(8) TP(9) LS(10)
+    const EF = 'rgba(201,130,106,0.95)';  // rose
+    const RF = 'rgba(106,158,138,0.95)';  // sage green
+    const MF = 'rgba(155,130,196,0.95)';  // lavender
+    const EI = 'rgba(196,164,90,0.95)';   // warm amber
+    const CLUSTER_COLORS = [EF, EF, RF, EF, RF, RF, MF, EF, MF, EI, MF];
+
     new Chart(ctx, {
-      // Cluster color mapping
-      // EB(0) EN(1) RE(2) SM(3) ID(4) RS(5) VA(6) SC(7) VG(8) TP(9) LS(10)
-      // EF: EB, EN, SC, SM / RF: RE, ID, RS / MF: VA, VG, LS / EI: EN, TP
-      const EF = 'rgba(201,130,106,0.95)';  // rose
-      const RF = 'rgba(106,158,138,0.95)';  // sage green
-      const MF = 'rgba(155,130,196,0.95)';  // lavender
-      const EI = 'rgba(196,164,90,0.95)';   // warm amber
-
-      const CLUSTER_COLORS = [EF, EF, RF, EF, RF, RF, MF, EF, MF, EI, MF];
-
       type: 'radar',
       data: {
         labels: DOMAINS.map(d => lang === 'ko' ? [d.en, `(${d.ko})`] : d.en),
