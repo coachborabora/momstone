@@ -724,7 +724,7 @@ function renderReport(d, row) {
     new Chart(ctx, {
       type: 'radar',
       data: {
-        labels: DOMAINS.map(d => d.en.split(' ')[0]),
+        labels: DOMAINS.map(d => lang === 'ko' ? [d.en.split(' ')[0], `(${d.ko})`] : d.en.split(' ')[0]),
         datasets: [{
           label: 'Rhythm',
           data: scores,
@@ -740,7 +740,7 @@ function renderReport(d, row) {
           min: 0, max: 5,
           ticks: { stepSize: 1, font: { size: 10 }, color: '#aaa' },
           grid: { color: 'rgba(0,0,0,0.06)' },
-          pointLabels: { font: { size: 11 }, color: '#555' }
+          pointLabels: { font: { size: lang === 'ko' ? 9 : 11 }, color: '#555' }
         } },
         plugins: { legend: { display: false } },
         responsive: true,
