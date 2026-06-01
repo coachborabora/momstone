@@ -721,27 +721,30 @@ function renderReport(d, row) {
   setTimeout(() => {
     const ctx = document.getElementById('radarChart');
     if (!ctx) return;
-    // Cluster color mapping
-    // EB(0) EN(1) RE(2) SM(3) ID(4) RS(5) VA(6) SC(7) VG(8) TP(9) LS(10)
+    // Cluster color mapping — reordered for radar chart
+    // Cluster order: EF(EB,EN,SC,SM) → RF(RE,ID,RS) → MF(VA,VG,LS) → EI(TP)
+    // Original index:  0   1   7   3     2   4   5     6   8  10     9
     const EF = 'rgba(201,130,106,0.95)';  // rose
     const RF = 'rgba(106,158,138,0.95)';  // sage green
     const MF = 'rgba(155,130,196,0.95)';  // lavender
     const EI = 'rgba(196,164,90,0.95)';   // warm amber
-    const CLUSTER_COLORS = [EF, EF, RF, EF, RF, RF, MF, EF, MF, EI, MF];
+
+    const CLUSTER_ORDER = [0, 1, 7, 3, 2, 4, 5, 6, 8, 10, 9]; // index into DOMAINS/scores
+    const CLUSTER_COLORS_ORDERED = [EF, EF, EF, EF, RF, RF, RF, MF, MF, MF, EI];
 
     new Chart(ctx, {
       type: 'radar',
       data: {
-        labels: DOMAINS.map(d => lang === 'ko' ? [d.en, `(${d.ko})`] : d.en),
+        labels: CLUSTER_ORDER.map(i => lang === 'ko' ? [DOMAINS[i].en, `(${DOMAINS[i].ko})`] : DOMAINS[i].en),
         datasets: [{
           label: 'Rhythm',
-          data: scores,
+          data: CLUSTER_ORDER.map(i => scores[i]),
           backgroundColor: 'rgba(201,130,106,0.08)',
           borderColor: 'rgba(201,130,106,0.4)',
           borderWidth: 1.5,
           borderDash: [4,3],
-          pointBackgroundColor: CLUSTER_COLORS,
-          pointBorderColor: CLUSTER_COLORS,
+          pointBackgroundColor: CLUSTER_COLORS_ORDERED,
+          pointBorderColor: CLUSTER_COLORS_ORDERED,
           pointRadius: 7,
           pointHoverRadius: 9,
         }]
@@ -758,8 +761,9 @@ function renderReport(d, row) {
           tooltip: {
             callbacks: {
               label: (ctx) => {
-                const clusters = ['EF','EF','RF','EF','RF','RF','MF','EF','MF','EI','MF'];
-                return `${ctx.parsed.r} / 5.0 · ${clusters[ctx.dataIndex]}`;
+                const clusterLabels = ['EF','EF','EF','EF','RF','RF','RF','MF','MF','MF','EI'];
+                const domainName = DOMAINS[CLUSTER_ORDER[ctx.dataIndex]].en;
+                return `${domainName}: ${ctx.parsed.r} / 5.0 · ${clusterLabels[ctx.dataIndex]}`;
               }
             }
           }
