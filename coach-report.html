@@ -523,8 +523,8 @@ function renderReport(d, row) {
   let html = `
   <!-- ① PROFILE -->
   <div class="section">
-    <div class="section-kicker">${{ui.sessionProfile}}</div>
-    <div class="section-title">${{ui.participantOverview}}</div>
+    <div class="section-kicker">${ui.sessionProfile}</div>
+    <div class="section-title">${ui.participantOverview}</div>
     <div class="section-sub">Row ${row} · Submitted ${get(d,'Date','—')}</div>
     <div class="profile-grid">
       <div class="profile-item"><div class="profile-label">Name</div><div class="profile-value">${esc(get(d,'Name','—'))}</div></div>
@@ -538,8 +538,8 @@ function renderReport(d, row) {
 
   <!-- ② RADAR -->
   <div class="section">
-    <div class="section-kicker">${{lang === 'en' ? 'Rhythm Map' : '리듬 지도'}}</div>
-    <div class="section-title">${{ui.rhythmMap}}</div>
+    <div class="section-kicker">${lang === 'en' ? 'Rhythm Map' : '리듬 지도'}</div>
+    <div class="section-title">${ui.rhythmMap}</div>
     <div class="radar-wrap">
       <canvas id="radarChart" style="max-height:360px;"></canvas>
       <div class="radar-meta">
@@ -553,11 +553,11 @@ function renderReport(d, row) {
 
   <!-- ③ SESSION OPENER -->
   <div class="section">
-    <div class="section-kicker">${{lang === 'en' ? 'Session Opener Guide' : '세션 오프너 가이드'}}</div>
-    <div class="section-title">${{ui.sessionOpener}}</div>
-    <div class="section-sub">${{ui.sessionOpenerSub}}</div>
+    <div class="section-kicker">${lang === 'en' ? 'Session Opener Guide' : '세션 오프너 가이드'}</div>
+    <div class="section-title">${ui.sessionOpener}</div>
+    <div class="section-sub">${ui.sessionOpenerSub}</div>
     <div class="music-card">
-      <div class="music-opener-label">${{ui.soundtrackLabel}}</div>
+      <div class="music-opener-label">${ui.soundtrackLabel}</div>
       <div class="music-tracks">
         ${musicKeys.map(m => `
           <div class="music-track">
@@ -576,21 +576,21 @@ function renderReport(d, row) {
 
   <!-- ④ STRENGTH-DRAIN GAP -->
   <div class="section">
-    <div class="section-kicker">${{lang === 'en' ? 'Strength-Drain Profile' : '강점-고갈 프로파일'}}</div>
-    <div class="section-title">${{ui.strengthDrain}}</div>
-    <div class="section-sub">${{ui.strengthDrainSub}}</div>
+    <div class="section-kicker">${lang === 'en' ? 'Strength-Drain Profile' : '강점-고갈 프로파일'}</div>
+    <div class="section-title">${ui.strengthDrain}</div>
+    <div class="section-sub">${ui.strengthDrainSub}</div>
     <div class="gap-domains">
       <div class="gap-col strength">
-        <div class="gap-col-label">${{ui.strengthDomains}}</div>
+        <div class="gap-col-label">${ui.strengthDomains}</div>
         ${top3.map(d => `<div class="gap-domain-item"><span>${esc(d.en)}</span><span class="gap-score strength">${d.score.toFixed(1)}</span></div>`).join('')}
       </div>
       <div class="gap-col drain">
-        <div class="gap-col-label">${{ui.depletedDomains}}</div>
+        <div class="gap-col-label">${ui.depletedDomains}</div>
         ${bottom3.map(d => `<div class="gap-domain-item"><span>${esc(d.en)}</span><span class="gap-score drain">${d.score.toFixed(1)}</span></div>`).join('')}
       </div>
     </div>
     <div class="analysis-card" style="margin-top:0;">
-      <div class="ac-label">${{ui.strengthGap}}</div>
+      <div class="ac-label">${ui.strengthGap}</div>
       <div class="ac-value">${strengthGap}</div>
       <div class="ac-text">${esc(strengthGapLabel)}</div>
     </div>
@@ -598,26 +598,26 @@ function renderReport(d, row) {
 
   <!-- ⑤⑥⑦⑧ ANALYSIS GRID -->
   <div class="section">
-    <div class="section-kicker">${{lang === 'en' ? 'Coaching Analysis' : '코칭 분석'}}</div>
-    <div class="section-title">${{ui.coachingAnalysis}}</div>
+    <div class="section-kicker">${lang === 'en' ? 'Coaching Analysis' : '코칭 분석'}</div>
+    <div class="section-title">${ui.coachingAnalysis}</div>
     <div class="analysis-grid">
       <div class="analysis-card ${vulnClass}">
-        <div class="ac-label">${{ui.vulnIndex}}</div>
+        <div class="ac-label">${ui.vulnIndex}</div>
         <div class="ac-value ${vulnClass}">${vulnIndex} <span style="font-size:16px;font-weight:400;color:var(--muted)">/ 10</span></div>
         <div class="ac-text">${esc(vulnLabel)}</div>
       </div>
       <div class="analysis-card ${readyClass}">
-        <div class="ac-label">${{ui.coachReadiness}}</div>
+        <div class="ac-label">${ui.coachReadiness}</div>
         <div class="ac-value ${readyClass}">${coachReady} <span style="font-size:16px;font-weight:400;color:var(--muted)">/ 5</span></div>
         <div class="ac-text">${esc(coachReadyLabel)}</div>
       </div>
       <div class="analysis-card">
-        <div class="ac-label">${{ui.relSelf}}</div>
+        <div class="ac-label">${ui.relSelf}</div>
         <div class="ac-value">${relSelf}</div>
         <div class="ac-text">${esc(relSelfLabel)}</div>
       </div>
       <div class="analysis-card">
-        <div class="ac-label">${{ui.clusterBalance}}</div>
+        <div class="ac-label">${ui.clusterBalance}</div>
         <div class="cluster-grid" style="margin-top:8px;">
           ${CLUSTERS.map(c => {
             const sc = parseFloat(get(d, c.scoreKey, 0));
@@ -634,9 +634,9 @@ function renderReport(d, row) {
 
   <!-- ⑨ DOMAIN DETAIL + REFLECTION GUIDE -->
   <div class="section">
-    <div class="section-kicker">${{lang === 'en' ? 'Domain Detail + Coaching Guide' : '도메인 상세 + 코칭 가이드'}}</div>
-    <div class="section-title">${{lang === 'en' ? '11 Domains — Full Analysis' : '11개 영역 전체 분석'}}</div>
-    <div class="section-sub">${{ui.domainDetail}}</div>
+    <div class="section-kicker">${lang === 'en' ? 'Domain Detail + Coaching Guide' : '도메인 상세 + 코칭 가이드'}</div>
+    <div class="section-title">${lang === 'en' ? '11 Domains — Full Analysis' : '11개 영역 전체 분석'}</div>
+    <div class="section-sub">${ui.domainDetail}</div>
     ${DOMAINS.map(dom => {
       const score = parseFloat(get(d, dom.code+'_score', 0));
       const domBand = get(d, dom.code+'_stage_code', band);
@@ -670,7 +670,7 @@ function renderReport(d, row) {
         </div>
         ${reflections.length ? `
         <div class="reflection-guide">
-          <div class="rg-label">${{ui.interventionGuide}}</div>
+          <div class="rg-label">${ui.interventionGuide}</div>
           <div class="rg-items">
             ${reflections.map(r => `
               <div class="rg-item">
@@ -692,21 +692,21 @@ function renderReport(d, row) {
     <div class="section-kicker">Reset Point</div>
     <div class="section-title">${esc(get(d,'Reset_Point','—'))}</div>
     <div class="analysis-card" style="margin-top:16px;">
-      <div class="ac-label">${{ui.resetReason}}</div>
+      <div class="ac-label">${ui.resetReason}</div>
       <div class="ac-text" style="font-size:14px;color:var(--ink);margin-bottom:16px;">${esc(get(d,'Reset_Reason','—'))}</div>
-      <div class="ac-label">${{ui.resetSignal}}</div>
+      <div class="ac-label">${ui.resetSignal}</div>
       <div class="ac-text" style="font-size:14px;color:var(--ink);margin-bottom:16px;">${esc(get(d,'Reset_Signal','—'))}</div>
-      <div class="ac-label">${{ui.todayAction}}</div>
+      <div class="ac-label">${ui.todayAction}</div>
       <div class="ac-text" style="font-size:14px;color:var(--ink);">${esc(get(d,'Reset_Action','—'))}</div>
     </div>
   </div>
 
   <!-- ⑪ COACH MEMO -->
   <div class="section">
-    <div class="section-kicker">${{lang === 'en' ? 'Coach Notes' : '코치 노트'}}</div>
-    <div class="section-title">${{ui.coachNotes}}</div>
-    <div class="section-sub">${{ui.coachNotesSub}}</div>
-    <textarea class="memo-area" placeholder="${{ui.coachNotesPlaceholder}}"></textarea>
+    <div class="section-kicker">${lang === 'en' ? 'Coach Notes' : '코치 노트'}</div>
+    <div class="section-title">${ui.coachNotes}</div>
+    <div class="section-sub">${ui.coachNotesSub}</div>
+    <textarea class="memo-area" placeholder="${ui.coachNotesPlaceholder}"></textarea>
   </div>
   `;
 
