@@ -732,22 +732,77 @@ function renderReport(d, row) {
     const CLUSTER_ORDER = [0, 1, 7, 3, 2, 4, 5, 6, 8, 10, 9]; // index into DOMAINS/scores
     const CLUSTER_COLORS_ORDERED = [EF, EF, EF, EF, RF, RF, RF, MF, MF, MF, EI];
 
+    // Build 4 cluster datasets — each fills only its own domain slots with null elsewhere
+    // CLUSTER_ORDER: [0,1,7,3, 2,4,5, 6,8,10, 9] → 11 slots
+    // EF: slots 0-3, RF: slots 4-6, MF: slots 7-9, EI: slot 10
+    const orderedScores = CLUSTER_ORDER.map(i => scores[i]);
+    const efData = orderedScores.map((v,i) => i <= 3 ? v : null);
+    const rfData = orderedScores.map((v,i) => i >= 4 && i <= 6 ? v : null);
+    const mfData = orderedScores.map((v,i) => i >= 7 && i <= 9 ? v : null);
+    const eiData = orderedScores.map((v,i) => i === 10 ? v : null);
+
+    // For EI (single point) — fill the adjacent slots to make a visible area
+    // Connect TP to its neighbors for visibility
+    const eiDataFull = orderedScores.map((v,i) => i >= 9 ? v : null);
+
     new Chart(ctx, {
       type: 'radar',
       data: {
         labels: CLUSTER_ORDER.map(i => lang === 'ko' ? [DOMAINS[i].en, `(${DOMAINS[i].ko})`] : DOMAINS[i].en),
-        datasets: [{
-          label: 'Rhythm',
-          data: CLUSTER_ORDER.map(i => scores[i]),
-          backgroundColor: 'rgba(201,130,106,0.08)',
-          borderColor: 'rgba(201,130,106,0.4)',
-          borderWidth: 1.5,
-          borderDash: [4,3],
-          pointBackgroundColor: CLUSTER_COLORS_ORDERED,
-          pointBorderColor: CLUSTER_COLORS_ORDERED,
-          pointRadius: 7,
-          pointHoverRadius: 9,
-        }]
+        datasets: [
+          {
+            label: 'Emotional Flow',
+            data: efData,
+            backgroundColor: 'rgba(201,130,106,0.20)',
+            borderColor: 'rgba(201,130,106,0.7)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(201,130,106,0.95)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            spanGaps: false,
+          },
+          {
+            label: 'Resilience Flow',
+            data: rfData,
+            backgroundColor: 'rgba(106,158,138,0.20)',
+            borderColor: 'rgba(106,158,138,0.7)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(106,158,138,0.95)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            spanGaps: false,
+          },
+          {
+            label: 'Meaning Flow',
+            data: mfData,
+            backgroundColor: 'rgba(155,130,196,0.20)',
+            borderColor: 'rgba(155,130,196,0.7)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(155,130,196,0.95)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            spanGaps: false,
+          },
+          {
+            label: 'Energy Index',
+            data: eiDataFull,
+            backgroundColor: 'rgba(196,164,90,0.20)',
+            borderColor: 'rgba(196,164,90,0.7)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(196,164,90,0.95)',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 1.5,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+            spanGaps: false,
+          },
+        ]
       },
       options: {
         scales: { r: {
@@ -761,9 +816,9 @@ function renderReport(d, row) {
           tooltip: {
             callbacks: {
               label: (ctx) => {
-                const clusterLabels = ['EF','EF','EF','EF','RF','RF','RF','MF','MF','MF','EI'];
+                if (ctx.parsed.r === null || ctx.parsed.r === undefined) return null;
                 const domainName = DOMAINS[CLUSTER_ORDER[ctx.dataIndex]].en;
-                return `${domainName}: ${ctx.parsed.r} / 5.0 · ${clusterLabels[ctx.dataIndex]}`;
+                return `${domainName}: ${ctx.parsed.r} / 5.0`;
               }
             }
           }
