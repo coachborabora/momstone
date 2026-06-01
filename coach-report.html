@@ -471,6 +471,8 @@ async function loadReport(row) {
 // ─── RENDER ──────────────────────────────────────────────────────────────────
 function renderReport(d, row) {
   const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko';
+  const ui = UI[lang];
+  const bandNamesLang = lang === 'en' ? BAND_NAMES : BAND_NAMES_KO;
 
   // Domain scores
   const domainScoreVals = DOMAINS.map(dom => parseFloat(get(d, dom.code+'_score', 0)));
