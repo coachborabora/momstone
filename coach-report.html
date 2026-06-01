@@ -4,7 +4,178 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Coach Report | Momstone</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js">
+function renderCoachGuide(lang) {
+  const el = document.getElementById('app');
+  if (!el) return;
+
+  const ko = lang === 'ko';
+
+  const domains = [
+    { code:'EB', en:'Emotional Balance',      ko:'감정 균형',         fn:'감정 인식 / 반응 조절',   ref:'Gross (1998); Salovey & Mayer (1990)',           enSum:'Gross distinguishes antecedent- and response-focused emotion regulation. Salovey & Mayer present a hierarchy of recognizing, understanding, and regulating emotion.',           koSum:'Gross의 감정 조절 이론은 감정 인식과 반응 조절을 2단계로 구분. Salovey & Mayer의 EQ 이론은 감정 인식→이해→조절의 위계를 제시.' },
+    { code:'EN', en:'Energy Management',      ko:'에너지 관리',        fn:'에너지 지속성 / 회복',    ref:'Loehr & Schwartz (2003); Baumeister et al. (1998)', enSum:'Loehr & Schwartz present a 4-dimension energy model. Baumeister explains the relationship between energy depletion and functional decline.',                                    koSum:'Loehr & Schwartz는 신체·감정·정신·영적 에너지의 4차원 관리 모델 제시. Baumeister의 자아 고갈 이론은 에너지 소모와 기능 저하의 관계를 설명.' },
+    { code:'RE', en:'Resilience',             ko:'회복 탄력성',        fn:'복원력 / 균형 복귀',      ref:'Masten (2001); Bonanno (2004)',                     enSum:'Masten defines resilience as ordinary adaptive mechanism. Bonanno demonstrates individual differences in recovery speed and trajectory.',                                    koSum:'Masten은 회복탄력성을 일상적 적응 기제로 정의. Bonanno는 균형 복귀 속도의 개인차와 회복 경로의 다양성을 실증.' },
+    { code:'SM', en:'Strengths & Motivation', ko:'강점·동기',          fn:'동기 방향 / 강점 활성화', ref:'Deci & Ryan (2000); Seligman (2000); Peterson & Seligman (2004)', enSum:'SDT presents three basic needs: autonomy, competence, relatedness. VIA classifies 24 character strengths empirically.',                                                  koSum:'SDT는 자율성·유능감·관계성의 3대 기본 심리 욕구를 제시. VIA는 24개 강점을 분류한 실증적 강점 체계.' },
+    { code:'ID', en:'Identity Integration',   ko:'정체감·역할 통합',   fn:'자기 정의 / 역할 통합',   ref:'Erikson (1968); Thoits (1983)',                     enSum:'Erikson presents identity formation as a life developmental task. Thoits empirically demonstrates multiple roles on wellbeing.',                                              koSum:'Erikson의 심리사회 발달 이론은 정체감 형성과 역할 통합을 생애 발달 과제로 제시. Thoits는 다중 역할이 자아 개념과 웰빙에 미치는 영향을 실증.' },
+    { code:'RS', en:'Relational Support',     ko:'관계 자원',          fn:'연결 / 상호작용',         ref:'Cohen & Wills (1985); Bowlby (1988)',               enSum:'Cohen & Wills demonstrate social support as stress buffer. Bowlby presents relationship as a secure base for exploration and growth.',                                        koSum:'Cohen & Wills는 사회적 지지가 스트레스를 완충하는 기제를 실증. Bowlby의 애착 이론은 안전 기지로서의 관계가 탐색과 성장의 기반임을 제시.' },
+    { code:'VA', en:'Values Alignment',       ko:'가치·의미',          fn:'가치 정렬 / 의미 연결',   ref:'Frankl (1963); Schwartz (1992)',                    enSum:'Frankl presents meaning as central to psychological health. Schwartz empirically classifies structure of 10 basic values.',                                                  koSum:'Frankl의 의미 치료는 의미감을 심리적 건강의 핵심으로 제시. Schwartz의 보편적 가치 이론은 10개 기본 가치의 구조를 실증적으로 분류.' },
+    { code:'SC', en:'Self-Compassion',        ko:'자기연민',           fn:'자기 수용 / 내적 기준',   ref:'Neff (2003); Gilbert (2010)',                       enSum:'Neff presents three components: self-kindness, common humanity, mindfulness. Gilbert explains neurobiological mechanisms of self-compassion.',                              koSum:'Neff의 자기연민 척도는 자기친절·공통 인간성·마음챙김의 3요소로 구성. Gilbert의 CFT는 자기비판과 자기연민의 신경생물학적 기제를 설명.' },
+    { code:'VG', en:'Vision & Growth',        ko:'비전·성장의지',      fn:'방향 감각 / 성장 의지',   ref:'Dweck (2006); Bandura (1977)',                      enSum:'Dweck presents growth mindset as a belief system. Bandura's self-efficacy is a key mediator of growth intention and behavioral change.',                                 koSum:'Dweck의 성장 마인드셋은 능력을 발전 가능한 것으로 보는 신념 체계. Bandura의 자기효능감은 성장 의지와 행동 변화의 핵심 매개 변수.' },
+    { code:'TP', en:'Time & Priority',        ko:'시간·우선순위',      fn:'자원 배분 / 우선순위',    ref:'Covey (1989); Kahneman (2011)',                     enSum:'Covey presents importance-urgency matrix for time allocation. Kahneman demonstrates cognitive resource limits and decision-making priorities.',                              koSum:'Covey의 중요도·긴급도 매트릭스는 시간 자원 배분의 실용적 프레임. Kahneman은 인지 자원의 한계와 의사결정 우선순위의 관계를 실증.' },
+    { code:'LS', en:'Life Satisfaction',      ko:'삶의 만족도',        fn:'삶 전반 만족 / 의미감',   ref:'Diener et al. (1985); Ryff (1989)',                 enSum:'Diener's SWLS is the most widely used subjective wellbeing tool. Ryff presents 6-factor model: autonomy, mastery, growth, relations, purpose, self-acceptance.',          koSum:'Diener의 SWLS는 전 세계에서 가장 널리 사용되는 주관적 웰빙 측정 도구. Ryff의 심리적 웰빙 6요소 모델은 자율성·환경 통제·성장·긍정 관계·삶의 목적·자기 수용을 제시.' },
+  ];
+
+  const strengthGapRanges = ko
+    ? [['0.0–0.5','균일한 리듬 — 고른 에너지 분포'],['0.5–1.0','부분적 불균형 — 일부 영역 부담 높음'],['1.0–1.5','뚜렷한 대비 — 강점/고갈 차이 선명'],['1.5+','극명한 불균형 — 핵심 코칭 포인트']]
+    : [['0.0–0.5','Even rhythm — consistent energy distribution'],['0.5–1.0','Partial imbalance — some areas carry more weight'],['1.0–1.5','Clear contrast — significant gap'],['1.5+','Stark imbalance — core coaching focus']];
+
+  const vulnRanges = ko
+    ? [['0–2','안정적 — 외부 변화에 잘 버팀'],['3–4','주의 — 특정 조건에서 흔들릴 수 있음'],['5–6','취약 구간 — 회복 자원 확인 필요'],['7+','고취약 — 가장 먼저 살펴봐야 할 상태']]
+    : [['0–2','Stable — resilient to external disruption'],['3–4','Watch — may destabilize under certain conditions'],['5–6','Vulnerable — check recovery resources'],['7+','High vulnerability — address first']];
+
+  const readyRanges = ko
+    ? [['4.0+','높은 준비도 — 심층 탐색 가능'],['3.0–3.9','중간 준비도 — 안전한 공간 먼저'],['2.0–2.9','낮은 준비도 — 안정화 우선'],['< 2.0','회복 먼저 — 코칭보다 자원 확보']]
+    : [['4.0+','High readiness — depth exploration available'],['3.0–3.9','Moderate — build safety first'],['2.0–2.9','Lower — stabilize before exploring'],['< 2.0','Recovery first — resources before coaching']];
+
+  const relSelfRanges = ko
+    ? [['≥ 1.0','관계 의존형 — 타인에게 기대지만 자기 수용 낮음'],['0.5–0.9','관계 우선형 — 관계에서 에너지 얻음, 자기돌봄 보충 필요'],['-0.4–0.4','균형형 — 관계와 자기수용이 비슷한 수준'],['-0.5– -0.9','자기 우선형 — 내면 안정적, 관계 자원 활용 필요'],['≤ -1.0','고립형 — 혼자 감당하는 패턴, 연결이 회복의 시작']]
+    : [['≥ 1.0','Relationally dependent — draws from others, self-acceptance low'],['0.5–0.9','Relationship-oriented — energized by connection, self-care needed'],['-0.4–0.4','Balanced — relational support and self-acceptance at similar levels'],['-0.5– -0.9','Self-oriented — inner stability present, relational resources needed'],['≤ -1.0','Isolated — carrying a lot alone, building connection is recovery']];
+
+  const clusters = [
+    { color:'rgba(201,130,106,0.15)', border:'rgba(201,130,106,0.5)', name:'Emotional Flow (EF)', domains:'EB + EN + SC + SM', desc: ko ? '감정 조절, 에너지 지속성, 자기연민, 동기 활성화. 자기돌봄과 내면 리듬의 핵심 영역.' : 'Emotional regulation, energy sustainability, self-compassion, and motivation activation.' },
+    { color:'rgba(106,158,138,0.15)', border:'rgba(106,158,138,0.5)', name:'Resilience Flow (RF)', domains:'RE + ID + RS', desc: ko ? '회복 탄력성, 정체감 안정성, 관계 자원. 어려움을 통해 균형을 되찾는 기반 영역.' : 'Recovery capacity, identity stability, and relational resources.' },
+    { color:'rgba(155,130,196,0.15)', border:'rgba(155,130,196,0.5)', name:'Meaning Flow (MF)', domains:'VA + VG + LS', desc: ko ? '가치 정렬, 비전·성장의지, 삶의 만족도. 일상을 방향과 의미로 연결하는 차원.' : 'Values alignment, vision, and life satisfaction — the dimension of direction and meaning.' },
+    { color:'rgba(196,164,90,0.15)',  border:'rgba(196,164,90,0.5)',  name:'Energy Index (EI)', domains:'EN + TP', desc: ko ? '에너지 관리와 시간·우선순위 배분. 일상에서 자원이 어떻게 분배되는지를 결정하는 실행 레이어.' : 'Energy and time/priority allocation — the operational layer of daily resource distribution.' },
+  ];
+
+  function rangeGrid(ranges, valueColor) {
+    return ranges.map(([r, l]) =>
+      '<div style="background:var(--bg);border-radius:8px;padding:10px;">' +
+      '<div style="font-size:12px;font-weight:700;color:' + (valueColor||'var(--rose-dark)') + ';">' + r + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + l + '</div></div>'
+    ).join('');
+  }
+
+  const html = '<div class="section" style="border-top:2px solid var(--border);padding-top:48px;">' +
+
+    '<div class="section-kicker">' + (ko ? '코치 참고 가이드' : 'Coach Reference Guide') + '</div>' +
+    '<div class="section-title">' + (ko ? '해석 기준 및 학술 근거' : 'Interpretation Framework & Academic References') + '</div>' +
+    '<div class="section-sub">' + (ko ? '세션 중 및 오프라인 참고용.' : 'For in-session and offline reference.') + '</div>' +
+
+    // ① DOMAINS
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '① 11개 도메인 학술 근거' : '① 11 Domains — Academic Basis') + '</h3>' +
+    '<div style="display:flex;flex-direction:column;gap:12px;">' +
+    domains.map(d =>
+      '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:110px 1fr;gap:12px;">' +
+      '<div>' +
+      '<div style="font-size:10px;letter-spacing:1.5px;font-weight:700;color:var(--muted);">' + d.code + '</div>' +
+      '<div style="font-size:14px;font-weight:700;color:var(--ink);margin-top:2px;">' + d.en + '</div>' +
+      (ko ? '<div style="font-size:12px;color:var(--muted);">(' + d.ko + ')</div>' : '') +
+      '</div>' +
+      '<div>' +
+      '<div style="font-size:11px;color:var(--rose-dark);font-weight:600;margin-bottom:4px;">' + d.fn + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px;">' + (ko ? d.koSum : d.enSum) + '</div>' +
+      '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 ' + d.ref + '</div>' +
+      '</div></div>'
+    ).join('') +
+    '</div></div>' +
+
+    // ② INDICATORS
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '② 분석 지표 해석 기준' : '② Analysis Indicators — Interpretation Guide') + '</h3>' +
+    '<div style="display:flex;flex-direction:column;gap:12px;">' +
+
+    // Strength Gap
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Strength Gap ' + (ko ? '(강점-고갈 갭)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: 상위 3개 도메인 평균 − 하위 3개 도메인 평균' : 'Formula: Avg of top 3 domain scores − Avg of bottom 3 domain scores') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">' + rangeGrid(strengthGapRanges) + '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Seligman & Csikszentmihalyi (2000) PERMA; Maslach Burnout Inventory (1981)</div>' +
+    '</div>' +
+
+    // Vulnerability Index
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Vulnerability Index ' + (ko ? '(취약성 지수)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: (변동성×3) + (하방리스크 개수×1.5) + SC<3이면 (3−SC)×1.5 · 범위: 0–10' : 'Formula: (Variability×3) + (Risk count×1.5) + (SC buffer penalty if SC<3) · Scale: 0–10') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">' + rangeGrid(vulnRanges, 'var(--warn)') + '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Bonanno (2004) Resilience Trajectory; Neff (2003) Self-Compassion Scale</div>' +
+    '</div>' +
+
+    // Coaching Readiness
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Coaching Readiness ' + (ko ? '(코칭 준비도)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: SC + VG + ID 평균 · 현재 세션에서 탐색 가능한 깊이를 나타냄' : 'Formula: Average of SC + VG + ID · Indicates depth available in the current session') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">' + rangeGrid(readyRanges, 'var(--good)') + '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Prochaska & DiClemente (1983) Stages of Change; ICF Coaching Competencies Framework</div>' +
+    '</div>' +
+
+    // Relational-Self Dynamic
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Relational-Self Dynamic ' + (ko ? '(관계-자기 역동)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: RS점수 − SC점수 · 양수=관계 지향, 음수=자기 지향' : 'Formula: RS score − SC score · Positive=relationship-oriented, Negative=self-oriented') + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">' +
+    relSelfRanges.map(([r, l]) =>
+      '<div style="background:var(--bg);border-radius:8px;padding:8px 12px;display:flex;gap:12px;align-items:center;">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--ink);min-width:90px;">' + r + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);">' + l + '</div></div>'
+    ).join('') +
+    '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Bowlby (1988) Attachment Theory; Bowen (1978) Family Systems Theory</div>' +
+    '</div>' +
+
+    '</div></div>' +
+
+    // ③ CLUSTERS
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '③ 4개 클러스터 구성' : '③ 4 Cluster Groups') + '</h3>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">' +
+    clusters.map(c =>
+      '<div style="background:' + c.color + ';border:1px solid ' + c.border + ';border-radius:12px;padding:18px;">' +
+      '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;">' + c.name + '</div>' +
+      '<div style="font-size:11px;font-weight:600;color:var(--coach-accent);margin-bottom:8px;">' + c.domains + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);line-height:1.7;">' + c.desc + '</div></div>'
+    ).join('') +
+    '</div></div>' +
+
+    // ④ REFLECTION DB
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '④ Reflection DB 필드 가이드' : '④ Reflection DB — Field Guide') + '</h3>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">' +
+    [
+      { title: 'Tone' + (ko ? ' (접근 톤)' : ''),
+        body: ko
+          ? '<b>위로하는</b> — 안정, 차분<br><b>호기심 있는</b> — 탐색, 열림<br><b>안정시키는</b> — 닻 내리기<br><b>초대하는</b> — 공간 만들기<br><b>확인하는</b> — 인정, 검증<br><b>회복시키는</b> — 채움, 회복<br><b>따뜻한</b> — 부드러움'
+          : '<b>Soothing</b> — calm, settle<br><b>Curious</b> — open, explore<br><b>Grounding</b> — anchor, stabilize<br><b>Inviting</b> — create space<br><b>Affirming</b> — validate, confirm<br><b>Restorative</b> — replenish, recover<br><b>Tender</b> — gentle, warm' },
+      { title: 'Modality' + (ko ? ' (개입 방식)' : ''),
+        body: ko
+          ? '<b>저널링</b> — 글쓰기 성찰<br><b>잠깐 멈춤</b> — 짧은 중단<br><b>내러티브</b> — 이야기 재구성<br><b>신체 감각</b> — 몸의 반응<br><b>루틴</b> — 습관 닻 내리기<br><b>재해석</b> — 관점 전환<br><b>작은 습관</b> — 작고 일관된 행동'
+          : '<b>Journaling</b> — written reflection<br><b>Micro-pause</b> — brief stop<br><b>Narrative</b> — story reframe<br><b>Somatic</b> — body sensation<br><b>Routine</b> — habit anchoring<br><b>Reframe</b> — perspective shift<br><b>Tiny-habit</b> — small consistent act' },
+      { title: 'Intensity' + (ko ? ' (강도)' : ''),
+        body: ko
+          ? '<b>가볍게</b> — 낮은 요구, 안전한 진입점. D/E밴드 또는 세션 초반에 적합.<br><br><b>중간 강도</b> — 중간 수준의 참여. 라포가 형성된 B/C밴드에 적합.'
+          : '<b>Light</b> — low demand, safe entry. Best for D/E bands or early session.<br><br><b>Medium</b> — moderate engagement. Suitable for B/C bands with established rapport.' },
+    ].map(f =>
+      '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">' + f.title + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);line-height:1.9;">' + f.body + '</div></div>'
+    ).join('') +
+    '</div></div>' +
+
+    // ⑤ DISCLAIMER
+    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:11px;color:var(--muted);line-height:1.9;">' +
+    '<div style="font-weight:700;color:var(--ink);margin-bottom:8px;">' + (ko ? '학술 근거 종합' : 'Academic Basis Summary') + '</div>' +
+    (ko
+      ? '이 진단은 다음 검증된 심리학 이론을 기반으로 설계되었습니다: 감정 조절(Gross, 1998) · 에너지 관리(Loehr & Schwartz, 2003) · 회복탄력성(Masten, 2001; Bonanno, 2004) · 자기결정이론(Deci & Ryan, 2000) · 긍정심리학(Seligman, 2000) · 정체감 발달(Erikson, 1968) · 사회적 지지(Cohen & Wills, 1985) · 의미 치료(Frankl, 1963) · 자기연민(Neff, 2003) · 성장 마인드셋(Dweck, 2006) · 주관적 웰빙(Diener et al., 1985; Ryff, 1989)<br><br>※ 본 도구는 임상 진단이 아닌 코칭 입문 목적의 자기 탐색 도구입니다.'
+      : 'Emotion Regulation (Gross, 1998) · Energy Management (Loehr & Schwartz, 2003) · Resilience (Masten, 2001; Bonanno, 2004) · SDT (Deci & Ryan, 2000) · Positive Psychology (Seligman, 2000) · Identity Development (Erikson, 1968) · Social Support (Cohen & Wills, 1985) · Logotherapy (Frankl, 1963) · Self-Compassion (Neff, 2003) · Growth Mindset (Dweck, 2006) · Subjective Wellbeing (Diener et al., 1985; Ryff, 1989)<br><br>※ This tool is a self-exploration instrument for coaching entry purposes, not a clinical diagnostic.') +
+    '</div>' +
+
+    '</div>';
+
+  el.innerHTML += html;
+}
+
+</script>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -712,180 +883,8 @@ function renderReport(d, row) {
   </div>
   `;
 
-  html += `
-  <!-- ⑫ COACH GUIDE -->
-  <div class="section" id="coach-guide" style="border-top:2px solid var(--border);padding-top:48px;">
-    <div class="section-kicker">${lang === 'en' ? 'Coach Reference Guide' : '코치 참고 가이드'}</div>
-    <div class="section-title">${lang === 'en' ? 'Interpretation Framework & Academic References' : '해석 기준 및 학술 근거'}</div>
-    <div class="section-sub">${lang === 'en' ? 'For in-session and offline reference.' : '세션 중 및 오프라인 참고용.'}</div>
-
-    <!-- 1. 11 DOMAINS -->
-    <div style="margin-bottom:40px;">
-      <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">${lang === 'en' ? '① 11 Domains — Academic Basis' : '① 11개 도메인 학술 근거'}</h3>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        ${[
-          { code:'EB', en:'Emotional Balance', ko:'감정 균형', fn:'감정 인식 / 반응 조절', ref:'Gross (1998); Salovey & Mayer (1990)', summary: lang === 'en' ? 'Gross's emotion regulation theory distinguishes two stages: antecedent-focused and response-focused. Salovey & Mayer's EQ model presents a hierarchy of recognizing, understanding, and regulating emotion.' : 'Gross의 감정 조절 이론은 감정 인식과 반응 조절을 2단계로 구분. Salovey & Mayer의 EQ 이론은 감정 인식→이해→조절의 위계를 제시.' },
-          { code:'EN', en:'Energy Management', ko:'에너지 관리', fn:'에너지 지속성 / 회복', ref:'Loehr & Schwartz (2003); Baumeister et al. (1998)', summary: lang === 'en' ? 'Loehr & Schwartz present a 4-dimension energy management model (physical, emotional, mental, spiritual). Baumeister's ego depletion theory explains the relationship between energy consumption and functional decline.' : 'Loehr & Schwartz는 신체·감정·정신·영적 에너지의 4차원 관리 모델 제시. Baumeister의 자아 고갈 이론은 에너지 소모와 기능 저하의 관계를 설명.' },
-          { code:'RE', en:'Resilience', ko:'회복 탄력성', fn:'복원력 / 균형 복귀', ref:'Masten (2001); Bonanno (2004)', summary: lang === 'en' ? 'Masten defines resilience as an ordinary adaptive mechanism. Bonanno empirically demonstrates individual differences in speed of recovery and diversity of recovery trajectories.' : 'Masten은 회복탄력성을 일상적 적응 기제로 정의. Bonanno는 균형 복귀 속도의 개인차와 회복 경로의 다양성을 실증 연구로 제시.' },
-          { code:'SM', en:'Strengths & Motivation', ko:'강점·동기', fn:'동기 방향 / 강점 활성화', ref:'Deci & Ryan (2000); Seligman & Csikszentmihalyi (2000); Peterson & Seligman (2004)', summary: lang === 'en' ? 'SDT distinguishes intrinsic/extrinsic motivation and presents three basic psychological needs: autonomy, competence, and relatedness. VIA classifies 24 character strengths empirically.' : 'SDT는 내재적/외재적 동기의 구분과 자율성·유능감·관계성의 3대 기본 심리 욕구를 제시. VIA는 24개 강점을 분류한 실증적 강점 체계.' },
-          { code:'ID', en:'Identity Integration', ko:'정체감·역할 통합', fn:'자기 정의 / 역할 통합', ref:'Erikson (1968); Thoits (1983)', summary: lang === 'en' ? 'Erikson presents identity formation and role integration as life developmental tasks. Thoits empirically demonstrates the impact of multiple roles on self-concept and wellbeing.' : 'Erikson의 심리사회 발달 이론은 정체감 형성과 역할 통합을 생애 발달 과제로 제시. Thoits는 다중 역할이 자아 개념과 웰빙에 미치는 영향을 실증.' },
-          { code:'RS', en:'Relational Support', ko:'관계 자원', fn:'연결 / 상호작용', ref:'Cohen & Wills (1985); Bowlby (1988)', summary: lang === 'en' ? 'Cohen & Wills empirically demonstrate the mechanism by which social support buffers stress. Bowlby's attachment theory presents relationship as a secure base for exploration and growth.' : 'Cohen & Wills는 사회적 지지가 스트레스를 완충하는 기제를 실증. Bowlby의 애착 이론은 안전 기지로서의 관계가 탐색과 성장의 기반임을 제시.' },
-          { code:'VA', en:'Values Alignment', ko:'가치·의미', fn:'가치 정렬 / 의미 연결', ref:'Frankl (1963); Schwartz (1992)', summary: lang === 'en' ? 'Frankl's logotherapy presents a sense of meaning as central to psychological health. Schwartz's universal value theory empirically classifies the structure and conflict relationships of 10 basic values.' : 'Frankl의 의미 치료는 의미감을 심리적 건강의 핵심으로 제시. Schwartz의 보편적 가치 이론은 10개 기본 가치의 구조와 갈등 관계를 실증적으로 분류.' },
-          { code:'SC', en:'Self-Compassion', ko:'자기연민', fn:'자기 수용 / 내적 기준', ref:'Neff (2003); Gilbert (2010)', summary: lang === 'en' ? 'Neff's Self-Compassion Scale consists of three empirically validated components: self-kindness, common humanity, and mindfulness. Gilbert's CFT explains the neurobiological mechanisms of self-criticism and self-compassion.' : 'Neff의 자기연민 척도는 자기친절·공통 인간성·마음챙김의 3요소로 구성. Gilbert의 CFT는 자기비판과 자기연민의 신경생물학적 기제를 설명.' },
-          { code:'VG', en:'Vision & Growth', ko:'비전·성장의지', fn:'방향 감각 / 성장 의지', ref:'Dweck (2006); Bandura (1977)', summary: lang === 'en' ? 'Dweck's growth mindset is a belief system that sees ability as developable rather than fixed. Bandura's self-efficacy is a key mediator of growth intention and behavioral change.' : 'Dweck의 성장 마인드셋은 능력을 고정된 것이 아닌 발전 가능한 것으로 보는 신념 체계. Bandura의 자기효능감은 성장 의지와 행동 변화의 핵심 매개 변수.' },
-          { code:'TP', en:'Time & Priority', ko:'시간·우선순위', fn:'자원 배분 / 우선순위', ref:'Covey (1989); Kahneman (2011)', summary: lang === 'en' ? 'Covey's importance-urgency matrix provides a practical framework for time resource allocation. Kahneman empirically demonstrates the relationship between cognitive resource limits and decision-making priorities.' : 'Covey의 중요도·긴급도 매트릭스는 시간 자원 배분의 실용적 프레임. Kahneman은 인지 자원의 한계와 의사결정 우선순위의 관계를 실증.' },
-          { code:'LS', en:'Life Satisfaction', ko:'삶의 만족도', fn:'삶 전반 만족 / 의미감', ref:'Diener et al. (1985); Ryff (1989)', summary: lang === 'en' ? 'Diener's SWLS is the most widely used subjective wellbeing measurement tool globally. Ryff's 6-factor psychological wellbeing model presents autonomy, environmental mastery, growth, positive relations, purpose in life, and self-acceptance.' : 'Diener의 SWLS는 전 세계에서 가장 널리 사용되는 주관적 웰빙 측정 도구. Ryff의 심리적 웰빙 6요소 모델은 자율성·환경 통제·성장·긍정 관계·삶의 목적·자기 수용을 제시.' },
-        ].map(d => `
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:100px 1fr;gap:12px;">
-            <div>
-              <div style="font-size:10px;letter-spacing:1.5px;font-weight:700;color:var(--muted);">${d.code}</div>
-              <div style="font-size:14px;font-weight:700;color:var(--ink);margin-top:2px;">${d.en}</div>
-              ${lang === 'ko' ? `<div style="font-size:12px;color:var(--muted);">${d.ko}</div>` : ''}
-            </div>
-            <div>
-              <div style="font-size:11px;color:var(--rose-dark);font-weight:600;margin-bottom:4px;">${d.fn}</div>
-              <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px;">${d.summary}</div>
-              <div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 ${d.ref}</div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-    <!-- 2. ANALYSIS INDICATORS -->
-    <div style="margin-bottom:40px;">
-      <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">${lang === 'en' ? '② Analysis Indicators — Interpretation Guide' : '② 분석 지표 해석 기준'}</h3>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-
-        <!-- Strength Gap -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">Strength Gap ${lang === 'ko' ? '(강점-고갈 갭)' : ''}</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${lang === 'en' ? 'Formula: Average of top 3 domain scores − Average of bottom 3 domain scores' : '산식: 상위 3개 도메인 평균 − 하위 3개 도메인 평균'}</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">
-            ${[
-              { range: '0.0–0.5', label: lang === 'en' ? 'Even rhythm — consistent energy distribution' : '균일한 리듬 — 고른 에너지 분포' },
-              { range: '0.5–1.0', label: lang === 'en' ? 'Partial imbalance — some areas carry more weight' : '부분적 불균형 — 일부 영역 부담 높음' },
-              { range: '1.0–1.5', label: lang === 'en' ? 'Clear contrast — significant gap between strong and depleted' : '뚜렷한 대비 — 강점/고갈 차이 선명' },
-              { range: '1.5+',   label: lang === 'en' ? 'Stark imbalance — core coaching focus area' : '극명한 불균형 — 핵심 코칭 포인트' },
-            ].map(r => `<div style="background:var(--bg);border-radius:8px;padding:10px;"><div style="font-size:12px;font-weight:700;color:var(--rose-dark);">${r.range}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${r.label}</div></div>`).join('')}
-          </div>
-          <div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Seligman & Csikszentmihalyi (2000) PERMA; Maslach Burnout Inventory (1981)</div>
-        </div>
-
-        <!-- Vulnerability Index -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">Vulnerability Index ${lang === 'ko' ? '(취약성 지수)' : ''}</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${lang === 'en' ? 'Formula: (Variability × 3) + (Risk count × 1.5) + (SC buffer penalty if SC < 3) · Scale: 0–10' : '산식: (변동성×3) + (하방리스크 개수×1.5) + (SC<3이면 (3−SC)×1.5) · 범위: 0–10'}</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">
-            ${[
-              { range: '0–2', label: lang === 'en' ? 'Stable — resilient to external disruption' : '안정적 — 외부 변화에 잘 버팀' },
-              { range: '3–4', label: lang === 'en' ? 'Watch — may destabilize under certain conditions' : '주의 — 특정 조건에서 흔들릴 수 있음' },
-              { range: '5–6', label: lang === 'en' ? 'Vulnerable — check recovery resources' : '취약 구간 — 회복 자원 확인 필요' },
-              { range: '7+',  label: lang === 'en' ? 'High vulnerability — address first' : '고취약 — 가장 먼저 살펴봐야 할 상태' },
-            ].map(r => `<div style="background:var(--bg);border-radius:8px;padding:10px;"><div style="font-size:12px;font-weight:700;color:var(--rose-dark);">${r.range}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${r.label}</div></div>`).join('')}
-          </div>
-          <div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Bonanno (2004) Resilience Trajectory; Neff (2003) Self-Compassion Scale</div>
-        </div>
-
-        <!-- Coaching Readiness -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">Coaching Readiness ${lang === 'ko' ? '(코칭 준비도)' : ''}</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${lang === 'en' ? 'Formula: Average of SC + VG + ID · Indicates depth available in the current session' : '산식: SC + VG + ID 평균 · 현재 세션에서 탐색 가능한 깊이를 나타냄'}</div>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">
-            ${[
-              { range: '4.0+',    label: lang === 'en' ? 'High readiness — depth exploration available' : '높은 준비도 — 심층 탐색 가능' },
-              { range: '3.0–3.9', label: lang === 'en' ? 'Moderate — build safety first' : '중간 준비도 — 안전한 공간 먼저' },
-              { range: '2.0–2.9', label: lang === 'en' ? 'Lower — stabilize before exploring' : '낮은 준비도 — 안정화 우선' },
-              { range: '< 2.0',   label: lang === 'en' ? 'Recovery first — resources before coaching' : '회복 먼저 — 코칭보다 자원 확보' },
-            ].map(r => `<div style="background:var(--bg);border-radius:8px;padding:10px;"><div style="font-size:12px;font-weight:700;color:var(--good);">${r.range}</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">${r.label}</div></div>`).join('')}
-          </div>
-          <div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Prochaska & DiClemente (1983) Stages of Change; ICF Coaching Competencies Framework</div>
-        </div>
-
-        <!-- Relational-Self Dynamic -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">
-          <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;">Relational-Self Dynamic ${lang === 'ko' ? '(관계-자기 역동)' : ''}</div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">${lang === 'en' ? 'Formula: RS score − SC score · Positive = relationship-oriented, Negative = self-oriented' : '산식: RS점수 − SC점수 · 양수 = 관계 지향, 음수 = 자기 지향'}</div>
-          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
-            ${[
-              { range: '≥ 1.0',       label: lang === 'en' ? 'Relationally dependent — draws from others, self-acceptance low' : '관계 의존형 — 타인에게 기대지만 자기 수용 낮음' },
-              { range: '0.5–0.9',     label: lang === 'en' ? 'Relationship-oriented — energized by connection, self-care needed' : '관계 우선형 — 관계에서 에너지 얻음, 자기돌봄 보충 필요' },
-              { range: '-0.4 – 0.4',  label: lang === 'en' ? 'Balanced — relational support and self-acceptance at similar levels' : '균형형 — 관계와 자기수용이 비슷한 수준' },
-              { range: '-0.5 – -0.9', label: lang === 'en' ? 'Self-oriented — inner stability present, relational resources worth drawing on' : '자기 우선형 — 내면 안정적, 관계 자원 활용 필요' },
-              { range: '≤ -1.0',      label: lang === 'en' ? 'Isolated — carrying a lot alone, building connection is recovery' : '고립형 — 혼자 감당하는 패턴, 연결이 회복의 시작' },
-            ].map(r => `<div style="background:var(--bg);border-radius:8px;padding:8px 12px;display:flex;gap:12px;align-items:center;"><div style="font-size:12px;font-weight:700;color:var(--ink);min-width:80px;">${r.range}</div><div style="font-size:11px;color:var(--muted);">${r.label}</div></div>`).join('')}
-          </div>
-          <div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Bowlby (1988) Attachment Theory; Bowen (1978) Family Systems Theory</div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 3. CLUSTERS -->
-    <div style="margin-bottom:40px;">
-      <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">${lang === 'en' ? '③ 4 Cluster Groups' : '③ 4개 클러스터 구성'}</h3>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
-        ${[
-          { color:'rgba(201,130,106,0.15)', border:'rgba(201,130,106,0.5)', name:'Emotional Flow (EF)', domains:'EB + EN + SC + SM', desc: lang === 'en' ? 'Emotional regulation, energy sustainability, self-compassion, and motivation activation. The core of self-care and internal rhythm.' : '감정 조절, 에너지 지속성, 자기연민, 동기 활성화. 자기돌봄과 내면 리듬의 핵심 영역.' },
-          { color:'rgba(106,158,138,0.15)', border:'rgba(106,158,138,0.5)', name:'Resilience Flow (RF)', domains:'RE + ID + RS', desc: lang === 'en' ? 'Recovery capacity, identity stability, and relational resources. The foundation that helps one return to balance through difficulty.' : '회복 탄력성, 정체감 안정성, 관계 자원. 어려움을 통해 균형을 되찾는 기반 영역.' },
-          { color:'rgba(155,130,196,0.15)', border:'rgba(155,130,196,0.5)', name:'Meaning Flow (MF)', domains:'VA + VG + LS', desc: lang === 'en' ? 'Values alignment, vision and growth intention, life satisfaction. The dimension that connects daily life to direction and meaning.' : '가치 정렬, 비전·성장의지, 삶의 만족도. 일상을 방향과 의미로 연결하는 차원.' },
-          { color:'rgba(196,164,90,0.15)',  border:'rgba(196,164,90,0.5)',  name:'Energy Index (EI)', domains:'EN + TP', desc: lang === 'en' ? 'Energy management and time/priority allocation. The operational layer that determines how resources are distributed in daily life.' : '에너지 관리와 시간·우선순위 배분. 일상에서 자원이 어떻게 분배되는지를 결정하는 실행 레이어.' },
-        ].map(c => `
-          <div style="background:${c.color};border:1px solid ${c.border};border-radius:12px;padding:18px;">
-            <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;">${c.name}</div>
-            <div style="font-size:11px;font-weight:600;color:var(--coach-accent);margin-bottom:8px;">${c.domains}</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.7;">${c.desc}</div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-    <!-- 4. REFLECTION DB GUIDE -->
-    <div style="margin-bottom:40px;">
-      <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">${lang === 'en' ? '④ Reflection DB — Field Guide' : '④ Reflection DB 필드 가이드'}</h3>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
-          <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">Tone ${lang === 'ko' ? '(접근 톤)' : ''}</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.8;">
-            ${lang === 'en'
-              ? 'The emotional register to bring into the intervention. <br><br><b>Soothing</b> — calm, settle<br><b>Curious</b> — open, explore<br><b>Grounding</b> — anchor, stabilize<br><b>Inviting</b> — create space<br><b>Affirming</b> — validate, confirm<br><b>Restorative</b> — replenish, recover<br><b>Tender</b> — gentle, warm'
-              : '개입 시 가져가야 할 정서적 접근 방식. <br><br><b>위로하는</b> — 안정, 차분<br><b>호기심 있는</b> — 탐색, 열림<br><b>안정시키는</b> — 닻 내리기<br><b>초대하는</b> — 공간 만들기<br><b>확인하는</b> — 인정, 검증<br><b>회복시키는</b> — 채움, 회복<br><b>따뜻한</b> — 부드러움'}
-          </div>
-        </div>
-
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
-          <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">Modality ${lang === 'ko' ? '(개입 방식)' : ''}</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.8;">
-            ${lang === 'en'
-              ? 'The form the intervention takes. <br><br><b>Journaling</b> — written reflection<br><b>Micro-pause</b> — brief stop<br><b>Narrative</b> — story reframe<br><b>Somatic</b> — body sensation<br><b>Routine</b> — habit anchoring<br><b>Reframe</b> — perspective shift<br><b>Tiny-habit</b> — small consistent act'
-              : '개입이 취하는 형태. <br><br><b>저널링</b> — 글쓰기 성찰<br><b>잠깐 멈춤</b> — 짧은 중단<br><b>내러티브</b> — 이야기 재구성<br><b>신체 감각</b> — 몸의 반응<br><b>루틴</b> — 습관 닻 내리기<br><b>재해석</b> — 관점 전환<br><b>작은 습관</b> — 작고 일관된 행동'}
-          </div>
-        </div>
-
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">
-          <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">Intensity ${lang === 'ko' ? '(강도)' : ''}</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.8;">
-            ${lang === 'en'
-              ? 'The depth of engagement required. <br><br><b>Light</b> — low demand, safe entry point. Best for D/E bands or early session. <br><br><b>Medium</b> — moderate engagement. Suitable for B/C bands with established rapport.'
-              : '요구되는 참여의 깊이. <br><br><b>가볍게</b> — 낮은 요구, 안전한 진입점. D/E밴드 또는 세션 초반에 적합. <br><br><b>중간 강도</b> — 중간 수준의 참여. 라포가 형성된 B/C밴드에 적합.'}
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 5. ACADEMIC DISCLAIMER -->
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:11px;color:var(--muted);line-height:1.9;">
-      <div style="font-weight:700;color:var(--ink);margin-bottom:8px;">${lang === 'en' ? 'Academic Basis Summary' : '학술 근거 종합'}</div>
-      ${lang === 'en'
-        ? 'This diagnostic is designed on the basis of the following validated psychological theories: Emotion Regulation (Gross, 1998) · Energy Management (Loehr & Schwartz, 2003) · Resilience (Masten, 2001; Bonanno, 2004) · Self-Determination Theory (Deci & Ryan, 2000) · Positive Psychology (Seligman, 2000) · Identity Development (Erikson, 1968) · Social Support (Cohen & Wills, 1985) · Logotherapy (Frankl, 1963) · Self-Compassion (Neff, 2003) · Growth Mindset (Dweck, 2006) · Subjective Wellbeing (Diener et al., 1985; Ryff, 1989)<br><br>※ This tool is a self-exploration instrument for coaching entry purposes, not a clinical diagnostic.'
-        : '이 진단은 다음 검증된 심리학 이론을 기반으로 설계되었습니다: 감정 조절(Gross, 1998) · 에너지 관리(Loehr & Schwartz, 2003) · 회복탄력성(Masten, 2001; Bonanno, 2004) · 자기결정이론(Deci & Ryan, 2000) · 긍정심리학(Seligman, 2000) · 정체감 발달(Erikson, 1968) · 사회적 지지(Cohen & Wills, 1985) · 의미 치료(Frankl, 1963) · 자기연민(Neff, 2003) · 성장 마인드셋(Dweck, 2006) · 주관적 웰빙(Diener et al., 1985; Ryff, 1989)<br><br>※ 본 도구는 임상 진단이 아닌 코칭 입문 목적의 자기 탐색 도구입니다.'}
-    </div>
-
-  </div>
-`;
   document.getElementById('app').innerHTML = html;
+  renderCoachGuide(lang);
   document.getElementById('app').style.display = 'block';
   document.getElementById('topbar').style.display = 'flex';
   document.getElementById('loading-screen').style.display = 'none';
@@ -1025,6 +1024,177 @@ function renderReport(d, row) {
     ctx.parentElement.appendChild(legendEl);
   }, 100);
 }
+
+function renderCoachGuide(lang) {
+  const el = document.getElementById('app');
+  if (!el) return;
+
+  const ko = lang === 'ko';
+
+  const domains = [
+    { code:'EB', en:'Emotional Balance',      ko:'감정 균형',         fn:'감정 인식 / 반응 조절',   ref:'Gross (1998); Salovey & Mayer (1990)',           enSum:'Gross distinguishes antecedent- and response-focused emotion regulation. Salovey & Mayer present a hierarchy of recognizing, understanding, and regulating emotion.',           koSum:'Gross의 감정 조절 이론은 감정 인식과 반응 조절을 2단계로 구분. Salovey & Mayer의 EQ 이론은 감정 인식→이해→조절의 위계를 제시.' },
+    { code:'EN', en:'Energy Management',      ko:'에너지 관리',        fn:'에너지 지속성 / 회복',    ref:'Loehr & Schwartz (2003); Baumeister et al. (1998)', enSum:'Loehr & Schwartz present a 4-dimension energy model. Baumeister explains the relationship between energy depletion and functional decline.',                                    koSum:'Loehr & Schwartz는 신체·감정·정신·영적 에너지의 4차원 관리 모델 제시. Baumeister의 자아 고갈 이론은 에너지 소모와 기능 저하의 관계를 설명.' },
+    { code:'RE', en:'Resilience',             ko:'회복 탄력성',        fn:'복원력 / 균형 복귀',      ref:'Masten (2001); Bonanno (2004)',                     enSum:'Masten defines resilience as ordinary adaptive mechanism. Bonanno demonstrates individual differences in recovery speed and trajectory.',                                    koSum:'Masten은 회복탄력성을 일상적 적응 기제로 정의. Bonanno는 균형 복귀 속도의 개인차와 회복 경로의 다양성을 실증.' },
+    { code:'SM', en:'Strengths & Motivation', ko:'강점·동기',          fn:'동기 방향 / 강점 활성화', ref:'Deci & Ryan (2000); Seligman (2000); Peterson & Seligman (2004)', enSum:'SDT presents three basic needs: autonomy, competence, relatedness. VIA classifies 24 character strengths empirically.',                                                  koSum:'SDT는 자율성·유능감·관계성의 3대 기본 심리 욕구를 제시. VIA는 24개 강점을 분류한 실증적 강점 체계.' },
+    { code:'ID', en:'Identity Integration',   ko:'정체감·역할 통합',   fn:'자기 정의 / 역할 통합',   ref:'Erikson (1968); Thoits (1983)',                     enSum:'Erikson presents identity formation as a life developmental task. Thoits empirically demonstrates multiple roles on wellbeing.',                                              koSum:'Erikson의 심리사회 발달 이론은 정체감 형성과 역할 통합을 생애 발달 과제로 제시. Thoits는 다중 역할이 자아 개념과 웰빙에 미치는 영향을 실증.' },
+    { code:'RS', en:'Relational Support',     ko:'관계 자원',          fn:'연결 / 상호작용',         ref:'Cohen & Wills (1985); Bowlby (1988)',               enSum:'Cohen & Wills demonstrate social support as stress buffer. Bowlby presents relationship as a secure base for exploration and growth.',                                        koSum:'Cohen & Wills는 사회적 지지가 스트레스를 완충하는 기제를 실증. Bowlby의 애착 이론은 안전 기지로서의 관계가 탐색과 성장의 기반임을 제시.' },
+    { code:'VA', en:'Values Alignment',       ko:'가치·의미',          fn:'가치 정렬 / 의미 연결',   ref:'Frankl (1963); Schwartz (1992)',                    enSum:'Frankl presents meaning as central to psychological health. Schwartz empirically classifies structure of 10 basic values.',                                                  koSum:'Frankl의 의미 치료는 의미감을 심리적 건강의 핵심으로 제시. Schwartz의 보편적 가치 이론은 10개 기본 가치의 구조를 실증적으로 분류.' },
+    { code:'SC', en:'Self-Compassion',        ko:'자기연민',           fn:'자기 수용 / 내적 기준',   ref:'Neff (2003); Gilbert (2010)',                       enSum:'Neff presents three components: self-kindness, common humanity, mindfulness. Gilbert explains neurobiological mechanisms of self-compassion.',                              koSum:'Neff의 자기연민 척도는 자기친절·공통 인간성·마음챙김의 3요소로 구성. Gilbert의 CFT는 자기비판과 자기연민의 신경생물학적 기제를 설명.' },
+    { code:'VG', en:'Vision & Growth',        ko:'비전·성장의지',      fn:'방향 감각 / 성장 의지',   ref:'Dweck (2006); Bandura (1977)',                      enSum:'Dweck presents growth mindset as a belief system. Bandura's self-efficacy is a key mediator of growth intention and behavioral change.',                                 koSum:'Dweck의 성장 마인드셋은 능력을 발전 가능한 것으로 보는 신념 체계. Bandura의 자기효능감은 성장 의지와 행동 변화의 핵심 매개 변수.' },
+    { code:'TP', en:'Time & Priority',        ko:'시간·우선순위',      fn:'자원 배분 / 우선순위',    ref:'Covey (1989); Kahneman (2011)',                     enSum:'Covey presents importance-urgency matrix for time allocation. Kahneman demonstrates cognitive resource limits and decision-making priorities.',                              koSum:'Covey의 중요도·긴급도 매트릭스는 시간 자원 배분의 실용적 프레임. Kahneman은 인지 자원의 한계와 의사결정 우선순위의 관계를 실증.' },
+    { code:'LS', en:'Life Satisfaction',      ko:'삶의 만족도',        fn:'삶 전반 만족 / 의미감',   ref:'Diener et al. (1985); Ryff (1989)',                 enSum:'Diener's SWLS is the most widely used subjective wellbeing tool. Ryff presents 6-factor model: autonomy, mastery, growth, relations, purpose, self-acceptance.',          koSum:'Diener의 SWLS는 전 세계에서 가장 널리 사용되는 주관적 웰빙 측정 도구. Ryff의 심리적 웰빙 6요소 모델은 자율성·환경 통제·성장·긍정 관계·삶의 목적·자기 수용을 제시.' },
+  ];
+
+  const strengthGapRanges = ko
+    ? [['0.0–0.5','균일한 리듬 — 고른 에너지 분포'],['0.5–1.0','부분적 불균형 — 일부 영역 부담 높음'],['1.0–1.5','뚜렷한 대비 — 강점/고갈 차이 선명'],['1.5+','극명한 불균형 — 핵심 코칭 포인트']]
+    : [['0.0–0.5','Even rhythm — consistent energy distribution'],['0.5–1.0','Partial imbalance — some areas carry more weight'],['1.0–1.5','Clear contrast — significant gap'],['1.5+','Stark imbalance — core coaching focus']];
+
+  const vulnRanges = ko
+    ? [['0–2','안정적 — 외부 변화에 잘 버팀'],['3–4','주의 — 특정 조건에서 흔들릴 수 있음'],['5–6','취약 구간 — 회복 자원 확인 필요'],['7+','고취약 — 가장 먼저 살펴봐야 할 상태']]
+    : [['0–2','Stable — resilient to external disruption'],['3–4','Watch — may destabilize under certain conditions'],['5–6','Vulnerable — check recovery resources'],['7+','High vulnerability — address first']];
+
+  const readyRanges = ko
+    ? [['4.0+','높은 준비도 — 심층 탐색 가능'],['3.0–3.9','중간 준비도 — 안전한 공간 먼저'],['2.0–2.9','낮은 준비도 — 안정화 우선'],['< 2.0','회복 먼저 — 코칭보다 자원 확보']]
+    : [['4.0+','High readiness — depth exploration available'],['3.0–3.9','Moderate — build safety first'],['2.0–2.9','Lower — stabilize before exploring'],['< 2.0','Recovery first — resources before coaching']];
+
+  const relSelfRanges = ko
+    ? [['≥ 1.0','관계 의존형 — 타인에게 기대지만 자기 수용 낮음'],['0.5–0.9','관계 우선형 — 관계에서 에너지 얻음, 자기돌봄 보충 필요'],['-0.4–0.4','균형형 — 관계와 자기수용이 비슷한 수준'],['-0.5– -0.9','자기 우선형 — 내면 안정적, 관계 자원 활용 필요'],['≤ -1.0','고립형 — 혼자 감당하는 패턴, 연결이 회복의 시작']]
+    : [['≥ 1.0','Relationally dependent — draws from others, self-acceptance low'],['0.5–0.9','Relationship-oriented — energized by connection, self-care needed'],['-0.4–0.4','Balanced — relational support and self-acceptance at similar levels'],['-0.5– -0.9','Self-oriented — inner stability present, relational resources needed'],['≤ -1.0','Isolated — carrying a lot alone, building connection is recovery']];
+
+  const clusters = [
+    { color:'rgba(201,130,106,0.15)', border:'rgba(201,130,106,0.5)', name:'Emotional Flow (EF)', domains:'EB + EN + SC + SM', desc: ko ? '감정 조절, 에너지 지속성, 자기연민, 동기 활성화. 자기돌봄과 내면 리듬의 핵심 영역.' : 'Emotional regulation, energy sustainability, self-compassion, and motivation activation.' },
+    { color:'rgba(106,158,138,0.15)', border:'rgba(106,158,138,0.5)', name:'Resilience Flow (RF)', domains:'RE + ID + RS', desc: ko ? '회복 탄력성, 정체감 안정성, 관계 자원. 어려움을 통해 균형을 되찾는 기반 영역.' : 'Recovery capacity, identity stability, and relational resources.' },
+    { color:'rgba(155,130,196,0.15)', border:'rgba(155,130,196,0.5)', name:'Meaning Flow (MF)', domains:'VA + VG + LS', desc: ko ? '가치 정렬, 비전·성장의지, 삶의 만족도. 일상을 방향과 의미로 연결하는 차원.' : 'Values alignment, vision, and life satisfaction — the dimension of direction and meaning.' },
+    { color:'rgba(196,164,90,0.15)',  border:'rgba(196,164,90,0.5)',  name:'Energy Index (EI)', domains:'EN + TP', desc: ko ? '에너지 관리와 시간·우선순위 배분. 일상에서 자원이 어떻게 분배되는지를 결정하는 실행 레이어.' : 'Energy and time/priority allocation — the operational layer of daily resource distribution.' },
+  ];
+
+  function rangeGrid(ranges, valueColor) {
+    return ranges.map(([r, l]) =>
+      '<div style="background:var(--bg);border-radius:8px;padding:10px;">' +
+      '<div style="font-size:12px;font-weight:700;color:' + (valueColor||'var(--rose-dark)') + ';">' + r + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + l + '</div></div>'
+    ).join('');
+  }
+
+  const html = '<div class="section" style="border-top:2px solid var(--border);padding-top:48px;">' +
+
+    '<div class="section-kicker">' + (ko ? '코치 참고 가이드' : 'Coach Reference Guide') + '</div>' +
+    '<div class="section-title">' + (ko ? '해석 기준 및 학술 근거' : 'Interpretation Framework & Academic References') + '</div>' +
+    '<div class="section-sub">' + (ko ? '세션 중 및 오프라인 참고용.' : 'For in-session and offline reference.') + '</div>' +
+
+    // ① DOMAINS
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '① 11개 도메인 학술 근거' : '① 11 Domains — Academic Basis') + '</h3>' +
+    '<div style="display:flex;flex-direction:column;gap:12px;">' +
+    domains.map(d =>
+      '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:110px 1fr;gap:12px;">' +
+      '<div>' +
+      '<div style="font-size:10px;letter-spacing:1.5px;font-weight:700;color:var(--muted);">' + d.code + '</div>' +
+      '<div style="font-size:14px;font-weight:700;color:var(--ink);margin-top:2px;">' + d.en + '</div>' +
+      (ko ? '<div style="font-size:12px;color:var(--muted);">(' + d.ko + ')</div>' : '') +
+      '</div>' +
+      '<div>' +
+      '<div style="font-size:11px;color:var(--rose-dark);font-weight:600;margin-bottom:4px;">' + d.fn + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:6px;">' + (ko ? d.koSum : d.enSum) + '</div>' +
+      '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 ' + d.ref + '</div>' +
+      '</div></div>'
+    ).join('') +
+    '</div></div>' +
+
+    // ② INDICATORS
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '② 분석 지표 해석 기준' : '② Analysis Indicators — Interpretation Guide') + '</h3>' +
+    '<div style="display:flex;flex-direction:column;gap:12px;">' +
+
+    // Strength Gap
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Strength Gap ' + (ko ? '(강점-고갈 갭)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: 상위 3개 도메인 평균 − 하위 3개 도메인 평균' : 'Formula: Avg of top 3 domain scores − Avg of bottom 3 domain scores') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">' + rangeGrid(strengthGapRanges) + '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Seligman & Csikszentmihalyi (2000) PERMA; Maslach Burnout Inventory (1981)</div>' +
+    '</div>' +
+
+    // Vulnerability Index
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Vulnerability Index ' + (ko ? '(취약성 지수)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: (변동성×3) + (하방리스크 개수×1.5) + SC<3이면 (3−SC)×1.5 · 범위: 0–10' : 'Formula: (Variability×3) + (Risk count×1.5) + (SC buffer penalty if SC<3) · Scale: 0–10') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">' + rangeGrid(vulnRanges, 'var(--warn)') + '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Bonanno (2004) Resilience Trajectory; Neff (2003) Self-Compassion Scale</div>' +
+    '</div>' +
+
+    // Coaching Readiness
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Coaching Readiness ' + (ko ? '(코칭 준비도)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: SC + VG + ID 평균 · 현재 세션에서 탐색 가능한 깊이를 나타냄' : 'Formula: Average of SC + VG + ID · Indicates depth available in the current session') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">' + rangeGrid(readyRanges, 'var(--good)') + '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Prochaska & DiClemente (1983) Stages of Change; ICF Coaching Competencies Framework</div>' +
+    '</div>' +
+
+    // Relational-Self Dynamic
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;">' +
+    '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;">Relational-Self Dynamic ' + (ko ? '(관계-자기 역동)' : '') + '</div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;">' + (ko ? '산식: RS점수 − SC점수 · 양수=관계 지향, 음수=자기 지향' : 'Formula: RS score − SC score · Positive=relationship-oriented, Negative=self-oriented') + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">' +
+    relSelfRanges.map(([r, l]) =>
+      '<div style="background:var(--bg);border-radius:8px;padding:8px 12px;display:flex;gap:12px;align-items:center;">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--ink);min-width:90px;">' + r + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);">' + l + '</div></div>'
+    ).join('') +
+    '</div>' +
+    '<div style="font-size:11px;color:var(--coach-accent);opacity:.7;">📚 Bowlby (1988) Attachment Theory; Bowen (1978) Family Systems Theory</div>' +
+    '</div>' +
+
+    '</div></div>' +
+
+    // ③ CLUSTERS
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '③ 4개 클러스터 구성' : '③ 4 Cluster Groups') + '</h3>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">' +
+    clusters.map(c =>
+      '<div style="background:' + c.color + ';border:1px solid ' + c.border + ';border-radius:12px;padding:18px;">' +
+      '<div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;">' + c.name + '</div>' +
+      '<div style="font-size:11px;font-weight:600;color:var(--coach-accent);margin-bottom:8px;">' + c.domains + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);line-height:1.7;">' + c.desc + '</div></div>'
+    ).join('') +
+    '</div></div>' +
+
+    // ④ REFLECTION DB
+    '<div style="margin-bottom:40px;">' +
+    '<h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:20px;">' + (ko ? '④ Reflection DB 필드 가이드' : '④ Reflection DB — Field Guide') + '</h3>' +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">' +
+    [
+      { title: 'Tone' + (ko ? ' (접근 톤)' : ''),
+        body: ko
+          ? '<b>위로하는</b> — 안정, 차분<br><b>호기심 있는</b> — 탐색, 열림<br><b>안정시키는</b> — 닻 내리기<br><b>초대하는</b> — 공간 만들기<br><b>확인하는</b> — 인정, 검증<br><b>회복시키는</b> — 채움, 회복<br><b>따뜻한</b> — 부드러움'
+          : '<b>Soothing</b> — calm, settle<br><b>Curious</b> — open, explore<br><b>Grounding</b> — anchor, stabilize<br><b>Inviting</b> — create space<br><b>Affirming</b> — validate, confirm<br><b>Restorative</b> — replenish, recover<br><b>Tender</b> — gentle, warm' },
+      { title: 'Modality' + (ko ? ' (개입 방식)' : ''),
+        body: ko
+          ? '<b>저널링</b> — 글쓰기 성찰<br><b>잠깐 멈춤</b> — 짧은 중단<br><b>내러티브</b> — 이야기 재구성<br><b>신체 감각</b> — 몸의 반응<br><b>루틴</b> — 습관 닻 내리기<br><b>재해석</b> — 관점 전환<br><b>작은 습관</b> — 작고 일관된 행동'
+          : '<b>Journaling</b> — written reflection<br><b>Micro-pause</b> — brief stop<br><b>Narrative</b> — story reframe<br><b>Somatic</b> — body sensation<br><b>Routine</b> — habit anchoring<br><b>Reframe</b> — perspective shift<br><b>Tiny-habit</b> — small consistent act' },
+      { title: 'Intensity' + (ko ? ' (강도)' : ''),
+        body: ko
+          ? '<b>가볍게</b> — 낮은 요구, 안전한 진입점. D/E밴드 또는 세션 초반에 적합.<br><br><b>중간 강도</b> — 중간 수준의 참여. 라포가 형성된 B/C밴드에 적합.'
+          : '<b>Light</b> — low demand, safe entry. Best for D/E bands or early session.<br><br><b>Medium</b> — moderate engagement. Suitable for B/C bands with established rapport.' },
+    ].map(f =>
+      '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:10px;">' + f.title + '</div>' +
+      '<div style="font-size:11px;color:var(--muted);line-height:1.9;">' + f.body + '</div></div>'
+    ).join('') +
+    '</div></div>' +
+
+    // ⑤ DISCLAIMER
+    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px;font-size:11px;color:var(--muted);line-height:1.9;">' +
+    '<div style="font-weight:700;color:var(--ink);margin-bottom:8px;">' + (ko ? '학술 근거 종합' : 'Academic Basis Summary') + '</div>' +
+    (ko
+      ? '이 진단은 다음 검증된 심리학 이론을 기반으로 설계되었습니다: 감정 조절(Gross, 1998) · 에너지 관리(Loehr & Schwartz, 2003) · 회복탄력성(Masten, 2001; Bonanno, 2004) · 자기결정이론(Deci & Ryan, 2000) · 긍정심리학(Seligman, 2000) · 정체감 발달(Erikson, 1968) · 사회적 지지(Cohen & Wills, 1985) · 의미 치료(Frankl, 1963) · 자기연민(Neff, 2003) · 성장 마인드셋(Dweck, 2006) · 주관적 웰빙(Diener et al., 1985; Ryff, 1989)<br><br>※ 본 도구는 임상 진단이 아닌 코칭 입문 목적의 자기 탐색 도구입니다.'
+      : 'Emotion Regulation (Gross, 1998) · Energy Management (Loehr & Schwartz, 2003) · Resilience (Masten, 2001; Bonanno, 2004) · SDT (Deci & Ryan, 2000) · Positive Psychology (Seligman, 2000) · Identity Development (Erikson, 1968) · Social Support (Cohen & Wills, 1985) · Logotherapy (Frankl, 1963) · Self-Compassion (Neff, 2003) · Growth Mindset (Dweck, 2006) · Subjective Wellbeing (Diener et al., 1985; Ryff, 1989)<br><br>※ This tool is a self-exploration instrument for coaching entry purposes, not a clinical diagnostic.') +
+    '</div>' +
+
+    '</div>';
+
+  el.innerHTML += html;
+}
+
 </script>
 </body>
 </html>
