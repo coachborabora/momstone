@@ -163,6 +163,196 @@ function renderCoachGuide(lang) {
   el.innerHTML += html;
 }
 
+
+async function generateAIAnalysis() {
+  const btn = document.getElementById('ai-btn');
+  const result = document.getElementById('ai-result');
+  if (!btn || !result) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span> ' + (currentLang === 'ko' ? '분석 중...' : 'Analyzing...');
+
+  result.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">' + (currentLang === 'ko' ? '클라이언트 데이터를 분석하고 있어요...' : 'Reading client data...') + '</div>';
+
+  try {
+    const prompt = buildAIPrompt();
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+
+    // Parse JSON response
+    let parsed;
+    try {
+      const clean = text.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      parsed = null;
+    }
+
+    if (parsed) {
+      result.innerHTML = renderAIResult(parsed);
+    } else {
+      result.innerHTML = '<div style="padding:16px;background:var(--warn-light);border-radius:12px;font-size:13px;color:var(--warn);">' + (currentLang === 'ko' ? '분석 결과를 파싱하지 못했어요. 다시 시도해보세요.' : 'Could not parse analysis result. Please try again.') + '</div>';
+    }
+
+  } catch(err) {
+    result.innerHTML = '<div style="padding:16px;background:var(--warn-light);border-radius:12px;font-size:13px;color:var(--warn);">' + (currentLang === 'ko' ? '인터넷 연결이 필요해요. 오프라인 상태에서는 사용할 수 없어요.' : 'Internet connection required. Not available offline.') + '</div>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>✦</span> ' + (currentLang === 'ko' ? '다시 생성' : 'Regenerate');
+}
+
+let currentData = null;
+let currentLang = 'ko';
+
+function buildAIPrompt() {
+  const d = currentData;
+  const ko = currentLang === 'ko';
+
+  const domainScores = DOMAINS.map(dom => ({
+    code: dom.code,
+    name: ko ? dom.ko : dom.en,
+    score: parseFloat(d[dom.code + '_score'] || 0)
+  }));
+
+  const sorted = [...domainScores].sort((a,b) => b.score - a.score);
+  const top3 = sorted.slice(0,3).map(d => d.name + ' ' + d.score.toFixed(1));
+  const bot3 = sorted.slice(-3).map(d => d.name + ' ' + d.score.toFixed(1));
+
+  const systemPrompt = ko
+    ? `당신은 CPCC 인증 코치를 위한 클라이언트 리듬 분석 전문가입니다. 
+성경적 관점을 기반으로 합니다: "자기가 답이다", "너 자신을 믿어라" 같은 자기중심 이데올로기를 피하고, 
+겸손한 탐색·동반자 언어를 사용하세요. 코치가 세션 전에 읽는 내부 분석 문서입니다.
+반드시 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만.`
+    : `You are a client rhythm analysis expert for CPCC-certified coaches.
+Avoid self-centered ideology ("you are your own answer", "trust yourself").
+Use humble, exploratory, companion language. This is an internal coaching document.
+Respond ONLY with valid JSON. No other text.`;
+
+  const userPrompt = ko
+    ? `다음 클라이언트 리듬 데이터를 분석해주세요:
+
+이름: ${d.Name || '비공개'}
+Band: ${d.Band || '?'} (${d.BandName || ''})
+전체 평균: ${parseFloat(d.Overall_Avg || 0).toFixed(2)} / 5.0
+Reset Point: ${d.Reset_Point || '?'}
+
+상위 3개 도메인: ${top3.join(', ')}
+하위 3개 도메인: ${bot3.join(', ')}
+
+클러스터:
+- Emotional Flow: ${parseFloat(d.EF_score || 0).toFixed(1)}
+- Resilience Flow: ${parseFloat(d.RF_score || 0).toFixed(1)}
+- Meaning Flow: ${parseFloat(d.MF_score || 0).toFixed(1)}
+- Energy Index: ${parseFloat(d.EI_score || 0).toFixed(1)}
+
+분석 지표:
+- Strength Gap: ${d.Strength_Gap || '?'}
+- Vulnerability Index: ${d.Vulnerability_Index || '?'} / 10
+- Coaching Readiness: ${d.Coaching_Readiness || '?'} / 5
+- Relational-Self Dynamic: ${d.Relational_Self_Dynamic || '?'}
+
+다음 JSON 형식으로 응답하세요:
+{
+  "narrative": "종합 패턴 해석 (2~3문장, 코치가 읽는 언어)",
+  "hypotheses": ["가설1", "가설2", "가설3"],
+  "session_structure": "0-15분: ...
+15-35분: ...
+35-50분: ...
+50-60분: ...",
+  "caution": "주의 신호 (1~2문장)",
+  "opener_hint": "Music Soundtrack을 세션 오프닝에 활용하는 구체적 방법 (1문장)"
+}`
+    : `Analyze the following client rhythm data:
+
+Name: ${d.Name || 'Anonymous'}
+Band: ${d.Band || '?'} (${d.BandName || ''})
+Overall: ${parseFloat(d.Overall_Avg || 0).toFixed(2)} / 5.0
+Reset Point: ${d.Reset_Point || '?'}
+
+Top 3 domains: ${top3.join(', ')}
+Bottom 3 domains: ${bot3.join(', ')}
+
+Clusters:
+- Emotional Flow: ${parseFloat(d.EF_score || 0).toFixed(1)}
+- Resilience Flow: ${parseFloat(d.RF_score || 0).toFixed(1)}
+- Meaning Flow: ${parseFloat(d.MF_score || 0).toFixed(1)}
+- Energy Index: ${parseFloat(d.EI_score || 0).toFixed(1)}
+
+Indicators:
+- Strength Gap: ${d.Strength_Gap || '?'}
+- Vulnerability Index: ${d.Vulnerability_Index || '?'} / 10
+- Coaching Readiness: ${d.Coaching_Readiness || '?'} / 5
+- Relational-Self Dynamic: ${d.Relational_Self_Dynamic || '?'}
+
+Respond with this exact JSON:
+{
+  "narrative": "2-3 sentence pattern interpretation in coach language",
+  "hypotheses": ["hypothesis 1", "hypothesis 2", "hypothesis 3"],
+  "session_structure": "0-15min: ...\n15-35min: ...\n35-50min: ...\n50-60min: ...",
+  "caution": "1-2 sentence warning signal",
+  "opener_hint": "One specific way to use the Music Soundtrack as session opener"
+}`;
+
+  return systemPrompt + '\n\n' + userPrompt;
+}
+
+function renderAIResult(p) {
+  const ko = currentLang === 'ko';
+  const cardStyle = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:12px;';
+  const kickerStyle = 'font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:8px;';
+  const textStyle = 'font-size:14px;color:var(--ink);line-height:1.8;';
+  const highlightStyle = cardStyle + 'border-left:3px solid var(--rose-dark);border-radius:0 14px 14px 0;';
+
+  const hypothesesHtml = (p.hypotheses || []).map((h, i) =>
+    '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;">' +
+    '<div style="font-size:12px;font-weight:700;color:var(--rose-dark);min-width:18px;margin-top:2px;">' + (i+1) + '</div>' +
+    '<div style="font-size:13px;color:var(--ink);line-height:1.7;">' + esc(h) + '</div></div>'
+  ).join('');
+
+  const sessionHtml = (p.session_structure || '').split('\n').map(line =>
+    line.trim() ? '<div style="font-size:13px;color:var(--ink);line-height:1.9;padding:4px 0;border-bottom:1px solid var(--border);">' + esc(line) + '</div>' : ''
+  ).join('');
+
+  return '<div style="border-top:1px dashed var(--border);padding-top:20px;">' +
+    '<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--rose-dark);font-weight:700;margin-bottom:16px;">✦ ' + (ko ? 'AI 심층 분석 결과' : 'AI Deep Analysis') + '</div>' +
+
+    '<div style="' + highlightStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '종합 패턴 해석' : 'Pattern Interpretation') + '</div>' +
+    '<div style="' + textStyle + '">' + esc(p.narrative || '') + '</div></div>' +
+
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '코칭 가설 3가지' : 'Coaching Hypotheses') + '</div>' +
+    hypothesesHtml + '</div>' +
+
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '세션 구조 제안 (60분)' : 'Session Structure (60 min)') + '</div>' +
+    sessionHtml + '</div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + 'color:var(--warn);">' + (ko ? '주의 신호' : 'Caution Signal') + '</div>' +
+    '<div style="font-size:13px;color:var(--ink);line-height:1.7;">' + esc(p.caution || '') + '</div></div>' +
+
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '🎵 세션 오프너 활용' : '🎵 Session Opener') + '</div>' +
+    '<div style="font-size:13px;color:var(--ink);line-height:1.7;">' + esc(p.opener_hint || '') + '</div></div>' +
+    '</div>' +
+
+    '<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;">✦ ' + (ko ? 'AI가 생성한 내용이에요. 코치의 전문적 판단과 함께 사용하세요.' : 'AI-generated content. Use alongside your professional coaching judgment.') + '</div>' +
+    '</div>';
+}
+
 </script>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
   <style>
@@ -410,6 +600,7 @@ function renderCoachGuide(lang) {
     .memo-area:focus { border-color: var(--rose-dark); }
 
     /* PRINT */
+    @keyframes spin { to { transform: rotate(360deg); } }
     @media print {
       .topbar { display: none; }
       .reflection-guide { break-inside: avoid; }
@@ -697,6 +888,20 @@ function renderReport(d, row) {
     </div>
   </div>
 
+  <!-- AI ANALYSIS -->
+  <div class="section" id="ai-analysis-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div class="section-kicker">${lang === 'en' ? 'AI Deep Analysis' : 'AI 심층 분석'}</div>
+        <div style="font-size:13px;color:var(--muted);">${lang === 'en' ? 'Pattern interpretation, coaching hypotheses, session structure — generated in real time.' : '패턴 해석, 코칭 가설, 세션 구조 — 실시간 생성.'}</div>
+      </div>
+      <button id="ai-btn" onclick="generateAIAnalysis()" style="background:var(--ink);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Satoshi',sans-serif;display:flex;align-items:center;gap:8px;">
+        <span>✦</span> ${lang === 'en' ? 'Generate AI Analysis' : 'AI 심층 분석 생성'}
+      </button>
+    </div>
+    <div id="ai-result" style="margin-top:20px;"></div>
+  </div>
+
   <!-- ② RADAR -->
   <div class="section">
     <div class="section-kicker">${lang === 'en' ? 'Rhythm Map' : '리듬 지도'}</div>
@@ -871,6 +1076,8 @@ function renderReport(d, row) {
   </div>
   `;
 
+  currentData = d;
+  currentLang = lang;
   document.getElementById('app').innerHTML = html;
   renderCoachGuide(lang);
   document.getElementById('app').style.display = 'block';
@@ -1181,6 +1388,196 @@ function renderCoachGuide(lang) {
     '</div>';
 
   el.innerHTML += html;
+}
+
+
+async function generateAIAnalysis() {
+  const btn = document.getElementById('ai-btn');
+  const result = document.getElementById('ai-result');
+  if (!btn || !result) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></span> ' + (currentLang === 'ko' ? '분석 중...' : 'Analyzing...');
+
+  result.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px;">' + (currentLang === 'ko' ? '클라이언트 데이터를 분석하고 있어요...' : 'Reading client data...') + '</div>';
+
+  try {
+    const prompt = buildAIPrompt();
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+
+    // Parse JSON response
+    let parsed;
+    try {
+      const clean = text.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      parsed = null;
+    }
+
+    if (parsed) {
+      result.innerHTML = renderAIResult(parsed);
+    } else {
+      result.innerHTML = '<div style="padding:16px;background:var(--warn-light);border-radius:12px;font-size:13px;color:var(--warn);">' + (currentLang === 'ko' ? '분석 결과를 파싱하지 못했어요. 다시 시도해보세요.' : 'Could not parse analysis result. Please try again.') + '</div>';
+    }
+
+  } catch(err) {
+    result.innerHTML = '<div style="padding:16px;background:var(--warn-light);border-radius:12px;font-size:13px;color:var(--warn);">' + (currentLang === 'ko' ? '인터넷 연결이 필요해요. 오프라인 상태에서는 사용할 수 없어요.' : 'Internet connection required. Not available offline.') + '</div>';
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>✦</span> ' + (currentLang === 'ko' ? '다시 생성' : 'Regenerate');
+}
+
+let currentData = null;
+let currentLang = 'ko';
+
+function buildAIPrompt() {
+  const d = currentData;
+  const ko = currentLang === 'ko';
+
+  const domainScores = DOMAINS.map(dom => ({
+    code: dom.code,
+    name: ko ? dom.ko : dom.en,
+    score: parseFloat(d[dom.code + '_score'] || 0)
+  }));
+
+  const sorted = [...domainScores].sort((a,b) => b.score - a.score);
+  const top3 = sorted.slice(0,3).map(d => d.name + ' ' + d.score.toFixed(1));
+  const bot3 = sorted.slice(-3).map(d => d.name + ' ' + d.score.toFixed(1));
+
+  const systemPrompt = ko
+    ? `당신은 CPCC 인증 코치를 위한 클라이언트 리듬 분석 전문가입니다. 
+성경적 관점을 기반으로 합니다: "자기가 답이다", "너 자신을 믿어라" 같은 자기중심 이데올로기를 피하고, 
+겸손한 탐색·동반자 언어를 사용하세요. 코치가 세션 전에 읽는 내부 분석 문서입니다.
+반드시 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만.`
+    : `You are a client rhythm analysis expert for CPCC-certified coaches.
+Avoid self-centered ideology ("you are your own answer", "trust yourself").
+Use humble, exploratory, companion language. This is an internal coaching document.
+Respond ONLY with valid JSON. No other text.`;
+
+  const userPrompt = ko
+    ? `다음 클라이언트 리듬 데이터를 분석해주세요:
+
+이름: ${d.Name || '비공개'}
+Band: ${d.Band || '?'} (${d.BandName || ''})
+전체 평균: ${parseFloat(d.Overall_Avg || 0).toFixed(2)} / 5.0
+Reset Point: ${d.Reset_Point || '?'}
+
+상위 3개 도메인: ${top3.join(', ')}
+하위 3개 도메인: ${bot3.join(', ')}
+
+클러스터:
+- Emotional Flow: ${parseFloat(d.EF_score || 0).toFixed(1)}
+- Resilience Flow: ${parseFloat(d.RF_score || 0).toFixed(1)}
+- Meaning Flow: ${parseFloat(d.MF_score || 0).toFixed(1)}
+- Energy Index: ${parseFloat(d.EI_score || 0).toFixed(1)}
+
+분석 지표:
+- Strength Gap: ${d.Strength_Gap || '?'}
+- Vulnerability Index: ${d.Vulnerability_Index || '?'} / 10
+- Coaching Readiness: ${d.Coaching_Readiness || '?'} / 5
+- Relational-Self Dynamic: ${d.Relational_Self_Dynamic || '?'}
+
+다음 JSON 형식으로 응답하세요:
+{
+  "narrative": "종합 패턴 해석 (2~3문장, 코치가 읽는 언어)",
+  "hypotheses": ["가설1", "가설2", "가설3"],
+  "session_structure": "0-15분: ...
+15-35분: ...
+35-50분: ...
+50-60분: ...",
+  "caution": "주의 신호 (1~2문장)",
+  "opener_hint": "Music Soundtrack을 세션 오프닝에 활용하는 구체적 방법 (1문장)"
+}`
+    : `Analyze the following client rhythm data:
+
+Name: ${d.Name || 'Anonymous'}
+Band: ${d.Band || '?'} (${d.BandName || ''})
+Overall: ${parseFloat(d.Overall_Avg || 0).toFixed(2)} / 5.0
+Reset Point: ${d.Reset_Point || '?'}
+
+Top 3 domains: ${top3.join(', ')}
+Bottom 3 domains: ${bot3.join(', ')}
+
+Clusters:
+- Emotional Flow: ${parseFloat(d.EF_score || 0).toFixed(1)}
+- Resilience Flow: ${parseFloat(d.RF_score || 0).toFixed(1)}
+- Meaning Flow: ${parseFloat(d.MF_score || 0).toFixed(1)}
+- Energy Index: ${parseFloat(d.EI_score || 0).toFixed(1)}
+
+Indicators:
+- Strength Gap: ${d.Strength_Gap || '?'}
+- Vulnerability Index: ${d.Vulnerability_Index || '?'} / 10
+- Coaching Readiness: ${d.Coaching_Readiness || '?'} / 5
+- Relational-Self Dynamic: ${d.Relational_Self_Dynamic || '?'}
+
+Respond with this exact JSON:
+{
+  "narrative": "2-3 sentence pattern interpretation in coach language",
+  "hypotheses": ["hypothesis 1", "hypothesis 2", "hypothesis 3"],
+  "session_structure": "0-15min: ...\n15-35min: ...\n35-50min: ...\n50-60min: ...",
+  "caution": "1-2 sentence warning signal",
+  "opener_hint": "One specific way to use the Music Soundtrack as session opener"
+}`;
+
+  return systemPrompt + '\n\n' + userPrompt;
+}
+
+function renderAIResult(p) {
+  const ko = currentLang === 'ko';
+  const cardStyle = 'background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:12px;';
+  const kickerStyle = 'font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--coach-accent);font-weight:700;margin-bottom:8px;';
+  const textStyle = 'font-size:14px;color:var(--ink);line-height:1.8;';
+  const highlightStyle = cardStyle + 'border-left:3px solid var(--rose-dark);border-radius:0 14px 14px 0;';
+
+  const hypothesesHtml = (p.hypotheses || []).map((h, i) =>
+    '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;">' +
+    '<div style="font-size:12px;font-weight:700;color:var(--rose-dark);min-width:18px;margin-top:2px;">' + (i+1) + '</div>' +
+    '<div style="font-size:13px;color:var(--ink);line-height:1.7;">' + esc(h) + '</div></div>'
+  ).join('');
+
+  const sessionHtml = (p.session_structure || '').split('\n').map(line =>
+    line.trim() ? '<div style="font-size:13px;color:var(--ink);line-height:1.9;padding:4px 0;border-bottom:1px solid var(--border);">' + esc(line) + '</div>' : ''
+  ).join('');
+
+  return '<div style="border-top:1px dashed var(--border);padding-top:20px;">' +
+    '<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--rose-dark);font-weight:700;margin-bottom:16px;">✦ ' + (ko ? 'AI 심층 분석 결과' : 'AI Deep Analysis') + '</div>' +
+
+    '<div style="' + highlightStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '종합 패턴 해석' : 'Pattern Interpretation') + '</div>' +
+    '<div style="' + textStyle + '">' + esc(p.narrative || '') + '</div></div>' +
+
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '코칭 가설 3가지' : 'Coaching Hypotheses') + '</div>' +
+    hypothesesHtml + '</div>' +
+
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '세션 구조 제안 (60분)' : 'Session Structure (60 min)') + '</div>' +
+    sessionHtml + '</div>' +
+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + 'color:var(--warn);">' + (ko ? '주의 신호' : 'Caution Signal') + '</div>' +
+    '<div style="font-size:13px;color:var(--ink);line-height:1.7;">' + esc(p.caution || '') + '</div></div>' +
+
+    '<div style="' + cardStyle + '">' +
+    '<div style="' + kickerStyle + '">' + (ko ? '🎵 세션 오프너 활용' : '🎵 Session Opener') + '</div>' +
+    '<div style="font-size:13px;color:var(--ink);line-height:1.7;">' + esc(p.opener_hint || '') + '</div></div>' +
+    '</div>' +
+
+    '<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:12px;">✦ ' + (ko ? 'AI가 생성한 내용이에요. 코치의 전문적 판단과 함께 사용하세요.' : 'AI-generated content. Use alongside your professional coaching judgment.') + '</div>' +
+    '</div>';
 }
 
 </script>
