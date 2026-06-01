@@ -724,7 +724,7 @@ function renderReport(d, row) {
     new Chart(ctx, {
       type: 'radar',
       data: {
-        labels: DOMAINS.map(d => lang === 'ko' ? [d.en.split(' ')[0], `(${d.ko})`] : d.en.split(' ')[0]),
+        labels: DOMAINS.map(d => lang === 'ko' ? [d.en, `(${d.ko})`] : d.en),
         datasets: [{
           label: 'Rhythm',
           data: scores,
