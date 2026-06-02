@@ -176,17 +176,13 @@ async function generateAIAnalysis() {
 
   try {
     const prompt = buildAIPrompt();
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    const data = await res.json();
+    const payload = encodeURIComponent(JSON.stringify({
+      messages: [{ role: 'user', content: prompt }]
+    }));
+    const res = await fetch(`${APPS_SCRIPT_URL}?claudeProxy=${payload}`);
+    const json2 = await res.json();
+    if (json2.result !== 'success') throw new Error(json2.message || 'API error');
+    const data = json2.data;
     const text = data.content?.[0]?.text || '';
 
     // Parse JSON response
@@ -1403,17 +1399,13 @@ async function generateAIAnalysis() {
 
   try {
     const prompt = buildAIPrompt();
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    const data = await res.json();
+    const payload = encodeURIComponent(JSON.stringify({
+      messages: [{ role: 'user', content: prompt }]
+    }));
+    const res = await fetch(`${APPS_SCRIPT_URL}?claudeProxy=${payload}`);
+    const json2 = await res.json();
+    if (json2.result !== 'success') throw new Error(json2.message || 'API error');
+    const data = json2.data;
     const text = data.content?.[0]?.text || '';
 
     // Parse JSON response
