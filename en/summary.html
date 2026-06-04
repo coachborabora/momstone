@@ -584,6 +584,15 @@ async function render() {
       </p>
     </div>
 
+
+    <!-- YOUR NEXT STEP -->
+    <div class="section no-print" id="next-step-section" style="background:#faf8f6;border-radius:20px;padding:40px;margin-bottom:0;">
+      <div class="section-label">Your Next Step</div>
+      <div class="section-title" style="margin-bottom:8px;">Where to go from here</div>
+      <div class="section-sub" style="margin-bottom:32px;">Based on your rhythm pattern, here's where you might begin.</div>
+      <div id="next-step-content"></div>
+    </div>
+
     <!-- CTA -->
     <div class="cta-section no-print">
       <div class="cta-inner">
@@ -652,6 +661,63 @@ async function render() {
 }
 
 render();
+
+function renderNextStep(d) {
+  const el = document.getElementById('next-step-content');
+  if (!el) return;
+
+  const band = (d.Band || '').toString().trim();
+  const overall = parseFloat(d.Overall_Avg || 0);
+  const ef = parseFloat(d.EF_score || 0);
+  const mf = parseFloat(d.MF_score || 0);
+  const ei = parseFloat(d.EI_score || 0);
+
+  let options = [];
+
+  if (band === 'E' || overall < 2.0) {
+    options = [
+      { tag:'Recommended', label:'Deep Dive Coaching', desc:'When multiple areas are signaling at once, a deeper container helps. Deep Dive Coaching is designed for exactly this season.', color:'#c9826a' },
+      { tag:'Free · 30 min', label:'Discovery Session', desc:'Start here — a conversation to explore what your rhythm map is pointing to.', color:'#2d4a3e' },
+    ];
+  } else if (band === 'D' || overall < 3.0) {
+    options = [
+      { tag:'Recommended', label:'Focus Coaching', desc:'One clear area to work on. Focus Coaching helps you move through a specific challenge with structure and support.', color:'#c9826a' },
+      { tag:'Also consider', label:'Deep Dive Coaching', desc:'If patterns keep repeating, Deep Dive Coaching works at the root level.', color:'#6a8aae' },
+      { tag:'Free · 30 min', label:'Discovery Session', desc:'Not sure which fits? Start with a conversation.', color:'#2d4a3e' },
+    ];
+  } else if (mf < 3.0) {
+    options = [
+      { tag:'Recommended', label:'Coaching for Key Life Transitions', desc:'When values and direction feel unclear, this is often a season of transition — not failure.', color:'#c9826a' },
+      { tag:'Consider', label:'Momstone Circle', desc:'Peer reflection alongside others navigating similar seasons.', color:'#6a8aae' },
+      { tag:'Free · 30 min', label:'Discovery Session', desc:"Let's look at your rhythm map together.", color:'#2d4a3e' },
+    ];
+  } else if (ef < 3.0 || ei < 3.0) {
+    options = [
+      { tag:'Recommended', label:'Focus Coaching', desc:'Emotion and energy are foundational. Focus Coaching helps you restore your rhythm in a targeted way.', color:'#c9826a' },
+      { tag:'Consider', label:'Momstone Circle', desc:'Sometimes knowing others share the same terrain is its own kind of support.', color:'#6a8aae' },
+      { tag:'Free · 30 min', label:'Discovery Session', desc:'Start with a conversation — no pressure.', color:'#2d4a3e' },
+    ];
+  } else {
+    options = [
+      { tag:'Recommended', label:'Focus Coaching', desc:'You have a strong base. Focus Coaching helps you move with intention in the area that matters most right now.', color:'#c9826a' },
+      { tag:'Consider', label:'Momstone Circle', desc:'Grow alongside others at a similar stage.', color:'#6a8aae' },
+      { tag:'Free · 30 min', label:'Discovery Session', desc:"Not sure where to start? A Discovery Session helps you find the right entry point.", color:'#2d4a3e' },
+    ];
+  }
+
+  el.innerHTML = options.map(opt =>
+    '<div style="display:flex;gap:16px;align-items:flex-start;padding:18px;background:#fff;border:1px solid #ede8e4;border-radius:14px;margin-bottom:12px;">' +
+    '<div style="flex-shrink:0;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:1px;background:' + opt.color + ';color:#fff;white-space:nowrap;margin-top:2px;">' + opt.tag + '</div>' +
+    '<div>' +
+    '<div style="font-size:16px;font-weight:700;color:#171717;margin-bottom:4px;">' + opt.label + '</div>' +
+    '<div style="font-size:13px;color:#888;line-height:1.7;">' + opt.desc + '</div>' +
+    '</div></div>'
+  ).join('') +
+  '<a href="https://calendly.com/coachborabora/30min" target="_blank" ' +
+  'style="display:inline-flex;align-items:center;gap:8px;background:#c9826a;color:#fff;font-size:14px;font-weight:700;padding:14px 28px;border-radius:999px;text-decoration:none;margin-top:8px;">' +
+  'Book a Discovery Session →</a>';
+}
+
 </script>
 </body>
 </html>
