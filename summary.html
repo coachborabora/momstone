@@ -613,6 +613,8 @@ async function render() {
     </footer>
   `;
 
+  renderNextStep();
+
   // 레이더 차트 렌더링
   const ctx = document.getElementById('radarChart').getContext('2d');
   new Chart(ctx, {
@@ -653,6 +655,63 @@ async function render() {
 }
 
 render();
+
+function renderNextStep() {
+  const el = document.getElementById('next-step-content');
+  if (!el) return;
+
+  const band = (data.Band || '').toString().trim();
+  const overall = parseFloat(data.Overall_Avg || 0);
+  const ef = parseFloat(data.EF_score || 0);
+  const mf = parseFloat(data.MF_score || 0);
+  const ei = parseFloat(data.EI_score || 0);
+
+  let options = [];
+
+  if (band === 'E' || overall < 2.0) {
+    options = [
+      { tag:'추천', label:'Deep Dive 코칭', desc:'여러 영역이 동시에 신호를 보낼 때, 더 깊은 컨테이너가 도움이 돼요. 지금 이 계절을 위해 설계된 코칭이에요.', color:'#c9826a' },
+      { tag:'무료 · 30분', label:'디스커버리 세션', desc:'리듬 지도가 가리키는 것을 함께 살펴보는 대화로 시작해요.', color:'#2d4a3e' },
+    ];
+  } else if (band === 'D' || overall < 3.0) {
+    options = [
+      { tag:'추천', label:'Focus 코칭', desc:'한 가지 명확한 영역에 집중해요. 구조와 지지 안에서 특정 과제를 통과하는 데 도움이 돼요.', color:'#c9826a' },
+      { tag:'함께 고려해보기', label:'Deep Dive 코칭', desc:'패턴이 반복된다면, 근본적인 수준에서 함께 작업해요.', color:'#6a8aae' },
+      { tag:'무료 · 30분', label:'디스커버리 세션', desc:'어떤 코칭이 맞는지 모르겠다면, 대화로 시작해요.', color:'#2d4a3e' },
+    ];
+  } else if (mf < 3.0) {
+    options = [
+      { tag:'추천', label:'주요 전환기 코칭', desc:'가치와 방향이 흐릿할 때, 이건 실패가 아닌 전환의 계절이에요.', color:'#c9826a' },
+      { tag:'고려해보기', label:'Momstone Circle', desc:'비슷한 계절을 지나는 사람들과 함께 성찰하는 공간이에요.', color:'#6a8aae' },
+      { tag:'무료 · 30분', label:'디스커버리 세션', desc:'리듬 지도를 함께 읽어봐요.', color:'#2d4a3e' },
+    ];
+  } else if (ef < 3.0 || ei < 3.0) {
+    options = [
+      { tag:'추천', label:'Focus 코칭', desc:'감정과 에너지는 모든 것의 기반이에요. 집중적인 방식으로 리듬을 회복하는 데 도움이 돼요.', color:'#c9826a' },
+      { tag:'고려해보기', label:'Momstone Circle', desc:'같은 지형을 지나고 있는 사람들이 있다는 것 자체가 지지가 되기도 해요.', color:'#6a8aae' },
+      { tag:'무료 · 30분', label:'디스커버리 세션', desc:'부담 없이 대화로 시작해요.', color:'#2d4a3e' },
+    ];
+  } else {
+    options = [
+      { tag:'추천', label:'Focus 코칭', desc:'좋은 기반이 있어요. 지금 가장 중요한 영역에서 의도적으로 나아가는 데 도움이 돼요.', color:'#c9826a' },
+      { tag:'고려해보기', label:'Momstone Circle', desc:'비슷한 단계에 있는 사람들과 함께 성장해요.', color:'#6a8aae' },
+      { tag:'무료 · 30분', label:'디스커버리 세션', desc:'어디서 시작할지 모르겠다면, 디스커버리 세션이 길을 찾아드려요.', color:'#2d4a3e' },
+    ];
+  }
+
+  el.innerHTML = options.map(function(opt) {
+    return '<div style="display:flex;gap:16px;align-items:flex-start;padding:18px;background:#fff;border:1px solid #ede8e4;border-radius:14px;margin-bottom:12px;">' +
+    '<div style="flex-shrink:0;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:1px;background:' + opt.color + ';color:#fff;white-space:nowrap;margin-top:2px;">' + opt.tag + '</div>' +
+    '<div>' +
+    '<div style="font-size:16px;font-weight:700;color:#171717;margin-bottom:4px;">' + opt.label + '</div>' +
+    '<div style="font-size:13px;color:#888;line-height:1.7;">' + opt.desc + '</div>' +
+    '</div></div>';
+  }).join('') +
+  '<a href="https://calendly.com/coachborabora/30min" target="_blank" ' +
+  'style="display:inline-flex;align-items:center;gap:8px;background:#c9826a;color:#fff;font-size:14px;font-weight:700;padding:14px 28px;border-radius:999px;text-decoration:none;margin-top:8px;">' +
+  '디스커버리 세션 신청하기 →</a>';
+}
+
 </script>
 </body>
 </html>
