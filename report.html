@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>나의 리듬 리포트 | Momstone</title>
+  <title>My Rhythm Report | Momstone</title>
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <link rel="alternate" hreflang="ko" href="https://momstone.com/report.html" />
+  <link rel="alternate" hreflang="en" href="https://momstone.com/en/report.html" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
     :root {
@@ -181,24 +183,24 @@
 
 <div class="topbar no-print">
   <span class="topbar-brand">momstone</span>
-  <button class="print-btn" onclick="window.print()">PDF 저장</button>
-  <div class="lang-toggle"><span class="lang-active">KO</span><span class="lang-sep"> · </span><a href="/en/report.html">EN</a></div>
+  <button class="print-btn" onclick="window.print()">Save as PDF</button>
+  <div class="lang-toggle"><a href="/report.html">KO</a><span class="lang-sep"> · </span><span class="lang-active">EN</span></div>
 </div>
 
 <div id="app"></div>
 
 <script>
-// ─── Apps Script URL ─────────────────────────────────────────────────────────
+// ─── Apps Script URL ───────────────────────────────────────────────────────
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
 
-// ─── 데이터 파싱 ─────────────────────────────────────────────────────────────
+// ─── DATA PARSING ───────────────────────────────────────────────────────────
 function parseData(r) {
   const get = (k, def='') => (r[k] !== undefined && r[k] !== null && r[k] !== '') ? String(r[k]) : def;
   const num = (k) => parseFloat(get(k, '0')) || 0;
 
   return {
-    name:       get('Name', '익명'),
-    date:       get('Date', new Date().toLocaleDateString('ko-KR')),
+    name:       get('Name', 'Anonymous'),
+    date:       get('Date', new Date().toLocaleDateString('en-US')),
     stability:  num('Overall Average_score'),
     stability_summary: get('Stability_summary', ''),
     overall_avg: (function() {
@@ -224,47 +226,47 @@ function parseData(r) {
     reset_bridge: get('Reset_Bridge', ''),
 
     domains: [
-      { code:'EB', kr:'심리 상태', en:'Emotional Balance',
+      { code:'EB', en:'Emotional Balance',
         score: num('EB_score'), stage: get('EF_stage',''),
         expression: get('EB_expression',''), summary: get('EB_summary',''),
         emotions: get('EB_emotions',''), question: get('EB_question',''), action: get('EB_action','') },
-      { code:'EN', kr:'에너지 관리', en:'Energy Management',
+      { code:'EN', en:'Energy Management',
         score: num('EN_score'), stage: get('EN_stage',''),
         expression: get('EN_expression',''), summary: get('EN_summary',''),
         emotions: get('EN_emotions',''), question: get('EN_question',''), action: get('EN_action','') },
-      { code:'RE', kr:'회복탄력성', en:'Resilience',
+      { code:'RE', en:'Resilience',
         score: num('RE_score'), stage: get('RE_stage',''),
         expression: get('RE_expression',''), summary: get('RE_summary',''),
         emotions: get('RE_emotions',''), question: get('RE_question',''), action: get('RE_action','') },
-      { code:'SM', kr:'강점·동기', en:'Strengths & Motivation',
+      { code:'SM', en:'Strengths & Motivation',
         score: num('SM_score'), stage: get('SM_stage',''),
         expression: get('SM_expression',''), summary: get('SM_summary',''),
         emotions: get('SM_emotions',''), question: get('SM_question',''), action: get('SM_action','') },
-      { code:'ID', kr:'정체감·역할통합', en:'Identity Integration',
+      { code:'ID', en:'Identity Integration',
         score: num('ID_score'), stage: get('ID_stage',''),
         expression: get('ID_expression',''), summary: get('ID_summary',''),
         emotions: get('ID_emotions',''), question: get('ID_question',''), action: get('ID_action','') },
-      { code:'RS', kr:'관계 자원', en:'Relational Support',
+      { code:'RS', en:'Relational Support',
         score: num('RS_score'), stage: get('RS_stage',''),
         expression: get('RS_expression',''), summary: get('RS_summary',''),
         emotions: get('RS_emotions',''), question: get('RS_question',''), action: get('RS_action','') },
-      { code:'VA', kr:'가치·의미', en:'Values Alignment',
+      { code:'VA', en:'Values Alignment',
         score: num('VA_score'), stage: get('VA_stage',''),
         expression: get('VA_expression',''), summary: get('VA_summary',''),
         emotions: get('VA_emotions',''), question: get('VA_question',''), action: get('VA_action','') },
-      { code:'SC', kr:'자기연민', en:'Self-Compassion',
+      { code:'SC', en:'Self-Compassion',
         score: num('SC_score'), stage: get('SC_stage',''),
         expression: get('SC_expression',''), summary: get('SC_summary',''),
         emotions: get('SC_emotions',''), question: get('SC_question',''), action: get('SC_action','') },
-      { code:'VG', kr:'비전·성장의지', en:'Vision & Growth',
+      { code:'VG', en:'Vision & Growth',
         score: num('VG_score'), stage: get('VG_stage',''),
         expression: get('VG_expression',''), summary: get('VG_summary',''),
         emotions: get('VG_emotions',''), question: get('VG_question',''), action: get('VG_action','') },
-      { code:'TP', kr:'시간·우선순위', en:'Time & Priority',
+      { code:'TP', en:'Time & Priority',
         score: num('TP_score'), stage: get('TP_stage',''),
         expression: get('TP_expression',''), summary: get('TP_summary',''),
         emotions: get('TP_emotions',''), question: get('TP_question',''), action: get('TP_action','') },
-      { code:'LS', kr:'삶의 만족도', en:'Life Satisfaction',
+      { code:'LS', en:'Life Satisfaction',
         score: num('LS_score'), stage: get('LS_stage',''),
         expression: get('LS_expression',''), summary: get('LS_summary',''),
         emotions: get('LS_emotions',''), question: get('LS_question',''), action: get('LS_action','') },
@@ -300,11 +302,11 @@ async function render() {
   let d;
 
   if (row) {
-    document.getElementById('app').innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Satoshi,sans-serif;color:#666;font-size:15px;">리포트를 불러오는 중...</div>';
+    document.getElementById('app').innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Satoshi,sans-serif;color:#666;font-size:15px;">Loading your report…</div>';
     
     for (let attempt = 0; attempt < 3; attempt++) {
       try {
-        const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}`);
+        const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}&lang=en`);
         const json = await res.json();
         if (json.result !== 'success') throw new Error(json.message);
         const parsed = parseData(json.data);
@@ -312,7 +314,7 @@ async function render() {
         break;
       } catch(err) {
         if (attempt === 2) {
-          document.getElementById('app').innerHTML = `<div class="error-wrap"><div class="error-title">데이터를 불러올 수 없어요</div><div class="error-sub">${err.message}</div></div>`;
+          document.getElementById('app').innerHTML = `<div class="error-wrap"><div class="error-title">Unable to load report data</div><div class="error-sub">${err.message}</div></div>`;
           return;
         }
         await new Promise(r => setTimeout(r, 2000));
@@ -320,11 +322,11 @@ async function render() {
     }
 
     if (!d) {
-      document.getElementById('app').innerHTML = '<div class="error-wrap"><div class="error-title">리포트 준비 중이에요</div><div class="error-sub">잠시 후 페이지를 새로고침해주세요.</div></div>';
+      document.getElementById('app').innerHTML = '<div class="error-wrap"><div class="error-title">Your report is being prepared</div><div class="error-sub">Please refresh the page in a moment.</div></div>';
       return;
     }
   } else {
-    // row 파라미터 없으면 샘플 데이터로 미리보기
+    // No row param — redirect to sample preview
     const hasData = false;
     if (!hasData) {
     const sampleUrl = '?name=미리보기&date=2026-04-29&stability=3.6' +
@@ -398,14 +400,14 @@ async function render() {
     }
   }
 
-  const labels = d.domains.map(dom => dom.kr.split('·')[0].trim());
+  const labels = d.domains.map(dom => dom.en.split('&')[0].trim());
   const scores = d.domains.map(dom => dom.score);
 
   const clusters = [
-    { name: 'Emotional Flow', kr: '감정·에너지', score: d.ef_score, summary: d.ef_summary },
-    { name: 'Resilience Flow', kr: '회복·정체감', score: d.rf_score, summary: d.rf_summary },
-    { name: 'Meaning Flow', kr: '의미·만족', score: d.mf_score, summary: d.mf_summary },
-    { name: 'Energy Index', kr: '에너지 지수', score: d.ei_score, summary: d.ei_summary },
+    { name: 'Emotional Flow', score: d.ef_score, summary: d.ef_summary },
+    { name: 'Resilience Flow', score: d.rf_score, summary: d.rf_summary },
+    { name: 'Meaning Flow', score: d.mf_score, summary: d.mf_summary },
+    { name: 'Energy Index', score: d.ei_score, summary: d.ei_summary },
   ];
 
   document.getElementById('app').innerHTML = `
@@ -415,12 +417,12 @@ async function render() {
       <div class="cover-inner">
         <div class="cover-eyebrow">Momstone · Rhythm Report</div>
         <div class="cover-title">
-          <strong>${esc(d.name)}</strong>님의<br>리듬 리포트
+          <strong>${esc(d.name)}</strong>'s<br>Rhythm Report
         </div>
         <div class="cover-divider"></div>
         <div class="cover-desc">
-          11개 영역에 걸친 당신만의 리듬 지도입니다.<br>
-          이 리포트는 코치와 함께 읽을 때 가장 깊이 열려요.
+          Your personal rhythm map across 11 domains.<br>
+          This report opens most fully when read with your coach.
         </div>
         <div class="cover-meta">
           <div class="cover-meta-item">
@@ -433,17 +435,17 @@ async function render() {
           </div>
           <div class="cover-meta-item">
             <div class="cover-meta-label">Domains</div>
-            <div class="cover-meta-value">11개 영역</div>
+            <div class="cover-meta-value">11 Domains</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 전체 리듬 지도 -->
+    <!-- Rhythm Map -->
     <div class="section page-break">
-      <div class="section-label">나의 리듬 지도</div>
-      <div class="section-title">11개 영역 전체 리듬</div>
-      <div class="section-sub">각 영역의 현재 리듬 상태를 한눈에 볼 수 있어요.</div>
+      <div class="section-label">My Rhythm Map</div>
+      <div class="section-title">Full Rhythm Across 11 Domains</div>
+      <div class="section-sub">See where your rhythm stands across every domain, at a glance.</div>
       <div class="radar-wrap">
         <canvas id="radarChart"></canvas>
       </div>
@@ -452,7 +454,7 @@ async function render() {
           <div class="stability-score">${d.overall_avg.toFixed(1)}<span>/5</span></div>
         </div>
         <div class="stability-text">
-          <div class="stability-label">전체 리듬 평균 (Overall Average)</div>
+          <div class="stability-label">Overall Rhythm Average</div>
           <div class="stability-summary">${esc(d.stability_summary)}</div>
         </div>
       </div>
@@ -460,18 +462,17 @@ async function render() {
 
     <div class="divider"></div>
 
-    <!-- 클러스터 -->
+    <!-- Clusters -->
     <div class="section">
-      <div class="section-label">리듬 클러스터</div>
-      <div class="section-title">4개 영역 그룹 요약</div>
-      <div class="section-sub">연관된 도메인들을 묶어 더 큰 흐름을 읽어드려요.</div>
+      <div class="section-label">Rhythm Clusters</div>
+      <div class="section-title">4-Cluster Group Summary</div>
+      <div class="section-sub">Related domains grouped together to reveal the broader flow.</div>
       <div class="cluster-grid">
         ${clusters.map(c => `
           <div class="cluster-card">
             <div class="cluster-header">
               <div>
-                <div class="cluster-name">${c.kr}</div>
-                <div style="font-size:11px;color:var(--muted);">${c.name}</div>
+                <div class="cluster-name">${c.name}</div>
               </div>
               <div class="cluster-score">${c.score.toFixed(1)}</div>
             </div>
@@ -486,17 +487,17 @@ async function render() {
 
     <div class="divider"></div>
 
-    <!-- 주목할 영역 -->
+    <!-- Focus Area -->
     <div class="section">
-      <div class="section-label">지금 주목할 영역</div>
-      <div class="section-title">가장 먼저 들여다볼 곳</div>
-      <div class="section-sub">지금 가장 신호를 보내고 있는 영역이에요.</div>
+      <div class="section-label">Area to Focus On</div>
+      <div class="section-title">Where to Look First</div>
+      <div class="section-sub">The domain sending the strongest signal right now.</div>
 
       ${d.lowest ? `
       <div class="highlight-card low" style="margin-bottom:16px;">
-        <div class="highlight-label">최저 도메인</div>
+        <div class="highlight-label">Lowest Domain</div>
         <div class="highlight-title">${esc(d.lowest)}</div>
-        <div class="highlight-text">지금 11개 영역 중 이 영역이 가장 강하게 신호를 보내고 있어요. 다른 영역들과 어떻게 연결되는지 코치와 함께 들여다보면 더 선명해져요.</div>
+        <div class="highlight-text">Among all 11 domains, this one is sending the clearest signal right now. It becomes even clearer when explored with your coach — to see how it connects to the others.</div>
       </div>` : ''}
 
       ${d.reset_point ? `
@@ -506,7 +507,7 @@ async function render() {
         <div class="highlight-text" style="margin-bottom:14px;">${esc(d.reset_reason)}</div>
         ${d.reset_signal ? `<div class="highlight-text" style="font-style:italic;opacity:0.8;">${esc(d.reset_signal)}</div>` : ''}
         ${d.reset_action ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(184,143,126,0.3);">
-          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--rose-dark);margin-bottom:8px;font-weight:700;">오늘의 액션</div>
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--rose-dark);margin-bottom:8px;font-weight:700;">Today's Action</div>
           <div class="highlight-text">${esc(d.reset_action)}</div>
         </div>` : ''}
       </div>` : ''}
@@ -514,19 +515,18 @@ async function render() {
 
     <div class="divider"></div>
 
-    <!-- 도메인 상세 -->
+    <!-- Domain Detail -->
     <div class="section">
-      <div class="section-label">도메인 상세 리포트</div>
-      <div class="section-title">11개 영역 전체 분석</div>
-      <div class="section-sub">각 영역의 현재 상태, 감정, 코칭 질문, 액션플랜이에요.</div>
+      <div class="section-label">Domain Detail Report</div>
+      <div class="section-title">Full Analysis Across 11 Domains</div>
+      <div class="section-sub">Current state, emotions, coaching question, and action plan for each domain.</div>
       <div class="domain-list">
         ${d.domains.map(dom => `
           <div class="domain-card">
             <div class="domain-header">
               <div class="domain-name-wrap">
                 <div class="domain-code">${dom.code}</div>
-                <div class="domain-name-kr">${esc(dom.kr)}</div>
-                <div class="domain-name-en">${esc(dom.en)}</div>
+                <div class="domain-name-kr">${esc(dom.en)}</div>
                 ${dom.stage ? `<div class="domain-stage ${stageClass(dom.stage)}">${stageLabel(dom.stage)}</div>` : ''}
               </div>
               <div class="domain-score-wrap">
@@ -539,29 +539,29 @@ async function render() {
             <div class="domain-body">
               ${dom.expression ? `
               <div class="domain-field">
-                <div class="domain-field-label">리듬 상태</div>
+                <div class="domain-field-label">Rhythm State</div>
                 <div class="domain-expression">${esc(dom.expression)}</div>
               </div>` : ''}
               ${dom.summary ? `
               <div class="domain-field">
-                <div class="domain-field-label">요약 해석</div>
+                <div class="domain-field-label">Interpretation</div>
                 <div class="domain-field-text">${esc(dom.summary)}</div>
               </div>` : ''}
               ${dom.emotions ? `
               <div class="domain-field">
-                <div class="domain-field-label">감정 키워드</div>
+                <div class="domain-field-label">Emotion Keywords</div>
                 <div class="domain-emotions">
                   ${dom.emotions.split('·').map(e => `<span class="emotion-tag">${esc(e.trim())}</span>`).join('')}
                 </div>
               </div>` : ''}
               ${dom.question ? `
               <div class="domain-field">
-                <div class="domain-field-label">코칭 질문</div>
+                <div class="domain-field-label">Coaching Question</div>
                 <div class="domain-question">${esc(dom.question)}</div>
               </div>` : ''}
               ${dom.action ? `
               <div class="domain-field">
-                <div class="domain-field-label">액션 플랜</div>
+                <div class="domain-field-label">Action Plan</div>
                 <div class="domain-action">${esc(dom.action.replace(/ \| /g, '\n'))}</div>
               </div>` : ''}
             </div>
@@ -573,18 +573,18 @@ async function render() {
 
     <footer>
       <div class="footer-brand">momstone</div>
-      <div class="footer-copy">© 2026 Momstone. All rights reserved.</div>
+      <div class="footer-copy">A place for clarity, groundedness, and wholeness. © 2026 Momstone.</div>
     </footer>
   `;
 
-  // 레이더 차트 렌더링
+  // Render radar chart
   const ctx = document.getElementById('radarChart').getContext('2d');
   new Chart(ctx, {
     type: 'radar',
     data: {
       labels: labels,
       datasets: [{
-        label: '나의 리듬',
+        label: 'My Rhythm',
         data: scores,
         backgroundColor: 'rgba(216,184,172,0.18)',
         borderColor: '#b88f7e',
