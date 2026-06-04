@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rhythm Check-in | Momstone — Discover what's supporting your rhythm — and what's quietly draining it.</title>
-  <meta name="description" content="A 7-minute check-in across 11 dimensions to discover where your rhythm stands today. Free, instant results." />
-  <link rel="alternate" hreflang="ko" href="https://momstone.com/diagnostic.html" />
-  <link rel="alternate" hreflang="en" href="https://momstone.com/en/diagnostic.html" />
+  <title>Rhythm Check-in | Momstone</title>
+  <meta name="description" content="나의 내면 리듬을 점검하는 7분 체크인 — Momstone Rhythm Check" />
   <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
   <style>
     :root {
@@ -29,7 +27,13 @@
     body { font-family: 'Satoshi', sans-serif; background: var(--bg); color: var(--ink-soft); line-height: 1.8; -webkit-font-smoothing: antialiased; font-weight: 450; }
     a { color: inherit; text-decoration: none; }
 
-
+    /* LANG */
+    .en { display: none; } .en-inline { display: none; }
+    .ko { display: block; } .ko-inline { display: inline; }
+    body.english .en { display: block; } body.english .en-inline { display: inline; }
+    body.english .ko { display: none; } body.english .ko-inline { display: none; }
+    body.korean .ko { display: block; } body.korean .ko-inline { display: inline; }
+    body.korean .en { display: none; } body.korean .en-inline { display: none; }
 
     /* TOPBAR */
     .topbar { background: var(--bg-deep); color: rgba(255,255,255,0.55); padding: 9px 20px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
@@ -211,28 +215,47 @@
     .lang-toggle .lang-sep { color: rgba(255,255,255,.2); font-weight: 300; }
     </style>
 </head>
-<body class="english">
+<body class="korean">
+<script>
+  (function() {
+    // 항상 한국어로 시작
+  })();
+</script>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <span class="ko-inline">리듬 체크인 · Rhythm Check-in</span>
+  <span class="en-inline">Rhythm Check-in · Momstone</span>
+  <div class="lang-wrap">
+    <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn active" id="btn-ko" onclick="setLang('ko')">한국어</button>
+  </div>
 </div>
 
 <!-- NAV -->
 <div class="site-nav">
   <div class="brand">momstone</div>
-  <a href="/en/index.html" class="back-link">
-  <div class="lang-toggle"><a href="/diagnostic.html">KO</a><span class="lang-sep"> · </span><span class="lang-active">EN</span></div>
+  <a href="index.html" class="back-link">
+  <div class="lang-toggle"><span class="lang-active">KO</span><span class="lang-sep"> · </span><a href="/en/diagnostic.html">EN</a></div>
     <span>←</span>
-    <span>Back to Home</span>
+    <span class="ko-inline">홈으로</span>
+    <span class="en-inline">Back to Home</span>
   </a>
 </div>
 
 <!-- HERO STRIP -->
 <div class="diag-hero">
   <div class="diag-hero-inner">
-    <div class="eyebrow">Momstone · Rhythm Check-in</div>
-    <h1>Discover what's supporting your rhythm — and what's quietly draining it.</h1>
-    <p>A 7-minute reflection across 11 dimensions of wellbeing — not to judge, but to illuminate where your rhythm stands today.</p>
+    <div class="eyebrow ko-inline">Momstone · Rhythm Check</div>
+    <div class="eyebrow en-inline">Momstone · Rhythm Check</div>
+    <h1 class="ko">나의 리듬 체크인</h1>
+    <h1 class="en">Discover Your Inner Rhythm</h1>
+    <p class="ko">11개 영역, 55개 문항으로 지금 나의 리듬을 탐색합니다.<br>점수가 아닌, 자각의 지도를 만드는 시간입니다.</p>
+    <p class="en">55 questions across 11 dimensions — not to judge, but to illuminate where your rhythm stands today.</p>
     <div class="promise-tag">
       <span>🌿</span>
-      <span>Just 7 min · Results shown instantly</span>
+      <span class="ko-inline">단 7분 · 결과 요약 즉시 확인</span>
+      <span class="en-inline">Just 7 min · Results shown instantly</span>
     </div>
   </div>
 </div>
@@ -242,7 +265,7 @@
   <!-- PROGRESS -->
   <div id="progress-area" style="display:none;">
     <div class="progress-header">
-      <span class="progress-label" id="progress-label-txt">Section 1 / 12</span>
+      <span class="progress-label" id="progress-label-txt">섹션 1 / 12</span>
       <span class="progress-pct" id="progress-pct-txt">0%</span>
     </div>
     <div class="progress-bar-bg">
@@ -253,41 +276,53 @@
   <!-- ===================== SCREEN 0: INTRO ===================== -->
   <div class="screen active" id="screen-intro">
     <div class="intro-card">
-      <h2>Before we begin — one small promise</h2>
-      <p>This is not a test to grade or define you.<br>It's a quiet moment to look at the rhythm of your life, right now.<br><br>
+      <h2 class="ko">잠깐, 시작 전 한 가지 약속</h2>
+      <h2 class="en">Before we begin — one small promise</h2>
+      <p class="ko">이 체크인은 점수를 매기거나 현재를 규정하기 위한 시험이 아닙니다.<br>지금 당신의 삶이 어떤 리듬으로 흐르는지, 가만히 들여다보는 성찰의 시간입니다.<br><br>
+      정답을 찾으려 애쓰지 않아도 괜찮습니다. 마음에 떠오르는 대로, 솔직하게 응답해주세요.</p>
+      <p class="en">This is not a test to grade or define you.<br>It's a quiet moment to look at the rhythm of your life, right now.<br><br>
       Don't try to find the "right" answer. Just respond honestly with whatever comes to mind.</p>
 
       <div class="intro-promise">
         <div class="intro-promise-icon">🔒</div>
         <div class="intro-promise-text">
-          <strong>Privacy Notice</strong>
-          <span>Your responses are used solely for rhythm coaching analysis and will never be shared for any other purpose.</span>
+          <strong class="ko">개인정보 안내</strong>
+          <strong class="en">Privacy Notice</strong>
+          <span class="ko">입력하신 정보는 코칭 리듬 분석 목적으로만 사용되며, 다른 목적에는 절대 사용되지 않습니다.</span>
+          <span class="en">Your responses are used solely for rhythm coaching analysis and will never be shared for any other purpose.</span>
         </div>
       </div>
 
       <div class="domain-pills">
-        <span class="domain-pill">① Emotional Balance</span>
-        <span class="domain-pill">② Energy Management</span>
-        <span class="domain-pill">③ Resilience</span>
-        <span class="domain-pill">④ Strengths & Motivation</span>
-        <span class="domain-pill">⑤ Identity Integration</span>
-        <span class="domain-pill">⑥ Relational Support</span>
-        <span class="domain-pill">⑦ Values Alignment</span>
-        <span class="domain-pill">⑧ Self-Compassion</span>
-        <span class="domain-pill">⑨ Vision & Growth</span>
-        <span class="domain-pill">⑩ Time & Priority</span>
-        <span class="domain-pill">⑪ Life Satisfaction</span>
+        <span class="domain-pill ko">① 심리 상태</span><span class="domain-pill en">① Emotional Balance</span>
+        <span class="domain-pill ko">② 에너지 관리</span><span class="domain-pill en">② Energy Management</span>
+        <span class="domain-pill ko">③ 회복탄력성</span><span class="domain-pill en">③ Resilience</span>
+        <span class="domain-pill ko">④ 강점·동기</span><span class="domain-pill en">④ Strengths & Motivation</span>
+        <span class="domain-pill ko">⑤ 정체감·역할통합</span><span class="domain-pill en">⑤ Identity Integration</span>
+        <span class="domain-pill ko">⑥ 관계 자원</span><span class="domain-pill en">⑥ Relational Support</span>
+        <span class="domain-pill ko">⑦ 가치·의미</span><span class="domain-pill en">⑦ Values Alignment</span>
+        <span class="domain-pill ko">⑧ 자기연민</span><span class="domain-pill en">⑧ Self-Compassion</span>
+        <span class="domain-pill ko">⑨ 비전·성장의지</span><span class="domain-pill en">⑨ Vision & Growth</span>
+        <span class="domain-pill ko">⑩ 시간·우선순위</span><span class="domain-pill en">⑩ Time & Priority</span>
+        <span class="domain-pill ko">⑪ 삶의 만족도</span><span class="domain-pill en">⑪ Life Satisfaction</span>
       </div>
     </div>
     <div style="text-align:center;">
       <button class="btn btn-primary" onclick="startDiag()" style="font-size:15px; padding:16px 36px;">
-        Start My Rhythm Check-in →
+        <span class="ko-inline">나의 리듬 체크인 시작하기 →</span>
+        <span class="en-inline">Start My Rhythm Check →</span>
       </button>
     </div>
 
     <div style="max-width:var(--max);margin:32px auto 64px;padding:20px 24px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:#f8f5f3;">
       <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#b88f7e;font-weight:700;margin-bottom:10px;text-align:center;">― Professional Note ―</div>
-      <p style="font-size:12px;color:#666;line-height:1.9;text-align:center;">
+      <p style="font-size:12px;color:#666;line-height:1.9;text-align:center;" class="ko">
+        본 결과는 의학적·임상적 판단이나 처방을 대신하지 않으며,<br>
+        응답 시점에서 경험한 '현재의 리듬 상태'를 반영한 참고 자료입니다.<br>
+        이 리포트는 진단이나 결론이 아니라,<br>
+        지금의 나를 이해하고 돌보는 방향을 탐색하기 위한 하나의 출발점으로 활용해 주세요.
+      </p>
+      <p style="font-size:12px;color:#666;line-height:1.9;text-align:center;" class="en">
         This is not a substitute for medical or clinical judgment.<br>
         It reflects your rhythm state at the time of response and is intended as a reference only.<br>
         Use this as a starting point to explore and care for who you are right now.
@@ -300,52 +335,59 @@
   <div class="screen" id="screen-profile">
 
     <div class="step-intro">
-      <h2>A little about you</h2>
-      <p>This helps us contextualize your rhythm results. All fields are optional.</p>
+      <h2 class="ko">나에 대한 기본 정보</h2>
+      <h2 class="en">A little about you</h2>
+      <p class="ko">체크인 결과를 맥락에 맞게 분석하기 위한 정보입니다. 모든 항목은 선택 사항입니다.</p>
+      <p class="en">This helps us contextualize your rhythm results. All fields are optional.</p>
     </div>
     <div class="profile-grid">
 
-      <!-- Nickname -->
+      <!-- 닉네임 -->
       <div class="field-group">
-        <label class="field-label">Nickname <span>(real name is fine too)</span> <span style="color:#b88f7e;">(Required)</span></label>
-        <input class="field-input" id="field-nickname" type="text" placeholder="e.g. Jieun, Sarah, J …" autocomplete="off" />
+        <label class="field-label ko">닉네임 <span>(실명도 괜찮아요)</span> <span style="color:#b88f7e;">(필수)</span></label>
+        <label class="field-label en">Nickname <span>(real name is fine too)</span> <span style="color:#b88f7e;">(Required)</span></label>
+        <input class="field-input" id="field-nickname" type="text" placeholder="예: 지은, Jieun, J …" autocomplete="off" />
       </div>
 
-      <!-- Email -->
+      <!-- 이메일 -->
       <div class="field-group">
-        <label class="field-label">Email <span style="color:#b88f7e;">(Required)</span></label>
-        <input class="field-input" id="field-email" type="email" placeholder="e.g. hello@email.com" autocomplete="off" />
+        <label class="field-label ko">이메일 <span style="color:#b88f7e;">(필수)</span></label>
+        <label class="field-label en">Email <span style="color:#b88f7e;">(Required)</span></label>
+        <input class="field-input" id="field-email" type="email" placeholder="예: hello@email.com" autocomplete="off" />
       </div>
 
-      <!-- Age group -->
+      <!-- 연령대 -->
       <div class="field-group">
-        <label class="field-label">Age group <span style="color:#b88f7e;">(Required)</span></label>
+        <label class="field-label ko">연령대 <span style="color:#b88f7e;">(필수)</span></label>
+        <label class="field-label en">Age group <span style="color:#b88f7e;">(Required)</span></label>
         <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="age" value="20대" /><span class="radio-pill-label">20s</span></label>
-          <label class="radio-pill"><input type="radio" name="age" value="30대 초반" /><span class="radio-pill-label">Early 30s</span></label>
-          <label class="radio-pill"><input type="radio" name="age" value="30대 후반" /><span class="radio-pill-label">Late 30s</span></label>
-          <label class="radio-pill"><input type="radio" name="age" value="40대 초반" /><span class="radio-pill-label">Early 40s</span></label>
-          <label class="radio-pill"><input type="radio" name="age" value="40대 후반" /><span class="radio-pill-label">Late 40s</span></label>
-          <label class="radio-pill"><input type="radio" name="age" value="50대 이상" /><span class="radio-pill-label">50+</span></label>
+          <label class="radio-pill"><input type="radio" name="age" value="20대" /><span class="radio-pill-label ko">20대</span><span class="radio-pill-label en" style="display:none;">20s</span></label>
+          <label class="radio-pill"><input type="radio" name="age" value="30대 초반" /><span class="radio-pill-label ko">30대 초반</span><span class="radio-pill-label en" style="display:none;">Early 30s</span></label>
+          <label class="radio-pill"><input type="radio" name="age" value="30대 후반" /><span class="radio-pill-label ko">30대 후반</span><span class="radio-pill-label en" style="display:none;">Late 30s</span></label>
+          <label class="radio-pill"><input type="radio" name="age" value="40대 초반" /><span class="radio-pill-label ko">40대 초반</span><span class="radio-pill-label en" style="display:none;">Early 40s</span></label>
+          <label class="radio-pill"><input type="radio" name="age" value="40대 후반" /><span class="radio-pill-label ko">40대 후반</span><span class="radio-pill-label en" style="display:none;">Late 40s</span></label>
+          <label class="radio-pill"><input type="radio" name="age" value="50대 이상" /><span class="radio-pill-label ko">50대 이상</span><span class="radio-pill-label en" style="display:none;">50+</span></label>
         </div>
       </div>
 
-      <!-- Relationship status -->
+      <!-- 결혼여부 -->
       <div class="field-group">
-        <label class="field-label">Relationship status</label>
+        <label class="field-label ko">결혼여부</label>
+        <label class="field-label en">Relationship status</label>
         <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="marital" value="미혼" /><span class="radio-pill-label">Single</span></label>
-          <label class="radio-pill"><input type="radio" name="marital" value="기혼" /><span class="radio-pill-label">Married</span></label>
-          <label class="radio-pill"><input type="radio" name="marital" value="이혼·별거" /><span class="radio-pill-label">Divorced/Sep.</span></label>
-          <label class="radio-pill"><input type="radio" name="marital" value="기타" /><span class="radio-pill-label">Other</span></label>
+          <label class="radio-pill"><input type="radio" name="marital" value="미혼" /><span class="radio-pill-label ko">미혼</span><span class="radio-pill-label en" style="display:none;">Single</span></label>
+          <label class="radio-pill"><input type="radio" name="marital" value="기혼" /><span class="radio-pill-label ko">기혼</span><span class="radio-pill-label en" style="display:none;">Married</span></label>
+          <label class="radio-pill"><input type="radio" name="marital" value="이혼·별거" /><span class="radio-pill-label ko">이혼·별거</span><span class="radio-pill-label en" style="display:none;">Divorced/Sep.</span></label>
+          <label class="radio-pill"><input type="radio" name="marital" value="기타" /><span class="radio-pill-label ko">기타</span><span class="radio-pill-label en" style="display:none;">Other</span></label>
         </div>
       </div>
 
-      <!-- Number of children -->
+      <!-- 자녀 수 -->
       <div class="field-group">
-        <label class="field-label">Number of children</label>
+        <label class="field-label ko">자녀 수</label>
+        <label class="field-label en">Number of children</label>
         <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="children" value="없음" /><span class="radio-pill-label">None</span></label>
+          <label class="radio-pill"><input type="radio" name="children" value="없음" /><span class="radio-pill-label ko">없음</span><span class="radio-pill-label en" style="display:none;">None</span></label>
           <label class="radio-pill"><input type="radio" name="children" value="1명" /><span class="radio-pill-label">1</span></label>
           <label class="radio-pill"><input type="radio" name="children" value="2명" /><span class="radio-pill-label">2</span></label>
           <label class="radio-pill"><input type="radio" name="children" value="3명" /><span class="radio-pill-label">3</span></label>
@@ -353,62 +395,76 @@
         </div>
       </div>
 
-      <!-- Primary activity type -->
+      <!-- 주요 활동 유형 -->
       <div class="field-group">
-        <label class="field-label">Primary activity type</label>
+        <label class="field-label ko">주요 활동 유형</label>
+        <label class="field-label en">Primary activity type</label>
         <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="activity" value="직장인 (풀타임)" /><span class="radio-pill-label">Full-time</span></label>
-          <label class="radio-pill"><input type="radio" name="activity" value="직장인 (파트타임)" /><span class="radio-pill-label">Part-time</span></label>
-          <label class="radio-pill"><input type="radio" name="activity" value="프리랜서·자영업" /><span class="radio-pill-label">Freelance/Self-employed</span></label>
-          <label class="radio-pill"><input type="radio" name="activity" value="육아 전담" /><span class="radio-pill-label">Caregiving</span></label>
-          <label class="radio-pill"><input type="radio" name="activity" value="커리어 전환 중" /><span class="radio-pill-label">Career Transition</span></label>
-          <label class="radio-pill"><input type="radio" name="activity" value="기타" /><span class="radio-pill-label">Other</span></label>
+          <label class="radio-pill"><input type="radio" name="activity" value="직장인 (풀타임)" /><span class="radio-pill-label ko">직장인 (풀타임)</span><span class="radio-pill-label en" style="display:none;">Full-time</span></label>
+          <label class="radio-pill"><input type="radio" name="activity" value="직장인 (파트타임)" /><span class="radio-pill-label ko">직장인 (파트타임)</span><span class="radio-pill-label en" style="display:none;">Part-time</span></label>
+          <label class="radio-pill"><input type="radio" name="activity" value="프리랜서·자영업" /><span class="radio-pill-label ko">프리랜서·자영업</span><span class="radio-pill-label en" style="display:none;">Freelance</span></label>
+          <label class="radio-pill"><input type="radio" name="activity" value="육아 전담" /><span class="radio-pill-label ko">육아 전담</span><span class="radio-pill-label en" style="display:none;">Caregiving</span></label>
+          <label class="radio-pill"><input type="radio" name="activity" value="커리어 전환 중" /><span class="radio-pill-label ko">커리어 전환 중</span><span class="radio-pill-label en" style="display:none;">Transitioning</span></label>
+          <label class="radio-pill"><input type="radio" name="activity" value="기타" /><span class="radio-pill-label ko">기타</span><span class="radio-pill-label en" style="display:none;">Other</span></label>
         </div>
       </div>
 
-      <!-- Role duration -->
+      <!-- 현재 역할 기간 -->
       <div class="field-group">
-        <label class="field-label">How long in your current role?</label>
+        <label class="field-label ko">현재 주요 역할 기간</label>
+        <label class="field-label en">How long in your current role?</label>
         <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="duration" value="1년 미만" /><span class="radio-pill-label">< 1 yr</span></label>
+          <label class="radio-pill"><input type="radio" name="duration" value="1년 미만" /><span class="radio-pill-label ko">1년 미만</span><span class="radio-pill-label en" style="display:none;">&lt; 1yr</span></label>
           <label class="radio-pill"><input type="radio" name="duration" value="1~3년" /><span class="radio-pill-label">1–3yr</span></label>
           <label class="radio-pill"><input type="radio" name="duration" value="4~6년" /><span class="radio-pill-label">4–6yr</span></label>
-          <label class="radio-pill"><input type="radio" name="duration" value="7년 이상" /><span class="radio-pill-label">7+ yr</span></label>
+          <label class="radio-pill"><input type="radio" name="duration" value="7년 이상" /><span class="radio-pill-label ko">7년 이상</span><span class="radio-pill-label en" style="display:none;">7+yr</span></label>
         </div>
       </div>
 
-      <!-- Topic of interest -->
+      <!-- 관심 주제 -->
       <div class="field-group">
-        <label class="field-label">What topic is on your mind most right now?</label>
+        <label class="field-label ko">지금 현재 가장 마음이 가는 주제는?</label>
+        <label class="field-label en">What topic is on your mind most right now?</label>
         <div class="radio-row">
-          <label class="radio-pill"><input type="radio" name="topic" value="감정" /><span class="radio-pill-label">Emotions</span></label>
-          <label class="radio-pill"><input type="radio" name="topic" value="에너지" /><span class="radio-pill-label">Energy</span></label>
-          <label class="radio-pill"><input type="radio" name="topic" value="일과 삶" /><span class="radio-pill-label">Work & Life</span></label>
-          <label class="radio-pill"><input type="radio" name="topic" value="관계" /><span class="radio-pill-label">Relationships</span></label>
-          <label class="radio-pill"><input type="radio" name="topic" value="나 자신" /><span class="radio-pill-label">Myself</span></label>
+          <label class="radio-pill"><input type="radio" name="topic" value="감정" /><span class="radio-pill-label ko">감정</span><span class="radio-pill-label en" style="display:none;">Emotions</span></label>
+          <label class="radio-pill"><input type="radio" name="topic" value="에너지" /><span class="radio-pill-label ko">에너지</span><span class="radio-pill-label en" style="display:none;">Energy</span></label>
+          <label class="radio-pill"><input type="radio" name="topic" value="일과 삶" /><span class="radio-pill-label ko">일과 삶</span><span class="radio-pill-label en" style="display:none;">Work & Life</span></label>
+          <label class="radio-pill"><input type="radio" name="topic" value="관계" /><span class="radio-pill-label ko">관계</span><span class="radio-pill-label en" style="display:none;">Relationships</span></label>
+          <label class="radio-pill"><input type="radio" name="topic" value="나 자신" /><span class="radio-pill-label ko">나 자신</span><span class="radio-pill-label en" style="display:none;">Myself</span></label>
         </div>
       </div>
 
     </div>
     <div class="nav-buttons">
-      <button class="btn btn-ghost" onclick="goScreen('screen-intro')">← Back</button>
-      <button class="btn btn-primary" onclick="goSectionFromProfile()">Begin Check-in →</button>
+      <button class="btn btn-ghost" onclick="goScreen('screen-intro')">
+        <span class="ko-inline">← 이전</span><span class="en-inline">← Back</span>
+      </button>
+      <button class="btn btn-primary" onclick="goSectionFromProfile()">
+        <span class="ko-inline">체크인 시작 →</span><span class="en-inline">Begin Check-in →</span>
+      </button>
     </div>
   </div>
 
   <!-- ===================== SCREEN 2: QUESTIONS ===================== -->
   <div class="screen" id="screen-questions">
     <div id="section-content"></div>
-    <p class="validation-msg" id="val-msg">⚠ Please answer all questions before continuing.</p>
+    <p class="validation-msg" id="val-msg">
+      <span class="ko-inline">⚠ 모든 문항에 응답해주세요.</span>
+      <span class="en-inline">⚠ Please answer all questions before continuing.</span>
+    </p>
     <div class="nav-buttons">
-      <button class="btn btn-ghost" id="btn-prev" onclick="prevSection()">← Back</button>
-      <button class="btn btn-primary" id="btn-next" onclick="nextSection()">Next →</button>
+      <button class="btn btn-ghost" id="btn-prev" onclick="prevSection()">
+        <span class="ko-inline">← 이전</span><span class="en-inline">← Back</span>
+      </button>
+      <button class="btn btn-primary" id="btn-next" onclick="nextSection()">
+        <span class="ko-inline">다음 →</span><span class="en-inline">Next →</span>
+      </button>
     </div>
   </div>
 
   <!-- ===================== SCREEN 3: RESULT ===================== -->
   <div class="screen" id="screen-result">
-    <!-- Loading overlay -->
+    <!-- 리듬 리포트로 이동 중 로딩 화면 -->
     <div id="result-section" style="display:none; position:fixed; inset:0; background:#111; z-index:9999; flex-direction:column; align-items:center; justify-content:center; gap:24px;">
       <div style="font-size:15px;font-weight:700;color:var(--rose);letter-spacing:4px;text-transform:lowercase;">momstone</div>
       <div style="display:flex;gap:8px;">
@@ -416,7 +472,8 @@
         <span style="width:7px;height:7px;border-radius:50%;background:var(--rose-dark);opacity:0.3;animation:pulse 1.2s ease-in-out 0.2s infinite;display:block;"></span>
         <span style="width:7px;height:7px;border-radius:50%;background:var(--rose-dark);opacity:0.3;animation:pulse 1.2s ease-in-out 0.4s infinite;display:block;"></span>
       </div>
-      <div style="font-size:14px;color:rgba(255,255,255,0.45);">Preparing your rhythm report…</div>
+      <div class="ko-inline" style="font-size:14px;color:rgba(255,255,255,0.45);">리듬 리포트를 준비하고 있어요</div>
+      <div class="en-inline" style="font-size:14px;color:rgba(255,255,255,0.45);">Preparing your rhythm report…</div>
     </div>
   </div>
 </div>
@@ -424,10 +481,12 @@
 <!-- FOOTER -->
 <footer>
   <div class="footer-brand">momstone</div>
-  <div class="footer-copy">A place for clarity, groundedness, and wholeness. © 2026 Momstone.</div>
+  <div class="footer-copy ko">명료함, 단단함, 성숙함을 위한 공간. © 2026 Momstone.</div>
+  <div class="footer-copy en">A grounded space for clarity, strength, and maturity. © 2026 Momstone.</div>
   <div style="margin-top:14px; font-size:11px; color:rgba(255,255,255,0.18); line-height:1.8; max-width:560px; margin-left:auto; margin-right:auto;">
-    This diagnostic tool and its results are the intellectual property of Momstone. © 2026 Momstone. All rights reserved.<br>
-    <span style="font-size:10px; opacity:0.7;">Unauthorized reproduction or commercial use is strictly prohibited.</span>
+    본 리듬 체크인 진단 도구 및 결과 리포트는 Momstone의 지적 재산이며,<br>
+    무단 복제·배포·상업적 활용을 금합니다. © 2026 Momstone. All rights reserved.<br>
+    <span style="font-size:10px; opacity:0.7;">Unauthorized reproduction or commercial use of this diagnostic tool and its results is strictly prohibited.</span>
   </div>
 </footer>
 
@@ -435,141 +494,165 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <script>
-// Language: English only
-function isKo() { return false; }
+// ─── LANGUAGE ───────────────────────────────────────────────────────────────
+function setLang(lang) {
+  if (lang === 'ko') {
+    document.body.classList.add('korean');
+    document.body.classList.remove('english');
+    document.getElementById('btn-ko').classList.add('active');
+    document.getElementById('btn-en').classList.remove('active');
+  } else {
+    document.body.classList.remove('korean');
+    document.body.classList.add('english');
+    document.getElementById('btn-en').classList.add('active');
+    document.getElementById('btn-ko').classList.remove('active');
+  }
+}
+function isKo() { return document.body.classList.contains('korean'); }
 
 // ─── QUESTION DATA ───────────────────────────────────────────────────────────
 const SECTIONS = [
   {
     key: 'EB', 
-    en: '① Emotional Balance',
+    ko: '① 심리 상태', en: '① Emotional Balance',
+    descKo: '감정의 흐름을 인식하고 함께 흘러가는 능력을 살펴봅니다.',
     descEn: 'Explores your ability to recognize and flow with your emotional states.',
     questions: [
-      { code:'EB1', en:'I notice shifts in my emotions more frequently than before.', reverse: false },
-      { code:'EB2', en:'I can recognize and manage my emotions.', reverse: false },
-      { code:'EB3', en:'Rather than hiding my emotions, I try to feel them as they are.', reverse: false },
-      { code:'EB4', en:'Even when emotions arise, I do not act on impulse.', reverse: false },
+      { code:'EB1', ko:'요즘 나는 감정의 변화나 출렁임을 이전보다 자주 알아차린다.', en:'I notice shifts in my emotions more frequently than before.', reverse: false },
+      { code:'EB2', ko:'나는 감정을 인식하고 다스릴 수 있다.', en:'I can recognize and manage my emotions.', reverse: false },
+      { code:'EB3', ko:'나는 감정을 숨기기보다, 있는 그대로 느끼려 한다.', en:'Rather than hiding my emotions, I try to feel them as they are.', reverse: false },
+      { code:'EB4', ko:'나는 감정이 올라와도 그것에 휩쓸려서 행동하지 않는다.', en:'Even when emotions arise, I do not act on impulse.', reverse: false },
     ]
   },
   {
     key: 'EN',
-    en: '② Energy Management',
+    ko: '② 에너지 관리', en: '② Energy Management',
+    descKo: '에너지의 고저를 인식하고 회복하는 패턴을 살펴봅니다.',
     descEn: 'Examines how you sense, manage, and replenish your energy.',
     questions: [
-      { code:'EN1', en:'I notice moments when my energy rises and falls throughout the day.', reverse: false },
-      { code:'EN2', en:'When I feel tired, I consciously carve out time to recover.', reverse: false },
-      { code:'EN3', en:'I know what drains my energy the most.', reverse: false },
-      { code:'EN4', en:'I can recognize when my body and mind need to rest.', reverse: false },
-      { code:'EN5', en:'Lately, I tend to push myself harder to get things done.', reverse: true },
-      { code:'EN6', en:'I have small recovery routines built into my daily life.', reverse: false },
+      { code:'EN1', ko:'나는 하루를 보내는 중에 에너지가 오르고 내리는 순간을 느낀다.', en:'I notice moments when my energy rises and falls throughout the day.', reverse: false },
+      { code:'EN2', ko:'나는 피로를 느낄 때 회복을 위한 시간을 의식적으로 확보한다.', en:'When I feel tired, I consciously carve out time to recover.', reverse: false },
+      { code:'EN3', ko:'나는 내 에너지를 가장 많이 소모시키는 것이 무엇인지 알고 있다.', en:'I know what drains my energy the most.', reverse: false },
+      { code:'EN4', ko:"나는 내 몸과 마음이 '쉬어야 할 때'를 알아차릴 수 있다.", en:'I can recognize when my body and mind need to rest.', reverse: false },
+      { code:'EN5', ko:'요즘 나는 할 일을 끝내기 위해 나를 조금 더 몰아붙이게 된다.', en:'Lately, I tend to push myself harder to get things done.', reverse: true },
+      { code:'EN6', ko:'나는 일상 속 작은 회복 루틴을 가지고 있다.', en:'I have small recovery routines built into my daily life.', reverse: false },
     ]
   },
   {
     key: 'RE',
-    en: '③ Resilience',
+    ko: '③ 회복탄력성', en: '③ Resilience',
+    descKo: '어려움 앞에서 다시 일어서는 내면의 힘을 살펴봅니다.',
     descEn: 'Looks at your inner capacity to bounce back from difficulties.',
     questions: [
-      { code:'RE1', en:'Even when I face difficulties, I can find my center again.', reverse: false },
-      { code:'RE2', en:'I know what helps me recover when I am stressed.', reverse: false },
-      { code:'RE3', en:'I try to find learning in failures and mistakes.', reverse: false },
-      { code:'RE4', en:'Even when things do not go as planned, I try to encourage myself.', reverse: false },
-      { code:'RE5', en:'When difficulties arise, it takes me a long time to find the will to get back up.', reverse: true },
-      { code:'RE6', en:'I can recall insights or lessons learned from recent hardships.', reverse: false },
+      { code:'RE1', ko:'나는 어려움을 겪어도 다시 중심을 찾을 수 있다.', en:'Even when I face difficulties, I can find my center again.', reverse: false },
+      { code:'RE2', ko:'나는 스트레스를 받았을 때 나를 회복시키는 방법을 알고 있다.', en:'I know what helps me recover when I am stressed.', reverse: false },
+      { code:'RE3', ko:'나는 실패나 실수를 통해 배움을 얻으려 한다.', en:'I try to find learning in failures and mistakes.', reverse: false },
+      { code:'RE4', ko:'나는 일이 뜻대로 되지 않아도 스스로를 격려하려 한다.', en:'Even when things do not go as planned, I try to encourage myself.', reverse: false },
+      { code:'RE5', ko:'어려운 상황이 닥치면 다시 일어설 마음을 먹기까지 꽤 오랜 시간이 걸린다.', en:'When difficulties arise, it takes me a long time to find the will to get back up.', reverse: true },
+      { code:'RE6', ko:'최근의 어려움에서 얻은 깨달음이나 배움을 떠올릴 수 있다.', en:'I can recall insights or lessons learned from recent hardships.', reverse: false },
     ]
   },
   {
     key: 'SM',
-    en: '④ Strengths & Motivation',
+    ko: '④ 강점·동기', en: '④ Strengths & Motivation',
+    descKo: '나의 강점을 알고 활용하며 내면의 동기를 발견하는 능력입니다.',
     descEn: 'Explores your awareness of your strengths and your sources of inner motivation.',
     questions: [
-      { code:'SM1', en:'I know what I am good at.', reverse: false },
-      { code:'SM2', en:'I actively use my strengths in daily life.', reverse: false },
-      { code:'SM3', en:"When I work, 'wanting to' drives me more than 'having to.'", reverse: false },
-      { code:'SM4', en:'I recognize my own efforts and growth.', reverse: false },
-      { code:'SM5', en:'Recently, I have not felt motivated by anything.', reverse: true },
+      { code:'SM1', ko:'나는 내가 잘하는 일을 알고 있다.', en:'I know what I am good at.', reverse: false },
+      { code:'SM2', ko:'나는 나의 강점을 일상에서 활용하고 있다.', en:'I actively use my strengths in daily life.', reverse: false },
+      { code:'SM3', ko:"나는 일을 할 때 '해야 해서'보다 '하고 싶어서'의 동기가 더 크다.", en:"When I work, 'wanting to' drives me more than 'having to.'", reverse: false },
+      { code:'SM4', ko:'나는 나의 노력과 성장을 스스로 인식하고 있다.', en:'I recognize my own efforts and growth.', reverse: false },
+      { code:'SM5', ko:'최근 나는 무엇에도 동기를 느끼지 못했다.', en:'Recently, I have not felt motivated by anything.', reverse: true },
     ]
   },
   {
     key: 'ID',
-    en: '⑤ Identity Integration',
+    ko: '⑤ 정체감·역할통합', en: '⑤ Identity Integration',
+    descKo: '다양한 역할 속에서 나다운 정체성을 유지하는 능력입니다.',
     descEn: 'Examines how you maintain a sense of self across your many roles.',
     questions: [
-      { code:'ID1', en:'I value both my roles and my individual self as equally important.', reverse: false },
-      { code:'ID2', en:'Beyond my roles, I have my own identity and goals.', reverse: false },
-      { code:'ID3', en:'I view my multiple roles (professional, partner, leader, etc.) in a balanced way.', reverse: false },
-      { code:'ID4', en:"Regardless of the roles I hold, I exist fully as 'myself.'", reverse: false },
-      { code:'ID5', en:'I try not to be consumed by any single role.', reverse: false },
-      { code:'ID6', en:'I can view myself positively from multiple angles.', reverse: false },
+      { code:'ID1', ko:'나는 역할을 맡은 나와 개인으로서의 나를 모두 중요하게 여긴다.', en:'I value both my roles and my individual self as equally important.', reverse: false },
+      { code:'ID2', ko:'나는 내가 맡은 역할 외에도 나만의 정체성과 목표가 있다.', en:'Beyond my roles, I have my own identity and goals.', reverse: false },
+      { code:'ID3', ko:'나는 나의 여러 역할(직장인, 파트너, 리더 등)을 균형 있게 바라본다.', en:'I view my multiple roles (professional, partner, leader, etc.) in a balanced way.', reverse: false },
+      { code:'ID4', ko:'어떤 역할을 맡고 있더라도, 나는 \'나 자신\'으로도 오롯이 존재한다.', en:"Regardless of the roles I hold, I exist fully as 'myself.'", reverse: false },
+      { code:'ID5', ko:'나는 내 역할들 중 어느 하나에만 치우치지 않으려 노력한다.', en:'I try not to be consumed by any single role.', reverse: false },
+      { code:'ID6', ko:'나는 현재의 나를 다양한 측면에서 긍정적으로 바라볼 수 있다.', en:'I can view myself positively from multiple angles.', reverse: false },
     ]
   },
   {
     key: 'RS',
-    en: '⑥ Relational Support',
+    ko: '⑥ 관계 자원', en: '⑥ Relational Support',
+    descKo: '관계 속에서 지지받고 진심 어린 연결을 나누는 능력입니다.',
     descEn: 'Explores the quality of support and authentic connection in your relationships.',
     questions: [
-      { code:'RS1', en:'I have someone I can open up to when things are hard.', reverse: false },
-      { code:'RS2', en:'I have sincere conversations with the people around me.', reverse: false },
-      { code:'RS3', en:'I do not feel much resistance to asking for help when I need it.', reverse: false },
-      { code:'RS4', en:'I can express my emotions and thoughts to family or friends.', reverse: false },
-      { code:'RS5', en:'I feel that I have relationships that support me.', reverse: false },
-      { code:'RS6', en:'I can be myself within my relationships.', reverse: false },
+      { code:'RS1', ko:'나는 어려울 때 마음을 나눌 수 있는 사람이 있다.', en:'I have someone I can open up to when things are hard.', reverse: false },
+      { code:'RS2', ko:'나는 주변 사람들과 진심 어린 대화를 나눈다.', en:'I have sincere conversations with the people around me.', reverse: false },
+      { code:'RS3', ko:'나는 어려울 때 도움을 요청하는 것에 거부감이 적다.', en:'I do not feel much resistance to asking for help when I need it.', reverse: false },
+      { code:'RS4', ko:'나는 나의 감정과 생각을 가족이나 친구에게 표현할 수 있다.', en:'I can express my emotions and thoughts to family or friends.', reverse: false },
+      { code:'RS5', ko:'나는 나를 지지해주는 관계가 있다고 느낀다.', en:'I feel that I have relationships that support me.', reverse: false },
+      { code:'RS6', ko:'나는 관계 속에서 나답게 존재할 수 있다.', en:'I can be myself within my relationships.', reverse: false },
     ]
   },
   {
     key: 'VA',
-    en: '⑦ Values Alignment',
+    ko: '⑦ 가치·의미', en: '⑦ Values Alignment',
+    descKo: '나의 가치와 삶의 선택이 얼마나 일치하는지 살펴봅니다.',
     descEn: 'Explores how aligned your choices are with what truly matters to you.',
     questions: [
-      { code:'VA1', en:'I know what values are most important to me.', reverse: false },
-      { code:'VA2', en:'I feel satisfied when my choices align with my values.', reverse: false },
-      { code:'VA3', en:"When making life decisions, I ask 'is this meaningful to me?'", reverse: false },
-      { code:'VA4', en:"I try to design my life by my own standards, not others'.", reverse: false },
+      { code:'VA1', ko:'나는 내가 중요하게 여기는 가치가 무엇인지 알고 있다.', en:'I know what values are most important to me.', reverse: false },
+      { code:'VA2', ko:'나는 나의 선택이 나의 가치와 일치할 때 만족감을 느낀다.', en:'I feel satisfied when my choices align with my values.', reverse: false },
+      { code:'VA3', ko:"나는 삶의 방향을 결정할 때 '나에게 의미 있는가'를 기준으로 본다.", en:"When making life decisions, I ask 'is this meaningful to me?'", reverse: false },
+      { code:'VA4', ko:'나는 주변의 기준보다 나만의 기준으로 삶을 설계하려 한다.', en:"I try to design my life by my own standards, not others'.", reverse: false },
     ]
   },
   {
     key: 'SC',
-    en: '⑧ Self-Compassion',
+    ko: '⑧ 자기연민', en: '⑧ Self-Compassion',
+    descKo: '실수나 힘든 순간에 나 자신을 이해하고 따뜻하게 대하는 능력입니다.',
     descEn: 'Looks at how gently and understandingly you treat yourself in difficult moments.',
     questions: [
-      { code:'SC1', en:'When I make mistakes, I try to understand rather than criticize myself.', reverse: false },
-      { code:'SC2', en:'I feel okay about not being perfect.', reverse: false },
-      { code:'SC3', en:'I know how to speak kindly to myself.', reverse: false },
-      { code:'SC4', en:'Even on hard days, I try to accept myself as I am.', reverse: false },
-      { code:'SC5', en:'Sometimes I hold myself to a stricter standard than I would others.', reverse: true },
+      { code:'SC1', ko:'나는 실수했을 때 나 자신을 비난하기보다 이해하려 한다.', en:'When I make mistakes, I try to understand rather than criticize myself.', reverse: false },
+      { code:'SC2', ko:'나는 완벽하지 않아도 괜찮다고 느낀다.', en:'I feel okay about not being perfect.', reverse: false },
+      { code:'SC3', ko:'나는 나에게 따뜻한 말을 건넬 줄 안다.', en:'I know how to speak kindly to myself.', reverse: false },
+      { code:'SC4', ko:'나는 힘든 날에도 나를 있는 그대로 받아들이려 한다.', en:'Even on hard days, I try to accept myself as I am.', reverse: false },
+      { code:'SC5', ko:'가끔은 남에게보다 나 자신에게 더 엄격한 잣대를 대곤 한다.', en:'Sometimes I hold myself to a stricter standard than I would others.', reverse: true },
     ]
   },
   {
     key: 'VG',
-    en: '⑨ Vision & Growth',
+    ko: '⑨ 비전·성장의지', en: '⑨ Vision & Growth',
+    descKo: '나아가고 싶은 방향과 성장의 의지를 살펴봅니다.',
     descEn: 'Explores your sense of direction and your will to keep growing.',
     questions: [
-      { code:'VG1', en:'I have a vague sense of the direction I want to go.', reverse: false },
-      { code:'VG2', en:'I know which areas I want to grow in.', reverse: false },
-      { code:'VG3', en:'I try to keep moving forward, even in small steps.', reverse: false },
-      { code:'VG4', en:'I know what changes I need to make right now.', reverse: false },
+      { code:'VG1', ko:'나는 내가 가고 싶은 방향이 어렴풋이 보인다.', en:'I have a vague sense of the direction I want to go.', reverse: false },
+      { code:'VG2', ko:'나는 성장하고 싶은 영역이 무엇인지 알고 있다.', en:'I know which areas I want to grow in.', reverse: false },
+      { code:'VG3', ko:'나는 작더라도 꾸준히 나아가려 한다.', en:'I try to keep moving forward, even in small steps.', reverse: false },
+      { code:'VG4', ko:'나는 지금의 나에게 필요한 변화를 알고 있다.', en:'I know what changes I need to make right now.', reverse: false },
     ]
   },
   {
     key: 'TP',
-    en: '⑩ Time & Priority',
+    ko: '⑩ 시간·우선순위', en: '⑩ Time & Priority',
+    descKo: '중요한 일에 시간을 쓰고 나를 위한 여백을 만드는 능력입니다.',
     descEn: 'Examines how intentionally you allocate your time and protect what matters.',
     questions: [
-      { code:'TP1', en:'I can distinguish between what is important to me and what is not.', reverse: false },
-      { code:'TP2', en:'Even in a busy day, I try to secure time for myself.', reverse: false },
-      { code:'TP3', en:'I spend more time on what is important rather than what is urgent.', reverse: false },
-      { code:'TP4', en:'I try to leave breathing room in my schedule.', reverse: false },
+      { code:'TP1', ko:'나는 나에게 중요한 일과 그렇지 않은 일을 구분할 수 있다.', en:'I can distinguish between what is important to me and what is not.', reverse: false },
+      { code:'TP2', ko:'나는 바쁜 하루 속에서도 나를 위한 시간을 확보하려 한다.', en:'Even in a busy day, I try to secure time for myself.', reverse: false },
+      { code:'TP3', ko:'나는 급한 일보다 중요한 일에 더 시간을 쓴다.', en:'I spend more time on what is important rather than what is urgent.', reverse: false },
+      { code:'TP4', ko:'나는 일정에 여유를 남겨 두려 한다.', en:'I try to leave breathing room in my schedule.', reverse: false },
     ]
   },
   {
     key: 'LS',
-    en: '⑪ Life Satisfaction',
+    ko: '⑪ 삶의 만족도', en: '⑪ Life Satisfaction',
+    descKo: '지금의 삶 전반에 대한 만족감과 감사를 살펴봅니다.',
     descEn: 'Reflects on your overall sense of satisfaction and gratitude for your life right now.',
     questions: [
-      { code:'LS1', en:'I am generally satisfied with my life right now.', reverse: false },
-      { code:'LS2', en:'I find small but certain moments of happiness in my daily life.', reverse: false },
-      { code:'LS3', en:'I feel that my life is flowing in a meaningful direction.', reverse: false },
-      { code:"LS4", en:"I can tell myself that I am 'doing well enough' right now.", reverse: false },
-      { code:'LS5', en:'I can recall things I am grateful for or relieved about each day.', reverse: false },
+      { code:'LS1', ko:'나는 지금의 삶에 전반적으로 만족한다.', en:'I am generally satisfied with my life right now.', reverse: false },
+      { code:'LS2', ko:'나는 일상 속에서 작지만 확실한 행복을 느낀다.', en:'I find small but certain moments of happiness in my daily life.', reverse: false },
+      { code:'LS3', ko:'나는 나의 삶이 의미 있게 흘러가고 있다고 느낀다.', en:'I feel that my life is flowing in a meaningful direction.', reverse: false },
+      { code:"LS4", ko:"나는 지금의 나에게 '충분히 잘하고 있다'고 말할 수 있다.", en:"I can tell myself that I am 'doing well enough' right now.", reverse: false },
+      { code:'LS5', ko:'하루의 감사/다행 포인트를 떠올릴 수 있다.', en:'I can recall things I am grateful for or relieved about each day.', reverse: false },
     ]
   },
 ];
@@ -593,47 +676,51 @@ function startDiag() {
 }
 
 async function goSectionFromProfile() {
+  const ko = isKo();
   const nickname = document.getElementById('field-nickname').value.trim();
   const email = document.getElementById('field-email').value.trim();
   const age = document.querySelector('input[name="age"]:checked');
 
-  // Basic validation
+  // 기본 유효성 검사
   if (!nickname) {
-    alert('Please enter your nickname.');
+    alert(ko ? '닉네임을 입력해주세요.' : 'Please enter your nickname.');
     document.getElementById('field-nickname').focus();
     return;
   }
   if (nickname.toLowerCase().includes('test')) {
-    alert('Nickname cannot contain "test". Please choose another nickname.');
+    alert(ko ? '닉네임에 "test"는 사용할 수 없어요. 다른 닉네임을 입력해주세요.' : 'Nickname cannot contain "test". Please choose another nickname.');
     document.getElementById('field-nickname').focus();
     return;
   }
   if (!age) {
-    alert('Please select your age group.');
+    alert(ko ? '연령대를 선택해주세요.' : 'Please select your age group.');
     return;
   }
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    alert('Please enter a valid email address.');
+    alert(ko ? '올바른 이메일 주소를 입력해주세요.' : 'Please enter a valid email address.');
     document.getElementById('field-email').focus();
     return;
   }
 
-  // 3-month email cooldown check
+  // 이메일 3개월 제한 체크
   const nextBtn = document.querySelector('#screen-profile .btn-primary');
-  if (nextBtn) { nextBtn.disabled = true; nextBtn.textContent = 'Checking...'; }
+  if (nextBtn) { nextBtn.disabled = true; nextBtn.textContent = ko ? '확인 중...' : 'Checking...'; }
 
   try {
     const res = await fetch(`${SHEET_URL}?checkEmail=${encodeURIComponent(email)}`);
     const json = await res.json();
     if (json.result === 'cooldown') {
       const remaining = json.remainingDays;
-      alert(`This email can be used again in ${remaining} days.\n\nRhythm Check-in is available once every 3 months.`);
-      if (nextBtn) { nextBtn.disabled = false; nextBtn.textContent = 'Begin Check-in →'; }
+      const msg = ko
+        ? `이 이메일은 ${remaining}일 후에 다시 사용할 수 있어요.\n\n리듬 체크는 3개월마다 받으실 수 있어요.`
+        : `This email can be used again in ${remaining} days.\n\nRhythm Check is available every 3 months.`;
+      alert(msg);
+      if (nextBtn) { nextBtn.disabled = false; nextBtn.textContent = ko ? '체크인 시작 →' : 'Begin Check-in →'; }
       return;
     }
   } catch (e) {
-    // On check failure, allow through
-    console.warn('Email check failed, proceeding:', e);
+    // 체크 실패 시 그냥 진행 (서버 오류로 막지 않음)
+    console.warn('이메일 체크 실패, 진행 허용:', e);
   }
 
   if (nextBtn) { nextBtn.disabled = false; }
@@ -642,16 +729,16 @@ async function goSectionFromProfile() {
 }
 
 function goSection(idx) {
-  // Collect profile
+  // Collect profile — 스프레드시트 컬럼 순서 기준
   profile.nickname = document.getElementById('field-nickname').value.trim();
   profile.email    = document.getElementById('field-email').value.trim();
   const getRadio = (name) => { const r = document.querySelector(`input[name="${name}"]:checked`); return r ? r.value : ''; };
-  profile.age      = getRadio('age');        // col D: age
-  profile.children = getRadio('children');   // col E: children
-  profile.marital  = getRadio('marital');    // col F: marital
-  profile.activity = getRadio('activity');   // col G: activity
-  profile.duration = getRadio('duration');   // col H: duration
-  profile.topic    = getRadio('topic');      // col I: topic
+  profile.age      = getRadio('age');        // D열: 연령대
+  profile.children = getRadio('children');   // E열: 자녀 수
+  profile.marital  = getRadio('marital');    // F열: 결혼여부
+  profile.activity = getRadio('activity');   // G열: 주요 활동 유형
+  profile.duration = getRadio('duration');   // H열: 현재 역할 기간
+  profile.topic    = getRadio('topic');      // I열: 관심 주제
 
   currentSection = idx;
   renderSection(idx);
@@ -695,27 +782,31 @@ function nextSection() {
 
 function updateProgress(sectionIdx) {
   const total = SECTIONS.length;
-  const current = sectionIdx + 1; // 0-indexed → 1-indexed
+  const current = sectionIdx + 1; // 0-indexed section → 1-indexed display
   const pct = sectionIdx < 0 ? 5 : Math.round((current / total) * 100);
   document.getElementById('progress-fill').style.width = pct + '%';
   document.getElementById('progress-pct-txt').textContent = pct + '%';
+  const ko = isKo();
   if (sectionIdx < 0) {
-    document.getElementById('progress-label-txt').textContent = 'Profile';
+    document.getElementById('progress-label-txt').textContent = ko ? '프로필 입력 중' : 'Profile';
   } else {
     const sec = SECTIONS[sectionIdx];
-    document.getElementById('progress-label-txt').textContent = sec.en;
+    document.getElementById('progress-label-txt').textContent = ko ? `${sec.ko}` : `${sec.en}`;
   }
 }
 
 // ─── RENDER SECTION ──────────────────────────────────────────────────────────
 function renderSection(idx) {
   const sec = SECTIONS[idx];
+  const ko = isKo();
+
+  // 번호 문자 제거 함수 (① → 심리 상태)
   const stripNum = (str) => str.replace(/^[①②③④⑤⑥⑦⑧⑨⑩⑪]\s*/, '');
 
   let html = `
     <div class="step-intro">
-      <h2>${stripNum(sec.en)}</h2>
-      <p>${sec.descEn}</p>
+      <h2>${ko ? stripNum(sec.ko) : stripNum(sec.en)}</h2>
+      <p>${ko ? sec.descKo : sec.descEn}</p>
     </div>
   `;
 
@@ -723,8 +814,8 @@ function renderSection(idx) {
     const val = answers[q.code];
     html += `<div class="question-block${val !== undefined ? ' answered' : ''}" id="block-${q.code}">
       <div class="q-code">${q.code}</div>
-      <div class="q-text">${q.en}</div>
-
+      <div class="q-text">${ko ? q.ko : q.en}</div>
+      ${!ko ? '' : `<div class="q-text-en">${q.en}</div>`}
       <div class="likert-row">`;
     for (let i = 1; i <= 5; i++) {
       html += `
@@ -738,21 +829,23 @@ function renderSection(idx) {
     }
     html += `</div>
       <div class="likert-labels">
-        <span>Not at all</span>
-        <span>Very much so</span>
+        <span>${ko ? '전혀 그렇지 않다' : 'Not at all'}</span>
+        <span>${ko ? '매우 그렇다' : 'Very much so'}</span>
       </div>
     </div>`;
   });
 
   // Last section button
   const isLast = idx === SECTIONS.length - 1;
-  document.getElementById('btn-next').textContent = isLast ? 'See Results →' : 'Next →';
+  document.getElementById('btn-next').innerHTML = isLast
+    ? `<span class="ko-inline">결과 보기 →</span><span class="en-inline">See Results →</span>`
+    : `<span class="ko-inline">다음 →</span><span class="en-inline">Next →</span>`;
 
   document.getElementById('section-content').innerHTML = html;
 }
 
 function setAnswer(code, val) {
-  answers[code] = Number(val);  // Ensure numeric type
+  answers[code] = Number(val);  // 숫자로 명시적 변환
   const block = document.getElementById('block-' + code);
   if (block) block.classList.add('answered');
 }
@@ -783,31 +876,37 @@ function getRhythmType(scores) {
   let type, descKo, descEn, strengthsKo, strengthsEn;
 
   if (overall >= 80) {
-    type = '🌿 Balanced Rhythm — Stability & Flow';
+    type = isKo() ? '🌿 균형 리듬 — 안정과 흐름' : '🌿 Balanced Rhythm — Stability & Flow';
+    descKo = '지금 당신의 리듬은 전반적으로 안정적으로 흐르고 있습니다. 다양한 영역에서 고른 에너지를 유지하며, 자신의 리듬을 잘 인식하고 있습니다. 이제는 깊이를 더하는 시간입니다.';
     descEn = 'Your rhythm is flowing with overall stability. You maintain balanced energy across most areas and have a clear awareness of your inner state. Now is the time to deepen what already works.';
+    strengthsKo = ['자기 인식', '균형 감각', '리듬 유지력'];
     strengthsEn = ['Self-Awareness', 'Balance', 'Rhythm Sustainability'];
   } else if (overall >= 60) {
-    type = '🌊 Growth Rhythm — Season of Expansion';
+    type = isKo() ? '🌊 성장 리듬 — 확장의 시기' : '🌊 Growth Rhythm — Season of Expansion';
+    descKo = '당신은 지금 리듬을 찾아가는 과정에 있습니다. 강한 영역이 존재하는 동시에, 아직 충분히 돌보지 못한 영역도 있습니다. 이 불균형 자체가 성장의 신호입니다.';
     descEn = 'You are in the process of finding your rhythm. Strong areas exist alongside areas that need more attention. This imbalance itself is a sign of growth in progress.';
+    strengthsKo = ['성장 의지', '자기 탐색', '회복력'];
     strengthsEn = ['Growth Will', 'Self-Exploration', 'Resilience'];
   } else {
-    type = '🌱 Recovery Rhythm — Season of Care';
+    type = isKo() ? '🌱 회복 리듬 — 돌봄의 시기' : '🌱 Recovery Rhythm — Season of Care';
+    descKo = '지금 당신의 리듬은 돌봄을 필요로 하고 있습니다. 많은 에너지를 쏟아왔고, 스스로를 위한 시간이 충분하지 않았을 수 있습니다. 지금은 회복이 먼저입니다.';
     descEn = 'Your rhythm is calling for care right now. You have been pouring energy outward, and time for yourself may have been scarce. Recovery comes first.';
+    strengthsKo = ['자각의 시작', '솔직한 성찰', '용기'];
     strengthsEn = ['Beginning Awareness', 'Honest Reflection', 'Courage'];
   }
 
-  return { type, descEn, strengthsEn, overall, top3, bottom3 };
+  return { type, descKo, descEn, strengthsKo, strengthsEn, overall, top3, bottom3 };
 }
 
 // ─── RESULTS ─────────────────────────────────────────────────────────────────
 function showResults() {
   goScreen('screen-result');
   document.getElementById('progress-area').style.display = 'none';
-  // Show loading overlay
+  // 로딩 오버레이 표시
   const rs = document.getElementById('result-section');
   rs.style.display = 'flex';
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // Submit data and redirect to summary
+  // 데이터 제출 및 summary로 이동
   autoSubmit();
 }
 
@@ -816,8 +915,8 @@ function showResults() {
 // Replace this URL with your Google Apps Script Web App deployment URL
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
 
-
-// ─── AUTO SUBMIT on results screen ───────────────────────────────────────────
+// ─── 자동 제출 (결과 화면 진입 시) ─────────────────────────────────────────
+// ─── 자동 제출 — 결과 화면 진입 시 이메일 없이 바로 전송 ──────────────────────
 async function autoSubmit() {
   const ko = isKo();
   const scores = calcScores();
@@ -830,14 +929,14 @@ async function autoSubmit() {
     activity: profile.activity || '',
     duration: profile.duration || '',
     topic:    profile.topic    || '',
-    emailYn:  profile.email ? 'Yes' : 'No',
+    emailYn:  profile.email ? '예, 받을게요' : '아니요, 이번엔 괜찮아요',
     email:    profile.email || '',
     answers:  Object.fromEntries(
       Object.entries(answers).map(([k,v]) => [k, Number(v)])
-    ),  // Ensure numeric types
+    ),  // 숫자 타입 보장
     scores:   Object.fromEntries(Object.entries(scores).map(([k,v]) => [k, v.pct])),
     overall:  Math.round(Object.values(scores).reduce((s,v) => s + v.pct, 0) / Object.values(scores).length),
-    lang:     'en'
+    lang:     ko ? 'ko' : 'en'
   };
   const ts = payload.timestamp;
   try {
@@ -847,12 +946,12 @@ async function autoSubmit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    console.log('✅ Auto-submit complete');
+    console.log('✅ 자동 제출 완료');
   } catch(e) {
-    console.error('Auto-submit error:', e);
+    console.error('자동 제출 오류:', e);
   }
 
-  // Poll for row by timestamp (every 2s, max 10 tries = 20s)
+  // 타임스탬프로 row 폴링 (2초 간격, 최대 10회 = 20초)
   let pollCount = 0;
   const pollRow = async () => {
     pollCount++;
@@ -860,17 +959,17 @@ async function autoSubmit() {
       const res = await fetch(`${SHEET_URL}?ts=${encodeURIComponent(ts)}`);
       const json = await res.json();
       if (json.result === 'success' && json.row) {
-        window.location.href = `../summary.html?row=${json.row}`;
+        window.location.href = `summary.html?row=${json.row}`;
         return;
       }
     } catch(e) {
-      console.error('Row poll error:', e);
+      console.error('row 검색 오류:', e);
     }
     if (pollCount < 10) {
       setTimeout(pollRow, 2000);
     } else {
-      // After 10 failures, redirect without row
-      window.location.href = '/en/summary.html';
+      // 10회 실패 시 summary로 그냥 이동 (row 없이)
+      window.location.href = 'summary.html';
     }
   };
   setTimeout(pollRow, 2000);
