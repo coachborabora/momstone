@@ -867,21 +867,21 @@ function renderReport(d, row) {
   const scores = domainScoreVals;
   const overall = parseFloat(get(d,'Overall_Avg', 0)) || 
     (domainScoreVals.length ? Math.round(domainScoreVals.reduce((a,b)=>a+b,0)/domainScoreVals.length * 100)/100 : 0);
-  const band = get(d,'Band', '');
-  const bandName = (lang === 'en' ? BAND_NAMES : BAND_NAMES_KO)[band] || '';
+  const band = get(d,'Band','') || get(d,'band','') || get(d,'BAND','');
+  const bandName = (lang === 'en' ? BAND_NAMES : BAND_NAMES_KO)[band] || get(d,'BandName','') || get(d,'Band_Name','') || '';
   const rhythmTypeEN = get(d,'Rhythm_Type_EN', bandName);
   const riskPoint = get(d,'Risk_Point','');
   const bufferMessage = get(d,'Buffer_Message','');
 
-  // New analysis
-  const strengthGap = get(d,'Strength_Gap','—');
-  const strengthGapLabel = get(d,'Strength_Gap_Label','');
-  const vulnIndex = get(d,'Vulnerability_Index','—');
-  const vulnLabel = get(d,'Vulnerability_Label','');
-  const coachReady = get(d,'Coaching_Readiness','—');
-  const coachReadyLabel = get(d,'Coaching_Readiness_Label','');
-  const relSelf = get(d,'Relational_Self_Dynamic','—');
-  const relSelfLabel = get(d,'Relational_Self_Label','');
+  // New analysis — with alias fallbacks for Sheets column name variations
+  const strengthGap = get(d,'Strength_Gap','') || get(d,'StrengthGap','') || get(d,'Strength Gap','') || '—';
+  const strengthGapLabel = get(d,'Strength_Gap_Label','') || get(d,'StrengthGapLabel','');
+  const vulnIndex = get(d,'Vulnerability_Index','') || get(d,'VulnerabilityIndex','') || get(d,'Vulnerability_Idx','') || '—';
+  const vulnLabel = get(d,'Vulnerability_Label','') || get(d,'VulnerabilityLabel','');
+  const coachReady = get(d,'Coaching_Readiness','') || get(d,'CoachingReadiness','') || get(d,'Coaching_Ready','') || '—';
+  const coachReadyLabel = get(d,'Coaching_Readiness_Label','') || get(d,'CoachingReadinessLabel','');
+  const relSelf = get(d,'Relational_Self_Dynamic','') || get(d,'RelationalSelfDynamic','') || get(d,'Relational_Self','') || '—';
+  const relSelfLabel = get(d,'Relational_Self_Label','') || get(d,'RelationalSelfLabel','');
 
   // Top 3 / Bottom 3
   const domainScores = DOMAINS.map((dom,i) => ({ ...dom, score: domainScoreVals[i] }));
@@ -948,8 +948,8 @@ function renderReport(d, row) {
       <canvas id="radarChart" style="max-height:360px;"></canvas>
       <div class="radar-meta">
         <div class="radar-meta-item">Overall <strong>${overall.toFixed(2)}</strong></div>
-        <div class="radar-meta-item">Band <strong>${band}</strong></div>
-        <div class="radar-meta-item">Rhythm Type <strong>${esc(bandName)}</strong></div>
+        <div class="radar-meta-item">Band <strong>${band || '—'}</strong></div>
+        <div class="radar-meta-item">Rhythm Type <strong>${esc(bandName || bandNamesLang[band] || '—')}</strong></div>
         <div class="radar-meta-item">Reset Point <strong>${esc(get(d,'Reset_Point','—'))}</strong></div>
       </div>
     </div>
@@ -1049,11 +1049,23 @@ function renderReport(d, row) {
       const action = get(d, dom.code+'_action', '');
       const focus = get(d, dom.code+'_focus', '');
 
-      // Reflection DB entries for this domain+band
+      // Reflection DB entries for this domain+band — with fallback
       const activeDB = lang === 'en' ? REFLECTION_DB_EN : REFLECTION_DB_KR;
-      const reflections = activeDB.filter(e =>
+      let reflections = activeDB.filter(e =>
         e.domain === dom.code && e.band === (domBand || band)
       );
+      // Fallback: if no match with domBand, try overall band
+      if (!reflections.length && domBand && domBand !== band) {
+        reflections = activeDB.filter(e => e.domain === dom.code && e.band === band);
+      }
+      // Fallback: if still no match, try any band for this domain
+      if (!reflections.length) {
+        const fallbackBands = ['A','B','C','D','E'];
+        for (const fb of fallbackBands) {
+          reflections = activeDB.filter(e => e.domain === dom.code && e.band === fb);
+          if (reflections.length) break;
+        }
+      }
 
       return `<div class="domain-card">
         <div class="domain-header">
@@ -1116,6 +1128,9 @@ function renderReport(d, row) {
 
   currentData = d;
   currentLang = lang;
+  // Debug: log actual data keys from Sheets (remove after confirming field names)
+  console.log('[Coach Report] Data keys received:', Object.keys(d));
+  console.log('[Coach Report] Band:', d.Band, '| Strength_Gap:', d.Strength_Gap, '| Vulnerability_Index:', d.Vulnerability_Index, '| Coaching_Readiness:', d.Coaching_Readiness, '| Relational_Self_Dynamic:', d.Relational_Self_Dynamic);
   document.getElementById('app').innerHTML = html;
   renderCoachGuide(lang);
   document.getElementById('app').style.display = 'block';
