@@ -471,6 +471,185 @@
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
     }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+      padding: 14px 20px;
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+    .filter-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .filter-select {
+      padding: 7px 28px 7px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      font-family: 'Satoshi', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      transition: 0.15s;
+    }
+    .filter-select:focus { outline: none; border-color: var(--rose); }
+    .filter-active-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      background: rgba(184,143,126,0.12);
+      color: var(--rose-dark);
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .filter-clear {
+      margin-left: auto;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: transparent;
+      font-family: 'Satoshi', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .filter-clear:hover { background: var(--rose-light); color: var(--rose-dark); border-color: var(--rose); }
+
+    /* ── GROUP INSIGHT PANEL ── */
+    #group-insight-section {
+      display: none;
+      margin-bottom: 20px;
+    }
+    .insight-panel {
+      background: var(--bg-deep);
+      border-radius: 16px;
+      padding: 28px;
+      border: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .insight-panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--rose-dark), var(--rose));
+    }
+    .insight-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .insight-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+    }
+    .insight-meta {
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 3px;
+    }
+    .insight-run-btn {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 18px;
+      border-radius: 50px;
+      border: none;
+      background: var(--rose-dark);
+      color: white;
+      font-family: 'Satoshi', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+      flex-shrink: 0;
+    }
+    .insight-run-btn:hover { background: var(--rose); }
+    .insight-run-btn:disabled { opacity: 0.5; cursor: default; }
+    .insight-body {
+      min-height: 80px;
+    }
+    .insight-empty {
+      font-size: 13px;
+      color: rgba(255,255,255,0.3);
+      text-align: center;
+      padding: 20px 0;
+    }
+    .insight-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .insight-card {
+      padding: 18px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .insight-card-num {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--rose);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .insight-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 6px;
+    }
+    .insight-card-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+    .insight-loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      padding: 16px 0;
+    }
+    .insight-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-top-color: var(--rose);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .insight-error {
+      font-size: 12px;
+      color: rgba(255,100,100,0.7);
+      padding: 12px 0;
+    }
   </style>
 </head>
 <body>
@@ -504,6 +683,9 @@
   <a class="sidebar-item" href="#recent">
     <span class="dot"></span> 최근 진단
   </a>
+  <a class="sidebar-item" href="#group-insight-section">
+    <span class="dot"></span> 그룹 공통 접점
+  </a>
 
   <div class="sidebar-label" style="margin-top:auto;">코치</div>
   <div style="font-size:12px; color:rgba(255,255,255,0.3); padding:8px 12px;">
@@ -525,6 +707,40 @@
       ↻ 새로고침
     </button>
   </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar" id="filter-bar">
+    <div class="filter-label">필터</div>
+    <select class="filter-select" id="filter-org" onchange="applyFilters()">
+      <option value="">전체 기관</option>
+    </select>
+    <select class="filter-select" id="filter-group" onchange="applyFilters()">
+      <option value="">전체 그룹</option>
+    </select>
+    <div id="filter-badge" style="display:none;" class="filter-active-badge">
+      <span>●</span> <span id="filter-badge-text"></span>
+    </div>
+    <button class="filter-clear" id="filter-clear-btn" onclick="clearFilters()" style="display:none;">✕ 초기화</button>
+    <div style="margin-left:auto;font-size:11px;color:var(--muted);" id="filter-count-label"></div>
+  </div>
+
+  <!-- GROUP INSIGHT -->
+  <section id="group-insight-section">
+    <div class="insight-panel">
+      <div class="insight-header">
+        <div>
+          <div class="insight-title">세션 전 공통 접점 분석</div>
+          <div class="insight-meta" id="insight-meta">그룹을 선택하면 활성화돼요</div>
+        </div>
+        <button class="insight-run-btn" id="insight-run-btn" onclick="runGroupInsight()" disabled>
+          ✦ AI 분석 실행
+        </button>
+      </div>
+      <div class="insight-body" id="insight-body">
+        <div class="insight-empty">기관·그룹 필터를 선택한 뒤 AI 분석을 실행해주세요.</div>
+      </div>
+    </div>
+  </section>
 
   <!-- KPI -->
   <section id="overview">
@@ -627,6 +843,176 @@
 <script>
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
 
+// ── 필터 상태 ──────────────────────────────────────────────────────────
+let allRows = [];
+let filteredRows = [];
+let currentOrg = '';
+let currentGroup = '';
+
+function populateFilters(rows) {
+  const orgs  = [...new Set(rows.map(r => getField(r,'org','Org','기관','organization')).filter(Boolean))].sort();
+  const groups = [...new Set(rows.map(r => getField(r,'group','Group','그룹')).filter(Boolean))].sort();
+
+  const orgSel = document.getElementById('filter-org');
+  const grpSel = document.getElementById('filter-group');
+
+  // 기존 옵션 초기화 (첫 번째 기본 항목 유지)
+  orgSel.innerHTML = '<option value="">전체 기관</option>' +
+    orgs.map(o => `<option value="${o}">${o}</option>`).join('');
+  grpSel.innerHTML = '<option value="">전체 그룹</option>' +
+    groups.map(g => `<option value="${g}">${g}</option>`).join('');
+}
+
+function applyFilters() {
+  currentOrg   = document.getElementById('filter-org').value;
+  currentGroup = document.getElementById('filter-group').value;
+
+  filteredRows = allRows.filter(r => {
+    const orgMatch   = !currentOrg   || getField(r,'org','Org','기관','organization') === currentOrg;
+    const groupMatch = !currentGroup || getField(r,'group','Group','그룹') === currentGroup;
+    return orgMatch && groupMatch;
+  });
+
+  // 배지 & 버튼 업데이트
+  const active = currentOrg || currentGroup;
+  const badge = document.getElementById('filter-badge');
+  const clearBtn = document.getElementById('filter-clear-btn');
+  const badgeText = document.getElementById('filter-badge-text');
+  const countLabel = document.getElementById('filter-count-label');
+
+  if (active) {
+    const parts = [];
+    if (currentOrg) parts.push(currentOrg);
+    if (currentGroup) parts.push(currentGroup);
+    badgeText.textContent = parts.join(' · ');
+    badge.style.display = 'inline-flex';
+    clearBtn.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+    clearBtn.style.display = 'none';
+  }
+  countLabel.textContent = active ? `${filteredRows.length}명 표시` : '';
+
+  // 그룹 인사이트 패널 활성화
+  const insightSection = document.getElementById('group-insight-section');
+  const insightMeta    = document.getElementById('insight-meta');
+  const insightRunBtn  = document.getElementById('insight-run-btn');
+
+  if (active && filteredRows.length > 0) {
+    insightSection.style.display = 'block';
+    insightMeta.textContent = `${filteredRows.length}명 데이터 기준 · 세션 전 코치 참고용`;
+    insightRunBtn.disabled = false;
+    document.getElementById('insight-body').innerHTML =
+      '<div class="insight-empty">AI 분석 버튼을 눌러 공통 접점 3개를 추출해요.</div>';
+  } else if (active && filteredRows.length === 0) {
+    insightSection.style.display = 'block';
+    insightMeta.textContent = '해당 필터에 해당하는 데이터가 없어요';
+    insightRunBtn.disabled = true;
+    document.getElementById('insight-body').innerHTML =
+      '<div class="insight-empty">데이터가 없습니다.</div>';
+  } else {
+    insightSection.style.display = 'none';
+  }
+
+  renderData(filteredRows);
+}
+
+function clearFilters() {
+  document.getElementById('filter-org').value = '';
+  document.getElementById('filter-group').value = '';
+  currentOrg = '';
+  currentGroup = '';
+  applyFilters();
+}
+
+// ── 그룹 공통 접점 AI 분석 ──────────────────────────────────────────────
+async function runGroupInsight() {
+  const btn  = document.getElementById('insight-run-btn');
+  const body = document.getElementById('insight-body');
+  btn.disabled = true;
+  body.innerHTML = `
+    <div class="insight-loading">
+      <div class="insight-spinner"></div>
+      공통 패턴을 분석하는 중이에요…
+    </div>`;
+
+  try {
+    // 참가자 요약 데이터 구성
+    const summaries = filteredRows.map(r => {
+      const domScores = DOMAINS.map(d => `${d.kr}:${(parseFloat(r[`${d.code}_score`]) || 0).toFixed(1)}`).join(', ');
+      const lowestDoms = DOMAINS
+        .map(d => ({ kr: d.kr, val: parseFloat(r[`${d.code}_score`]) || 0 }))
+        .sort((a,b) => a.val - b.val)
+        .slice(0, 3)
+        .map(d => d.kr)
+        .join(' / ');
+      const nick = getField(r,'Name','nickname','닉네임','Nickname','nick','이름') || '참가자';
+      const age  = getField(r,'age','Year','연령대','Age','ageGroup','나이') || '';
+      return `- ${nick}(${age}): 전체평균 ${domainAvg(r).toFixed(1)}, 최저도메인: ${lowestDoms}, 전체도메인: ${domScores}`;
+    }).join('\n');
+
+    const filterDesc = [currentOrg, currentGroup].filter(Boolean).join(' · ');
+    const prompt = `당신은 라이프 코치 보조 AI입니다. 아래는 "${filterDesc}" 그룹 ${filteredRows.length}명의 리듬 체크 진단 결과입니다.
+
+${summaries}
+
+위 데이터를 분석하여, 이 그룹이 세션에서 공통적으로 다룰 만한 접점(공통 패턴, 공유 어려움, 집단적 강점)을 정확히 3가지 추출해주세요.
+
+다음 JSON 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요:
+[
+  {
+    "title": "접점 제목 (10자 이내)",
+    "description": "2-3문장으로 구체적인 설명. 왜 이 그룹에서 공통으로 보이는지, 세션에서 어떻게 활용할 수 있는지 포함.",
+    "domain": "관련 도메인 코드 (예: EB, EN, VA...)"
+  },
+  ...
+]`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    const text = data.content.map(i => i.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const insights = JSON.parse(clean);
+
+    const domainColorMap = {
+      EB:'#c9a96e', EN:'#7eab8f', RE:'#b88f7e', SM:'#d8b8ac',
+      ID:'#9b8ea8', RS:'#7eab8f', VA:'#b88f7e', SC:'#c9a96e',
+      VG:'#7eab8f', TP:'#d8b8ac', LS:'#b88f7e'
+    };
+
+    body.innerHTML = `
+      <div class="insight-card-grid">
+        ${insights.map((ins, i) => {
+          const color = domainColorMap[ins.domain] || '#d8b8ac';
+          return `
+            <div class="insight-card">
+              <div class="insight-card-num" style="color:${color}">0${i+1}</div>
+              <div class="insight-card-title">${ins.title}</div>
+              <div class="insight-card-desc">${ins.description}</div>
+              ${ins.domain ? `<div style="margin-top:10px;font-size:10px;letter-spacing:1px;color:${color};font-weight:700;opacity:0.7;">${ins.domain}</div>` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="margin-top:16px;font-size:11px;color:rgba(255,255,255,0.2);text-align:right;">AI 분석 결과 · 코치 판단과 함께 활용해주세요</div>
+    `;
+  } catch(err) {
+    console.error('AI 분석 오류:', err);
+    body.innerHTML = `<div class="insight-error">분석 중 오류가 발생했어요. 다시 시도해주세요.<br><small>${err.message}</small></div>`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 const DOMAINS = [
   { code: 'EB', kr: '심리 상태',    en: 'Emotional Balance' },
   { code: 'EN', kr: '에너지 관리',  en: 'Energy Management' },
@@ -660,7 +1046,15 @@ async function loadData() {
       console.log('KEY LIST:', Object.keys(json.data[0]));
       console.log('ROW SAMPLE:', JSON.stringify(json.data[0]));
     }
-    renderData(json.data);
+    allRows = json.data || [];
+    populateFilters(allRows);
+    // 현재 필터 상태 유지하며 렌더
+    if (currentOrg || currentGroup) {
+      applyFilters();
+    } else {
+      filteredRows = allRows;
+      renderData(allRows);
+    }
   } catch(err) {
     console.error('데이터 로드 오류:', err);
     renderData(null);
