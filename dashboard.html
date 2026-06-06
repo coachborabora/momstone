@@ -850,13 +850,12 @@ let currentOrg = '';
 let currentGroup = '';
 
 function populateFilters(rows) {
-  const orgs  = [...new Set(rows.map(r => getField(r,'org','Org','기관','organization')).filter(Boolean))].sort();
-  const groups = [...new Set(rows.map(r => getField(r,'group','Group','그룹')).filter(Boolean))].sort();
+  const orgs  = [...new Set(rows.map(r => getField(r,'BO1')).filter(Boolean))].sort();
+  const groups = [...new Set(rows.map(r => getField(r,'BP1')).filter(Boolean))].sort();
 
   const orgSel = document.getElementById('filter-org');
   const grpSel = document.getElementById('filter-group');
 
-  // 기존 옵션 초기화 (첫 번째 기본 항목 유지)
   orgSel.innerHTML = '<option value="">전체 기관</option>' +
     orgs.map(o => `<option value="${o}">${o}</option>`).join('');
   grpSel.innerHTML = '<option value="">전체 그룹</option>' +
@@ -868,8 +867,8 @@ function applyFilters() {
   currentGroup = document.getElementById('filter-group').value;
 
   filteredRows = allRows.filter(r => {
-    const orgMatch   = !currentOrg   || getField(r,'org','Org','기관','organization') === currentOrg;
-    const groupMatch = !currentGroup || getField(r,'group','Group','그룹') === currentGroup;
+    const orgMatch   = !currentOrg   || getField(r,'BO1') === currentOrg;
+    const groupMatch = !currentGroup || getField(r,'BP1') === currentGroup;
     return orgMatch && groupMatch;
   });
 
@@ -1048,6 +1047,13 @@ async function loadData() {
     }
     allRows = json.data || [];
     populateFilters(allRows);
+    // 디버그: BO1/BP1 확인
+    console.log('📊 총 데이터 행 수:', allRows.length);
+    if (allRows.length > 0) {
+      console.log('🔑 KEY LIST:', Object.keys(allRows[0]));
+      const sample = allRows.find(r => r['BO1'] || r['BP1']);
+      console.log('🏢 BO1/BP1 샘플:', sample ? { BO1: sample['BO1'], BP1: sample['BP1'] } : '값 없음');
+    }
     // 현재 필터 상태 유지하며 렌더
     if (currentOrg || currentGroup) {
       applyFilters();
@@ -1393,9 +1399,10 @@ function findPairs(rows, emailMap) {
 
 function dismissLoading() {
   const el = document.getElementById('loading');
+  if (!el) return; // 이미 제거된 경우 무시
   el.classList.add('hide');
   setTimeout(() => {
-    el.remove();
+    if (el.parentNode) el.remove();
     // 로딩 완료 후 비밀번호 체크
     const saved = sessionStorage.getItem('momstone_dash_auth');
     if (saved !== 'ok') {
