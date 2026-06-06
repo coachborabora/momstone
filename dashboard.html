@@ -270,7 +270,7 @@
     }
 
     /* ── PERSONA ── */
-    .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .persona-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     .persona-title-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
     .persona-label { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0 !important; }
     .tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
@@ -283,7 +283,8 @@
     .persona-month-label { font-size: 9px; color: var(--muted); }
     .persona-month-count { font-size: 9px; color: var(--ink); font-weight: 600; }
 
-    .persona-item { }
+    .persona-item { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .persona-item:last-child { border-bottom: none; padding-bottom: 0; }
 
     .persona-label {
       font-size: 11px;
@@ -795,17 +796,15 @@
 
   <!-- 클러스터 + 페르소나 -->
   <section id="persona">
-    <div class="grid-2">
-      <div class="chart-card">
-        <div class="card-title">4개 클러스터 평균</div>
-        <div class="card-sub">연관 도메인 그룹별 흐름</div>
-        <div class="cluster-grid" id="cluster-grid"></div>
-      </div>
-      <div class="chart-card">
-        <div class="card-title">참여자 페르소나</div>
-        <div class="card-sub">연령대 및 활동 유형 분포</div>
-        <div class="persona-grid" id="persona-grid"></div>
-      </div>
+    <div class="chart-card" style="margin-bottom:20px;">
+      <div class="card-title">4개 클러스터 평균</div>
+      <div class="card-sub">연관 도메인 그룹별 흐름</div>
+      <div class="cluster-grid" id="cluster-grid"></div>
+    </div>
+    <div class="chart-card">
+      <div class="card-title">참여자 페르소나</div>
+      <div class="card-sub">연령대 및 활동 유형 분포</div>
+      <div class="persona-grid" id="persona-grid"></div>
     </div>
   </section>
 
