@@ -850,8 +850,8 @@ let currentOrg = '';
 let currentGroup = '';
 
 function populateFilters(rows) {
-  const orgs  = [...new Set(rows.map(r => getField(r,'BO1')).filter(Boolean))].sort();
-  const groups = [...new Set(rows.map(r => getField(r,'BP1')).filter(Boolean))].sort();
+  const orgs  = [...new Set(rows.map(r => r['Org']).filter(Boolean))].sort();
+  const groups = [...new Set(rows.map(r => r['Group']).filter(Boolean))].sort();
 
   const orgSel = document.getElementById('filter-org');
   const grpSel = document.getElementById('filter-group');
@@ -867,8 +867,8 @@ function applyFilters() {
   currentGroup = document.getElementById('filter-group').value;
 
   filteredRows = allRows.filter(r => {
-    const orgMatch   = !currentOrg   || getField(r,'BO1') === currentOrg;
-    const groupMatch = !currentGroup || getField(r,'BP1') === currentGroup;
+    const orgMatch   = !currentOrg   || r['Org'] === currentOrg;
+    const groupMatch = !currentGroup || r['Group'] === currentGroup;
     return orgMatch && groupMatch;
   });
 
