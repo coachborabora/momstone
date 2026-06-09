@@ -991,7 +991,10 @@ async function autoSubmit() {
       const res = await fetch(`${SHEET_URL}?ts=${encodeURIComponent(ts)}`);
       const json = await res.json();
       if (json.result === 'success' && json.row) {
-        window.location.href = `summary.html?row=${json.row}`;
+        const dest = profile.org
+          ? `orgs/${profile.org}/summary.html?row=${json.row}`
+          : `summary.html?row=${json.row}`;
+        window.location.href = dest;
         return;
       }
     } catch(e) {
@@ -1001,7 +1004,8 @@ async function autoSubmit() {
       setTimeout(pollRow, 2000);
     } else {
       // 10회 실패 시 summary로 그냥 이동 (row 없이)
-      window.location.href = 'summary.html';
+      const dest = profile.org ? `orgs/${profile.org}/summary.html` : 'summary.html';
+      window.location.href = dest;
     }
   };
   setTimeout(pollRow, 2000);
