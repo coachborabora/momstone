@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>리듬 체크인 결과 | Momstone × AP어린이집</title>
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet" />
+  <style>
+    :root {
+      --rose: #d8b8ac;
+      --rose-dark: #b88f7e;
+      --rose-light: #f0e4de;
+      --ink: #171717;
+      --ink-soft: #1e1e1e;
+      --muted: #666;
+      --line: rgba(0,0,0,0.08);
+      --bg: #ffffff;
+      --bg-soft: #f8f5f3;
+      --bg-deep: #111111;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Pretendard', sans-serif; background: var(--bg); color: var(--ink-soft); line-height: 1.8; -webkit-font-smoothing: antialiased; }
+
+    /* PRINT */
+    @media print {
+      .no-print { display: none !important; }
+      .page-break { page-break-before: always; }
+      body { background: white; }
+      .cover { min-height: auto; padding: 60px 40px; }
+    }
+
+    /* NAV */
+    .topbar { background: var(--bg-deep); color: rgba(255,255,255,0.5); padding: 10px 24px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; }
+    .topbar-brand { color: var(--rose); font-weight: 700; }
+    .topbar-home { color: rgba(255,255,255,0.5); background: none; border: 1px solid rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 50px; font-size: 11px; font-family: 'Pretendard', sans-serif; cursor: pointer; font-weight: 700; letter-spacing: 1px; transition: 0.2s; }
+    .topbar-home:hover { color: white; border-color: rgba(255,255,255,0.5); }
+    .print-btn { background: var(--rose-dark); color: white; border: none; padding: 6px 16px; border-radius: 50px; font-size: 11px; font-family: 'Pretendard', sans-serif; cursor: pointer; font-weight: 700; letter-spacing: 1px; transition: 0.2s; }
+    .print-btn:hover { background: var(--rose); }
+
+    /* COVER */
+    .cover { background: linear-gradient(160deg, #0f0f0f 0%, #1c1a19 100%); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 80px 48px; position: relative; overflow: hidden; }
+    .cover::before { content: ""; position: absolute; width: 500px; height: 500px; border-radius: 50%; background: rgba(216,184,172,0.05); top: -200px; right: -150px; }
+    .cover::after { content: ""; position: absolute; width: 300px; height: 300px; border-radius: 50%; background: rgba(216,184,172,0.04); bottom: -100px; left: -80px; }
+    .cover-inner { max-width: 640px; position: relative; z-index: 1; }
+    .cover-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose); font-weight: 700; margin-bottom: 20px; }
+    .cover-title { font-size: clamp(36px, 6vw, 56px); font-weight: 300; color: white; line-height: 1.1; margin-bottom: 24px; }
+    .cover-title strong { font-weight: 700; color: var(--rose); }
+    .cover-meta { display: flex; gap: 32px; margin-top: 48px; }
+    .cover-meta-item { }
+    .cover-meta-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 4px; }
+    .cover-meta-value { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 500; }
+    .cover-divider { width: 48px; height: 2px; background: var(--rose-dark); margin: 32px 0; }
+    .cover-desc { font-size: 14px; color: rgba(255,255,255,0.5); line-height: 1.9; max-width: 42ch; }
+
+    /* SECTION WRAPPER */
+    .section { max-width: 800px; margin: 0 auto; padding: 72px 24px; }
+    .section-sm { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+
+    /* SECTION LABEL */
+    .section-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose-dark); font-weight: 700; margin-bottom: 12px; }
+    .section-title { font-size: clamp(22px, 4vw, 32px); font-weight: 500; color: var(--ink); margin-bottom: 8px; line-height: 1.2; }
+    .section-sub { font-size: 14px; color: var(--muted); line-height: 1.9; margin-bottom: 40px; }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--line); max-width: 800px; margin: 0 auto; }
+
+    /* RADAR */
+    .radar-wrap { max-width: 480px; margin: 0 auto 40px; }
+
+    /* STABILITY CARD */
+    .stability-card { background: var(--bg-deep); border-radius: 20px; padding: 32px; margin-top: 32px; display: flex; align-items: center; gap: 32px; }
+    .stability-score { font-size: 56px; font-weight: 700; color: var(--rose); line-height: 1; }
+    .stability-score span { font-size: 20px; color: rgba(255,255,255,0.4); font-weight: 400; }
+    .stability-text { }
+    .stability-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+    .stability-summary { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.8; }
+
+
+    /* HIGHLIGHT CARD */
+    .highlight-card { border-radius: 20px; padding: 32px; margin-bottom: 16px; }
+    .highlight-card.low { background: linear-gradient(135deg, #1c1a19, #241f1d); border: 1px solid rgba(216,184,172,0.15); }
+    .highlight-card.reset { background: var(--rose-light); border: 1px solid rgba(184,143,126,0.2); }
+    .highlight-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+    .highlight-card.low .highlight-label { color: var(--rose); }
+    .highlight-card.reset .highlight-label { color: var(--rose-dark); }
+    .highlight-title { font-size: 20px; font-weight: 600; margin-bottom: 8px; line-height: 1.3; }
+    .highlight-card.low .highlight-title { color: white; }
+    .highlight-card.reset .highlight-title { color: var(--ink); }
+    .highlight-text { font-size: 13px; line-height: 1.85; }
+    .highlight-card.low .highlight-text { color: rgba(255,255,255,0.65); }
+    .highlight-card.reset .highlight-text { color: var(--ink-soft); }
+
+
+
+    /* FOOTER */
+    footer { background: #080808; padding: 24px; text-align: center; }
+    .footer-brand { font-size: 14px; color: var(--rose); letter-spacing: 3px; font-weight: 500; }
+
+    .footer-copy { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+    /* ERROR */
+    .error-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+    .error-title { font-size: 24px; font-weight: 500; color: var(--ink); margin-bottom: 8px; }
+    .error-sub { font-size: 14px; color: var(--muted); }
+
+    /* LOADING */
+    #loading-screen { position: fixed; inset: 0; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 9998; transition: opacity 0.4s ease; }
+    #loading-screen.hide { opacity: 0; pointer-events: none; }
+    .loading-brand { font-size: 15px; font-weight: 700; color: var(--rose); letter-spacing: 4px; text-transform: lowercase; }
+    .loading-text { font-size: 14px; color: rgba(255,255,255,0.45); letter-spacing: 0.5px; }
+    .loading-dots { display: flex; gap: 8px; }
+    .loading-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--rose-dark); opacity: 0.3; animation: pulse 1.2s ease-in-out infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.3); } }
+    body.loading .topbar { visibility: hidden; }
+
+    @media (max-width: 600px) {
+      .cover { padding: 60px 24px; }
+      .stability-card { flex-direction: column; gap: 16px; }
+    }
+  
+    /* LANG TOGGLE */
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+    }
+    .lang-toggle a {
+      color: rgba(255,255,255,.35);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .lang-toggle a:hover { color: rgba(255,255,255,.75); }
+    .lang-toggle .lang-active { color: rgba(255,255,255,.85); cursor: default; pointer-events: none; }
+    .lang-toggle .lang-sep { color: rgba(255,255,255,.2); font-weight: 300; }
+    </style>
+</head>
+<body class="loading">
+
+<!-- 로딩 화면 -->
+<div id="loading-screen">
+  <div class="loading-brand">momstone</div>
+  <div class="loading-dots">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="loading-text">리듬 체크인 결과를 불러오는 중이에요</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:4px;">AP어린이집 부모 코칭 프로그램</div>
+</div>
+
+<div class="topbar no-print">
+  <span class="topbar-brand">momstone</span>
+  <span style="color:rgba(255,255,255,0.35);font-size:11px;letter-spacing:1.5px;">× AP어린이집</span>
+</div>
+
+
+<div id="app"></div>
+
+<script>
+// ─── Apps Script URL ─────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzMNpM2L4Bba-dA_zJWf0IDvn0Yxm647GgF7X4H7SEf_-Pp8bRuoUOhkv4wR1qTljrL/exec';
+
+
+// ─── 데이터 파싱 ─────────────────────────────────────────────────────────────
+function parseData(r) {
+  const get = (k, def='') => (r[k] !== undefined && r[k] !== null && r[k] !== '') ? String(r[k]) : def;
+  const num = (k) => parseFloat(get(k, '0')) || 0;
+
+  return {
+    name:       get('Name', '익명'),
+    date:       get('Date', new Date().toLocaleDateString('ko-KR')),
+    stability:  num('Stability_score'),
+    stability_summary: get('Stability_summary', ''),
+    overall_avg: (function() {
+      const keys = ['EB_score','EN_score','RE_score','SM_score','ID_score','RS_score','VA_score','SC_score','VG_score','TP_score','LS_score'];
+      const vals = keys.map(k => parseFloat(r[k]) || 0);
+      return Math.round((vals.reduce((a,b) => a+b, 0) / vals.length) * 10) / 10;
+    })(),
+
+    ef_score:   num('EF_score'),
+    ef_summary: get('EF_Summary', ''),
+    rf_score:   num('RF_score'),
+    rf_summary: get('RF_Summary', ''),
+    mf_score:   num('MF_score'),
+    mf_summary: get('MF_Summary', ''),
+    ei_score:   num('EI_score'),
+    ei_summary: get('EI_Summary', ''),
+
+    lowest:      get('최저도메인 이름', ''),
+    reset_point:  get('Reset_Point', ''),
+    reset_reason: get('Reset_Reason', ''),
+    reset_signal: get('Reset_Signal', ''),
+    reset_action: get('Reset_Action', ''),
+    reset_bridge: get('Reset_Bridge', ''),
+
+    domains: [
+      { code:'EB', kr:'심리 상태', en:'Emotional Balance',
+        score: num('EB_score'), stage: get('EF_stage',''),
+        expression: get('EB_expression',''), summary: get('EB_summary',''),
+        emotions: get('EB_emotions',''), question: get('EB_question',''), action: get('EB_action','') },
+      { code:'EN', kr:'에너지 관리', en:'Energy Management',
+        score: num('EN_score'), stage: get('EN_stage',''),
+        expression: get('EN_expression',''), summary: get('EN_summary',''),
+        emotions: get('EN_emotions',''), question: get('EN_question',''), action: get('EN_action','') },
+      { code:'RE', kr:'회복탄력성', en:'Resilience',
+        score: num('RE_score'), stage: get('RE_stage',''),
+        expression: get('RE_expression',''), summary: get('RE_summary',''),
+        emotions: get('RE_emotions',''), question: get('RE_question',''), action: get('RE_action','') },
+      { code:'SM', kr:'강점·동기', en:'Strengths & Motivation',
+        score: num('SM_score'), stage: get('SM_stage',''),
+        expression: get('SM_expression',''), summary: get('SM_summary',''),
+        emotions: get('SM_emotions',''), question: get('SM_question',''), action: get('SM_action','') },
+      { code:'ID', kr:'정체감·역할통합', en:'Identity Integration',
+        score: num('ID_score'), stage: get('ID_stage',''),
+        expression: get('ID_expression',''), summary: get('ID_summary',''),
+        emotions: get('ID_emotions',''), question: get('ID_question',''), action: get('ID_action','') },
+      { code:'RS', kr:'관계 자원', en:'Relational Support',
+        score: num('RS_score'), stage: get('RS_stage',''),
+        expression: get('RS_expression',''), summary: get('RS_summary',''),
+        emotions: get('RS_emotions',''), question: get('RS_question',''), action: get('RS_action','') },
+      { code:'VA', kr:'가치·의미', en:'Values Alignment',
+        score: num('VA_score'), stage: get('VA_stage',''),
+        expression: get('VA_expression',''), summary: get('VA_summary',''),
+        emotions: get('VA_emotions',''), question: get('VA_question',''), action: get('VA_action','') },
+      { code:'SC', kr:'자기연민', en:'Self-Compassion',
+        score: num('SC_score'), stage: get('SC_stage',''),
+        expression: get('SC_expression',''), summary: get('SC_summary',''),
+        emotions: get('SC_emotions',''), question: get('SC_question',''), action: get('SC_action','') },
+      { code:'VG', kr:'비전·성장의지', en:'Vision & Growth',
+        score: num('VG_score'), stage: get('VG_stage',''),
+        expression: get('VG_expression',''), summary: get('VG_summary',''),
+        emotions: get('VG_emotions',''), question: get('VG_question',''), action: get('VG_action','') },
+      { code:'TP', kr:'시간·우선순위', en:'Time & Priority',
+        score: num('TP_score'), stage: get('TP_stage',''),
+        expression: get('TP_expression',''), summary: get('TP_summary',''),
+        emotions: get('TP_emotions',''), question: get('TP_question',''), action: get('TP_action','') },
+      { code:'LS', kr:'삶의 만족도', en:'Life Satisfaction',
+        score: num('LS_score'), stage: get('LS_stage',''),
+        expression: get('LS_expression',''), summary: get('LS_summary',''),
+        emotions: get('LS_emotions',''), question: get('LS_question',''), action: get('LS_action','') },
+    ]
+  };
+}
+
+function stageClass(stage) {
+  const s = (stage || '').charAt(0).toUpperCase();
+  return 'stage-' + (s || 'C');
+}
+
+function stageLabel(stage) {
+  const map = {
+    'A': 'Flowing Harmony', 'B': 'Balanced Awareness',
+    'C': 'Transitional Flow', 'D': 'Fragmented Rhythm', 'E': 'Silent Exhaustion'
+  };
+  return map[stage] || stage;
+}
+
+function pct(score) {
+  return Math.round((score / 5) * 100);
+}
+
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function dismissLoading() {
+  const el = document.getElementById('loading-screen');
+  if (!el) return;
+  el.classList.add('hide');
+  document.body.classList.remove('loading');
+  setTimeout(() => el.remove(), 450);
+}
+
+function showLoadingError(title, sub) {
+  const el = document.getElementById('loading-screen');
+  if (el) {
+    el.innerHTML = `
+      <div class="loading-brand">momstone</div>
+      <div style="text-align:center;margin-top:8px;">
+        <div style="font-size:17px;font-weight:500;color:rgba(255,255,255,0.85);margin-bottom:8px;">${title}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.4);line-height:1.7;">${sub}</div>
+      </div>
+    `;
+  }
+}
+
+async function render() {
+  const params = new URLSearchParams(window.location.search);
+  const row = params.get('row');
+
+  let d;
+
+  if (row) {
+    for (let attempt = 0; attempt < 10; attempt++) {
+      try {
+        const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}`);
+        const json = await res.json();
+        if (json.result !== 'success') throw new Error(json.message);
+        d = parseData(json.data);
+        break;
+      } catch(err) {
+        showLoadingError('데이터를 불러올 수 없어요', err.message);
+        return;
+      }
+    }
+
+    if (!d) {
+      showLoadingError('리포트 준비 중이에요', '잠시 후 페이지를 새로고침해주세요.');
+      return;
+    }
+  } else {
+    // row 파라미터 없음 — 로딩 화면 유지
+    return;
+  }
+
+  const labels = d.domains.map(dom => dom.kr.split('·')[0].trim());
+  const scores = d.domains.map(dom => dom.score);
+
+  const clusters = [
+    { name: 'Emotional Flow', kr: '감정·에너지', score: d.ef_score, summary: d.ef_summary },
+    { name: 'Resilience Flow', kr: '회복·정체감', score: d.rf_score, summary: d.rf_summary },
+    { name: 'Meaning Flow', kr: '의미·만족', score: d.mf_score, summary: d.mf_summary },
+    { name: 'Energy Index', kr: '에너지 지수', score: d.ei_score, summary: d.ei_summary },
+  ];
+
+  document.getElementById('app').innerHTML = `
+
+    <!-- COVER -->
+    <div class="cover">
+      <div class="cover-inner">
+        <div class="cover-eyebrow">Momstone × AP어린이집</div>
+        <div class="cover-title">
+          <strong>${esc(d.name)}</strong>님의<br>리듬 미리보기
+        </div>
+        <div class="cover-divider"></div>
+        <div class="cover-desc">
+          지금 나의 리듬에서 가장 신호를 보내는 영역을 확인해요.<br>
+          오늘 세션에서 코치와 함께 들여다볼 거예요.
+        </div>
+        <div class="cover-meta">
+          <div class="cover-meta-item">
+            <div class="cover-meta-label">Date</div>
+            <div class="cover-meta-value">${esc(d.date)}</div>
+          </div>
+          <div class="cover-meta-item">
+            <div class="cover-meta-label">Program</div>
+            <div class="cover-meta-value">AP 부모 코칭</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7;">
+          ※ 이 결과는 오늘 세션을 위한 참고 자료입니다.
+        </div>
+      </div>
+    </div>
+
+    <!-- 주목할 영역 -->
+    <div class="section">
+      <div class="section-label">지금 주목할 영역</div>
+      <div class="section-title">가장 먼저 들여다볼 곳</div>
+      <div class="section-sub">지금 가장 신호를 보내고 있는 영역이에요.</div>
+
+      ${d.lowest ? `
+      <div class="highlight-card low" style="margin-bottom:16px;">
+        <div class="highlight-label">지금 주목할 영역</div>
+        <div class="highlight-title">${esc(d.lowest)}</div>
+        <div class="highlight-text">지금 11개 영역 중 이 영역이 가장 강하게 신호를 보내고 있어요. 오늘 세션에서 코치와 함께 이 영역을 중심으로 이야기 나눠요.</div>
+      </div>` : ''}
+
+      ${d.reset_point ? `
+      <div class="highlight-card reset">
+        <div class="highlight-label">Reset Point · ${esc(d.reset_point)}</div>
+        <div class="highlight-title">${esc(d.reset_reason.split('—')[0] || d.reset_point)}</div>
+        <div class="highlight-text" style="margin-bottom:14px;">${esc(d.reset_reason)}</div>
+        ${d.reset_signal ? `<div class="highlight-text" style="font-style:italic;opacity:0.8;">${esc(d.reset_signal)}</div>` : ''}
+        ${d.reset_action ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(184,143,126,0.3);">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--rose-dark);margin-bottom:8px;font-weight:700;">오늘의 액션</div>
+          <div class="highlight-text">${esc(d.reset_action)}</div>
+        </div>` : ''}
+      </div>` : ''}
+    </div>
+
+    <!-- Professional Note -->
+    <div style="max-width:600px;margin:0 auto 48px;padding:20px 24px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:#f8f5f3;">
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#b88f7e;font-weight:700;margin-bottom:10px;text-align:center;">― Professional Note ―</div>
+      <p style="font-size:12px;color:#666;line-height:1.9;text-align:center;">
+        본 결과는 의학적·임상적 판단이나 처방을 대신하지 않으며,<br>
+        응답 시점에서 경험한 '현재의 리듬 상태'를 반영한 참고 자료입니다.<br>
+        이 리포트는 진단이나 결론이 아니라,<br>
+        지금의 나를 이해하고 돌보는 방향을 탐색하기 위한 하나의 출발점으로 활용해 주세요.
+      </p>
+    </div>
+
+    <footer>
+      <div class="footer-brand">momstone</div>
+      <div class="footer-copy">© 2026 Momstone. All rights reserved.</div>
+    </footer>
+  `
+
+  dismissLoading();
+}
+
+render();
+
+
+</script>
+</body>
+</html>
