@@ -803,15 +803,20 @@ const BAND_NAMES = {
 // ─── ACCESS GATE ─────────────────────────────────────────────────────────────
 function checkGate() {
   const val = document.getElementById('gate-input').value.trim();
+
   if (val === ACCESS_TOKEN) {
     document.getElementById('gate').style.display = 'none';
+
     const params = new URLSearchParams(window.location.search);
-    const row = params.get('row');
-    if (row) {
+    const assessmentId = params.get('id');
+    const accessToken = params.get('accessToken');
+
+    if (assessmentId && accessToken) {
       document.getElementById('loading-screen').style.display = 'flex';
-      loadReport(parseInt(row));
+      loadReport(assessmentId, accessToken);
     } else {
-      document.getElementById('app').innerHTML = '<div style="padding:60px;text-align:center;color:#888;">No row parameter in URL. Use ?row=XX&token=momstone2026</div>';
+      document.getElementById('app').innerHTML =
+        '<div style="padding:60px;text-align:center;color:#888;">Missing report credentials.</div>';
       document.getElementById('app').style.display = 'block';
       document.getElementById('topbar').style.display = 'flex';
     }
@@ -827,12 +832,16 @@ document.getElementById('gate-input').addEventListener('keydown', e => {
 // Auto-check token in URL
 (function() {
   const params = new URLSearchParams(window.location.search);
+
   if (params.get('token') === ACCESS_TOKEN) {
     document.getElementById('gate').style.display = 'none';
-    const row = params.get('row');
-    if (row) {
+
+    const assessmentId = params.get('id');
+    const accessToken = params.get('accessToken');
+
+    if (assessmentId && accessToken) {
       document.getElementById('loading-screen').style.display = 'flex';
-      loadReport(parseInt(row));
+      loadReport(assessmentId, accessToken);
     }
   }
 })();
@@ -841,16 +850,29 @@ document.getElementById('gate-input').addEventListener('keydown', e => {
 function get(d, k, fallback='') { return d[k] !== undefined && d[k] !== '' ? d[k] : fallback; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-async function loadReport(row) {
+async function loadReport(assessmentId, accessToken) {
   try {
-    const lang = new URLSearchParams(window.location.search).get('lang') === 'en' ? 'en' : 'ko';
-    const res = await fetch(`${APPS_SCRIPT_URL}?row=${row}&lang=${lang}`);
+    const params = new URLSearchParams(window.location.search);
+    const lang = params.get('lang') === 'en' ? 'en' : 'ko';
+
+    const apiParams = new URLSearchParams({
+      id: assessmentId,
+      accessToken: accessToken,
+      lang: lang
+    });
+
+    const res = await fetch(`${APPS_SCRIPT_URL}?${apiParams.toString()}`);
     const json = await res.json();
-    if (json.result !== 'success') throw new Error(json.message);
-    renderReport(json.data, row);
+
+    if (json.result !== 'success') {
+      throw new Error(json.message || 'Unable to load report');
+    }
+
+    renderReport(json.data);
   } catch(err) {
     document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('app').innerHTML = `<div style="padding:60px;text-align:center;color:#888;">Unable to load report: ${err.message}</div>`;
+    document.getElementById('app').innerHTML =
+      `<div style="padding:60px;text-align:center;color:#888;">Unable to load report: ${err.message}</div>`;
     document.getElementById('app').style.display = 'block';
     document.getElementById('topbar').style.display = 'flex';
   }
