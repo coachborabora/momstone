@@ -1034,10 +1034,20 @@ const CLUSTERS = [
 
 let radarChart = null;
 
-async function loadData() {
+async function loadData(secret) {
   dismissLoading();
+
   try {
-    const res = await fetch(`${APPS_SCRIPT_URL}?dashboard=true`);
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify({
+        action: 'dashboard',
+        secret: secret
+      })
+    });
     const json = await res.json();
     if (json.result !== 'success') throw new Error(json.message);
     if (json.data && json.data.length > 0) {
@@ -1398,25 +1408,31 @@ function findPairs(rows, emailMap) {
 
 function dismissLoading() {
   const el = document.getElementById('loading');
-  if (!el) return; // 이미 제거된 경우 무시
+  if (!el) return;
+
   el.classList.add('hide');
+
   setTimeout(() => {
     if (el.parentNode) el.remove();
-    // 로딩 완료 후 비밀번호 체크
-    const saved = sessionStorage.getItem('momstone_dash_auth');
-    if (saved !== 'ok') {
-      const pw = prompt('Momstone 코치 대시보드\n\n비밀번호를 입력해주세요.');
-      if (pw === 'momstone2026') {
-        sessionStorage.setItem('momstone_dash_auth', 'ok');
-      } else {
-        document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Satoshi,sans-serif;color:#888;font-size:14px;">접근 권한이 없어요.</div>';
-      }
-    }
   }, 450);
 }
 
+async function startDashboard() {
+  const secret = prompt(
+    'Momstone 코치 대시보드\n\n비밀번호를 입력해주세요.'
+  );
+
+  if (!secret) {
+    document.body.innerHTML =
+      '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Satoshi,sans-serif;color:#888;font-size:14px;">접근 권한이 없어요.</div>';
+    return;
+  }
+
+  await loadData(secret);
+}
+
 // 시작
-loadData();
+startDashboard();
 </script>
 
 </body>
